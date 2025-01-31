@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Sleeper</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script>
+        console.log('CSS carregado com sucesso!');
+    </script>
+</head>
+<body>
+    <!-- Botões laterais (desktop) -->
+    <div id="sidebar">
+        <button id="btn-ranking" class="active">Ranking</button>
+        <button id="btn-campeoes">Campeões</button>
+    </div>
+
+    <!-- Container principal -->
+    <div id="main-content">
+        <!-- Indicador de carregamento -->
+        <div id="loading-indicator" class="hidden">
+            <p>Carregando dados...</p>
+        </div>
+
+        <!-- Tabelas de ranking (visível por padrão) -->
+        <div id="tables-container">
+            <!-- Tabela da esquerda -->
+            <div id="ranking-container-left">
+                <h2>AMBO 1ª Divisão</h2>
+                <table id="ranking-table-left">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th></th>
+                            <th>Nome</th>
+                            <th>Pontos</th>
+                            <th>PF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- As linhas serão preenchidas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tabela da direita -->
+            <div id="ranking-container-right">
+                <h2>AMBO 2ª Divisão</h2>
+                <table id="ranking-table-right">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th></th>
+                            <th>Nome</th>
+                            <th>Pontos</th>
+                            <th>PF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- As linhas serão preenchidas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabela de campeões (oculta por padrão) -->
+        <div id="campeoes-container" class="hidden">
+            <h2>Campeões</h2>
+            <table id="campeoes-table">
+                <thead>
+                    <tr>
+                        <th>Ano</th>
+                        <th>AMBO Keeper</th>
+                        <th>AMBO Série A</th>
+                        <th>AMBO Série B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2024</td>
+                        <td>Jptavares</td>
+                        <td>dedebenjor</td>
+                        <td>Jptavares</td>
+                    </tr>
+                    <tr>
+                        <td>2023</td>
+                        <td>GuiZilse</td>
+                        <td>L_Bezerra</td>
+                        <td>Jotaa</td>
+                    </tr>
+                    <tr>
+                        <td>2022</td>
+                        <td>rafastein</td>
+                        <td>SCPATRIOTS</td>
+                        <td>DanHen</td>
+                    </tr>
+                    <tr>
+                        <td>2021</td>
+                        <td>CanelaShow</td>
+                        <td>SCPATRIOTS</td>
+                        <td>dedebenjor</td>
+                    </tr>
+                    <tr>
+                        <td>2020</td>
+                        <td>Bucs da Massa</td>
+                        <td>rdfseabra</td>
+                        <td>fabiofirmo</td>
+                    </tr>
+                    <tr>
+                        <td>2019</td>
+                        <td>Jotaa</td>
+                        <td>SCPATRIOTS</td>
+                        <td>Miranda12s</td>
+                    </tr>
+                    <tr>
+                        <td>2018</td>
+                        <td>Olinda Falcons</td>
+                        <td>rafastein</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>2017</td>
+                        <td>-</td>
+                        <td>DanHen</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="scripts/main.js"></script>
+</body>
+</html>
