@@ -1,0 +1,571 @@
+:root {
+    --primary-color: #4A90E2;
+    --secondary-color: #357ABD;
+    --background-color: #1a1a2e;
+    --text-color: #ffffff;
+    --font-family: 'Poppins', sans-serif;
+    --table-header-color: #0f3460;
+    --table-row-hover-color: #293142;
+    --border-radius: 0.75rem;
+    --box-shadow: 0 0.25rem 0.9375rem rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos globais */
+html {
+    font-size: 16px;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.5;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 1.25rem;
+}
+
+/* Layout principal */
+#container {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    max-width: 120rem;
+    margin: 0 auto;
+}
+
+/* Indicador de carregamento */
+#loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: var(--text-color);
+    padding: 1.25rem;
+    border-radius: 0.3125rem;
+    font-size: 1.125rem;
+    z-index: 9999;
+    display: none;
+}
+
+/* Sidebar */
+#sidebar {
+    width: 10rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding: 0.9375rem;
+    background-color: #16213e;
+    border-radius: var(--border-radius);
+    margin-right: 0.9375rem;
+    box-shadow: var(--box-shadow);
+}
+
+#sidebar button {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--text-color);
+    border: none;
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#sidebar button:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.1875rem 0.625rem rgba(74, 144, 226, 0.4);
+}
+
+#sidebar button.active {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    box-shadow: 0 0 0.5rem rgba(40, 167, 69, 0.6);
+}
+
+/* Textos dos anos */
+.year-group span {
+    color: var(--text-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    margin: 0.625rem 0 0.1875rem 0;
+}
+
+/* Grupos de anos */
+.year-group {
+    border: 0.125rem solid var(--primary-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1875rem;
+}
+
+/* Container principal */
+#main-content {
+    flex: 1;
+    background-color: #16213e;
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Títulos */
+h1,
+h2 {
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 0.625rem;
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+h2 {
+    font-size: 1.375rem;
+    font-weight: 500;
+}
+
+/* Container das tabelas */
+#tables-container {
+    display: flex;
+    width: 100%;
+    padding: 0 1.25rem;
+    flex: 1;
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+#tables-container.active {
+    height: auto;
+}
+
+/* Contêineres individuais das tabelas */
+#combined-table-container,
+#ranking-container-left,
+#ranking-container-right {
+    background-color: #293142;
+    padding: 0.3125rem;
+    border-radius: 0.625rem;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin: 0 0.3125rem;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Remover a margem do primeiro e último item */
+#tables-container > div:first-child {
+    margin-left: 0;
+}
+
+#tables-container > div:last-child {
+    margin-right: 0;
+}
+
+/* Oculta os contêineres individualmente quando a seção de tabelas não está ativa */
+#tables-container:not(.active) #combined-table-container,
+#tables-container:not(.active) #ranking-container-left,
+#tables-container:not(.active) #ranking-container-right {
+    display: none;
+}
+
+/* Estilos para a mensagem de erro */
+#error-message {
+    color: #ff4d4d;
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px solid #ff4d4d;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+/* Tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #16213e;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    font-size: 0.875rem;
+    display: block;
+    table-layout: fixed; /* Adicionado */
+}
+
+table th,
+table td {
+    padding: 0.5rem !important;
+    text-align: center;
+    border-bottom: 1px solid #3e4452;
+    font-size: 0.75rem;
+    height: 1.875rem !important;
+}
+
+table th {
+    background-color: var(--table-header-color);
+    color: var(--text-color);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    min-height: 1.875rem;
+    height: auto;
+    line-height: 1.2;
+}
+
+table tr:hover {
+    background-color: var(--table-row-hover-color);
+    transition: background-color 0.3s ease;
+}
+
+/* Avatares */
+.avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+    vertical-align: middle;
+    margin-right: 0.25rem;
+}
+
+/* Ajusta a célula que contém o avatar */
+.avatar-cell {
+    text-align: center;
+}
+
+/* Ajusta a célula que contém o nome do time */
+.team-name-cell {
+    text-align: left;
+    padding-left: 0.25rem;
+}
+
+/* Seção de campeões */
+#campeoes-container {
+    margin-top: 1.25rem;
+    background-color: #293142;
+    padding: 1.25rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    text-align: center;
+}
+
+/* Remove a margem esquerda em telas menores */
+@media (max-width: 768px) {
+    #campeoes-container {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+#campeoesTable {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background-color: #16213e;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    display: table;
+    table-layout: fixed;
+}
+
+#campeoesTable th {
+    background-color: var(--table-header-color);
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+#campeoesTable td {
+    font-size: 0.75rem;
+    height: 1.875rem;
+}
+
+#campeoesTable th,
+#campeoesTable td {
+    padding: 0.375rem;
+    text-align: center;
+    border-bottom: 1px solid #3e4452;
+    font-size: 0.75rem;
+    height: 1.875rem;
+    display: table-cell;
+}
+
+#campeoesTable tbody tr:hover {
+    background-color: var(--table-row-hover-color);
+    transition: background-color 0.3s ease;
+}
+
+/* Esconde a seção de ranking combinado e tabelas das ligas por padrão */
+.hidden {
+    display: none;
+}
+
+/* Ajusta o tamanho das tabelas e centraliza a tabela de ranking combinado */
+#combined-table-container {
+    max-width: 100%;
+    margin: 0 0;
+    padding: 0;
+    background-color: #293142;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex: 1; /* Garante que ocupe todo o espaço horizontal restante */
+}
+
+#combinedTable {
+    width: auto;
+    border-collapse: collapse;
+    background-color: #16213e;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    font-size: 0.675rem;
+    display: block;
+    table-layout: fixed;
+}
+
+#combinedTable th,
+#combinedTable td {
+    padding: 0.375rem;
+    text-align: center;
+    border-bottom: 1px solid #3e4452;
+    font-size: 0.75rem;
+    height: 1.875rem;
+}
+
+/* Impede a quebra de palavras nos cabeçalhos da tabela combinada */
+#combinedTable th {
+    white-space: nowrap;
+}
+
+#combinedTable th {
+    background-color: var(--table-header-color);
+    color: var(--text-color);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    min-height: 1.875rem;
+    height: auto;
+    line-height: 1.2;
+}
+
+#combinedTable tbody tr:hover {
+    background-color: var(--table-row-hover-color);
+    transition: background-color 0.3s ease;
+}
+
+/* Estilos para as linhas de ranking */
+.first-place {
+    background-color: #FFFF00;
+    color: #022550;
+}
+
+.second-place {
+    background-color: #C0C0C0;
+    color: #022550;
+}
+
+.third-place {
+    background-color: #CD7F32;
+    color: #022550;
+}
+
+.bottom-three {
+    background-color: #FF0000;
+}
+
+/* Estilos para as tabelas (Liga 1 e Liga 2) */
+#table1,
+#table2 {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Larguras das colunas das tabelas Liga 1 e Liga 2 */
+#table1 th:nth-child(1),
+#table1 td:nth-child(1),
+#table2 th:nth-child(1),
+#table2 td:nth-child(1) {
+    width: 10%;
+}
+
+#table1 th:nth-child(2),
+#table1 td:nth-child(2),
+#table2 th:nth-child(2),
+#table2 td:nth-child(2) {
+    width: 15%;
+}
+
+#table1 th:nth-child(3),
+#table1 td:nth-child(3),
+#table2 th:nth-child(3),
+#table2 td:nth-child(3) {
+    width: 45%;
+}
+
+#table1 th:nth-child(4),
+#table1 td:nth-child(4),
+#table2 th:nth-child(4),
+#table2 td:nth-child(4) {
+    width: 20%;
+}
+
+#table1 th:nth-child(5),
+#table1 td:nth-child(5),
+#table2 th:nth-child(5),
+#table2 td:nth-child(5) {
+    width: 10%;
+}
+
+/* Larguras das colunas da tabela de Ranking Combinado */
+#combinedTable th:nth-child(1),
+#combinedTable td:nth-child(1) {
+    width: 5%;
+}
+
+#combinedTable th:nth-child(2),
+#combinedTable td:nth-child(2) {
+    width: 10%;
+}
+
+#combinedTable th:nth-child(3),
+#combinedTable td:nth-child(3) {
+    width: 40%;
+}
+
+#combinedTable th:nth-child(4),
+#combinedTable td:nth-child(4) {
+    width: 15%;
+}
+
+#combinedTable th:nth-child(5),
+#combinedTable td:nth-child(5) {
+    width: 15%;
+    word-break: break-word; /* Permite a quebra de palavras */
+}
+
+#combinedTable th:nth-child(6),
+#combinedTable td:nth-child(6) {
+    width: 15%;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+
+    /* Estilos para o menu hamburger */
+    .hamburger {
+        display: block;
+        /* Garante que o botão hamburger seja visível */
+        position: fixed;
+        top: 1.25rem;
+        left: 1.25rem;
+        z-index: 1001;
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        font-size: 1.5rem;
+    }
+
+    #hamburger-menu-content {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 80%;
+        /* Ajuste a largura conforme necessário */
+        height: 100%;
+        background-color: #16213e;
+        padding: 1.25rem;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        /* Adicionado para lidar com conteúdo longo */
+    }
+
+    #hamburger-menu-content.active {
+        transform: translateX(0);
+    }
+}
+
+/* Hamburger */
+.hamburger {
+    display: none;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    position: fixed;
+    top: 1.25rem;
+    left: 1.25rem;
+    z-index: 1001;
+}
+
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+    }
+
+    #sidebar,
+    #hamburger-menu-content {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 15.625rem;
+        height: 100%;
+        background-color: #16213e;
+        padding: 1.25rem;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    #sidebar.active,
+    #hamburger-menu-content.active {
+        transform: translateX(0);
+    }
+
+    #hamburger-menu-content.active::before,
+    #sidebar.active::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
+
+    #sidebar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
