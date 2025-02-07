@@ -314,6 +314,21 @@ table tr:hover {
     transition: background-color 0.3s ease;
 }
 
+/* Define a largura das colunas da tabela de campeões */
+#campeoesTable th:nth-child(1),
+#campeoesTable td:nth-child(1) {
+    width: 10%; /* Ano */
+}
+
+#campeoesTable th:nth-child(2),
+#campeoesTable td:nth-child(2),
+#campeoesTable th:nth-child(3),
+#campeoesTable td:nth-child(3),
+#campeoesTable th:nth-child(4),
+#campeoesTable td:nth-child(4) {
+    width: 30%; /* AMBO Keeper, AMBO Série A, AMBO Série B */
+}
+
 /* Esconde a seção de ranking combinado e tabelas das ligas por padrão */
 .hidden {
     display: none;
@@ -322,8 +337,8 @@ table tr:hover {
 /* Ajusta o tamanho das tabelas e centraliza a tabela de ranking combinado */
 #combined-table-container {
     max-width: 100%;
-    margin: 0 0;
-    padding: 0;
+    margin: 0 0.3125rem;
+    padding: 0.625rem;
     background-color: #293142;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -334,13 +349,13 @@ table tr:hover {
 }
 
 #combinedTable {
-    width: auto;
+    width: 100%;
     border-collapse: collapse;
     background-color: #16213e;
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--box-shadow);
-    font-size: 0.675rem;
+    font-size: 0.875rem;
     display: block;
     table-layout: fixed;
 }
@@ -374,6 +389,38 @@ table tr:hover {
 #combinedTable tbody tr:hover {
     background-color: var(--table-row-hover-color);
     transition: background-color 0.3s ease;
+}
+
+/* Larguras das colunas da tabela de Ranking Combinado */
+#combinedTable th:nth-child(1),
+#combinedTable td:nth-child(1) {
+    width: 5%; /* Rank */
+}
+
+#combinedTable th:nth-child(2),
+#combinedTable td:nth-child(2) {
+    width: 10%; /* Avatar */
+}
+
+#combinedTable th:nth-child(3),
+#combinedTable td:nth-child(3) {
+    width: 30%; /* Time */
+}
+
+#combinedTable th:nth-child(4),
+#combinedTable td:nth-child(4) {
+    width: 15%; /* Pontos */
+}
+
+#combinedTable th:nth-child(5),
+#combinedTable td:nth-child(5) {
+    width: 15%; /* Melhor Posição */
+}
+
+#combinedTable th:nth-child(6),
+#combinedTable td:nth-child(6) {
+    width: 25%; /* Fpts */
+    word-break: break-word; /* Permite a quebra de palavras */
 }
 
 /* Estilos para as linhas de ranking */
@@ -437,38 +484,6 @@ table tr:hover {
 #table2 th:nth-child(5),
 #table2 td:nth-child(5) {
     width: 10%;
-}
-
-/* Larguras das colunas da tabela de Ranking Combinado */
-#combinedTable th:nth-child(1),
-#combinedTable td:nth-child(1) {
-    width: 5%;
-}
-
-#combinedTable th:nth-child(2),
-#combinedTable td:nth-child(2) {
-    width: 10%;
-}
-
-#combinedTable th:nth-child(3),
-#combinedTable td:nth-child(3) {
-    width: 40%;
-}
-
-#combinedTable th:nth-child(4),
-#combinedTable td:nth-child(4) {
-    width: 15%;
-}
-
-#combinedTable th:nth-child(5),
-#combinedTable td:nth-child(5) {
-    width: 15%;
-    word-break: break-word; /* Permite a quebra de palavras */
-}
-
-#combinedTable th:nth-child(6),
-#combinedTable td:nth-child(6) {
-    width: 15%;
 }
 
 /* Responsividade */
