@@ -93,6 +93,23 @@ document.addEventListener('DOMContentLoaded', function () {
             hamburgerMenuContent.appendChild(clonedElement);
         }
 
+        // Configuração dos botões do menu hamburger (AGORA DENTRO DA FUNÇÃO)
+        for (const year in leagueIds) {
+            for (const serie in leagueIds[year]) {
+                const buttonId = `btn${serie.charAt(0).toUpperCase() + serie.slice(1)}${year}Hamburger`;
+                setupLeagueButton(buttonId, leagueIds[year][serie]);
+            }
+        }
+
+        //Event listeners para o botão de campeões (AGORA DENTRO DA FUNÇÃO)
+        const btnCampeoesHamburger = document.getElementById('btnCampeoesHamburger');
+        if (btnCampeoesHamburger) {
+            btnCampeoesHamburger.addEventListener('click', function () {
+                setActiveButton(this);
+                showCampeoesTable();
+            });
+        }
+
     }
 
     // Chama a função para copiar o conteúdo inicialmente
@@ -108,15 +125,6 @@ document.addEventListener('DOMContentLoaded', function () {
         characterData: true
     });
 
-    // Event listeners para os botões da sidebar e menu hamburger (Campeões)
-    const btnCampeoes = document.getElementById('btnCampeoes');
-    if (btnCampeoes) {
-        btnCampeoes.addEventListener('click', function () {
-            setActiveButton(this);
-            showCampeoesTable();
-        });
-    }
-
     // Variáveis globais
     hamburgerMenu = document.getElementById('hamburger-menu');
     sidebarMenu = document.getElementById('sidebar'); // Renomeado para evitar confusão
@@ -129,6 +137,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
    }
     // Função para abrir e fechar o menu hamburger
+
+    // Função para fechar o menu hamburger
     function closeHamburgerMenu() {
         if (window.innerWidth <= 768) {
             sidebarMenu.classList.remove('active');
@@ -136,6 +146,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Event listeners para os botões da sidebar e menu hamburger (Campeões)
+    const btnCampeoes = document.getElementById('btnCampeoes');
+    if (btnCampeoes) {
+        btnCampeoes.addEventListener('click', function () {
+            setActiveButton(this);
+            showCampeoesTable();
+        });
+    }
     // Exibe a tabela de campeões ao carregar a página
     function showCampeoesTable() {
         console.log("Exibindo a tabela de campeões");
@@ -161,5 +179,4 @@ document.addEventListener('DOMContentLoaded', function () {
             setupLeagueButton(hamburgerButtonId, leagueIds[year][serie]);
         }
     }
-
 });
