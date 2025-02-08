@@ -451,56 +451,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Função para copiar o conteúdo da sidebar para o menu hamburger
-    function copySidebarContent() {
-        const sidebar = document.getElementById('sidebar');
-        hamburgerMenuContent = document.getElementById('hamburger-menu-content');
-
-        // Limpa o conteúdo existente do menu hamburger
-        hamburgerMenuContent.innerHTML = '';
-
-        // Clona os elementos da sidebar e adiciona ao menu hamburger
-        const sidebarChildren = sidebar.children;
-        for (let i = 0; i < sidebarChildren.length; i++) {
-            const clonedElement = sidebarChildren[i].cloneNode(true);
-            hamburgerMenuContent.appendChild(clonedElement);
-        }
-
-    }
-
-    // Chama a função para copiar o conteúdo inicialmente
-    copySidebarContent();
-
-    // Adiciona um MutationObserver para atualizar o menu hamburger sempre que a sidebar for alterada
-    const sidebar = document.getElementById('sidebar');
-    const observer = new MutationObserver(copySidebarContent);
-    observer.observe(sidebar, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        characterData: true
-    });
-
-    // Variáveis globais
-    hamburgerMenu = document.getElementById('hamburger-menu');
-    sidebarMenu = document.getElementById('sidebar'); // Renomeado para evitar confusão
-    hamburgerMenuContent = document.getElementById('hamburger-menu-content');
-
-   if (hamburgerMenu && sidebarMenu && hamburgerMenuContent) {
-        hamburgerMenu.addEventListener('click', function () {
-            console.log("Hamburger menu clicked!"); // Adicione este log
-            sidebarMenu.classList.toggle('active');
-            hamburgerMenuContent.classList.toggle('active');
+   //Função do menu hamburger
+        hamburgerMenu = document.getElementById(HAMBURGER_MENU_ID);
+        sidebarMenu = document.getElementById(SIDEBAR_ID);
+        hamburgerMenuContent = document.getElementById(HAMBURGER_MENU_CONTENT_ID);
+   if(hamburgerMenu && sidebarMenu && hamburgerMenuContent){
+          hamburgerMenu.addEventListener('click', function () {
+        console.log("Hamburger menu clicked!");
+        sidebarMenu.classList.toggle('active');
+        hamburgerMenuContent.classList.toggle('active');
         });
-    }
-
-    // Função para abrir e fechar o menu hamburger
-    function closeHamburgerMenu() {
-        if (window.innerWidth <= 768) {
-            sidebarMenu.classList.remove('active');
-            hamburgerMenuContent.classList.remove('active');
+   }
+   // Função para abrir e fechar o menu hamburger
+        function closeHamburgerMenu() {
+            if (window.innerWidth <= 768) {
+                sidebarMenu.classList.remove('active');
+                hamburgerMenuContent.classList.remove('active');
+            }
         }
-    }
 
     // Event listeners para os botões da sidebar e menu hamburger (Campeões)
     if (document.getElementById('btnCampeoes')) {
@@ -512,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function () {
    if (document.getElementById('btnCampeoesHamburger')) {
           document.getElementById('btnCampeoesHamburger').addEventListener('click', function () {
             setActiveButton(this);
-           showCampeoesTable();
+            showCampeoesTable();
         });
    }
 
@@ -542,16 +510,32 @@ document.addEventListener('DOMContentLoaded', function () {
             setupLeagueButton(hamburgerButtonId, leagueIds[year][serie]);
         }
     }
+     // Função para copiar o conteúdo da sidebar para o menu hamburger
+     function copySidebarContent() {
+         const sidebar = document.getElementById('sidebar');
+         hamburgerMenuContent = document.getElementById('hamburger-menu-content');
 
-    // Certifique-se de que os elementos hamburgerMenu, sidebarMenu e hamburgerMenuContent existem
-    if (hamburgerMenu && sidebarMenu && hamburgerMenuContent) {
-        // Adicione um ouvinte de evento ao botão do menu hamburger
-        hamburgerMenu.addEventListener('click', function () {
-            console.log("Hamburger menu clicked!");
-            sidebarMenu.classList.toggle('active');
-            hamburgerMenuContent.classList.toggle('active');
-        });
-    } else {
-        console.warn("Um ou mais elementos do menu hamburger não foram encontrados.");
-    }
+         // Limpa o conteúdo existente do menu hamburger
+         hamburgerMenuContent.innerHTML = '';
+
+         // Clona os elementos da sidebar e adiciona ao menu hamburger
+         const sidebarChildren = sidebar.children;
+         for (let i = 0; i < sidebarChildren.length; i++) {
+             const clonedElement = sidebarChildren[i].cloneNode(true);
+             hamburgerMenuContent.appendChild(clonedElement);
+         }
+     }
+
+     // Chama a função para copiar o conteúdo inicialmente
+     copySidebarContent();
+
+     // Adiciona um MutationObserver para atualizar o menu hamburger sempre que a sidebar for alterada
+     const sidebar = document.getElementById('sidebar');
+     const observer = new MutationObserver(copySidebarContent);
+     observer.observe(sidebar, {
+         childList: true,
+         subtree: true,
+         attributes: true,
+         characterData: true
+     });
 });
