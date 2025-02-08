@@ -400,11 +400,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedOption = this.options[this.selectedIndex];
         const action = selectedOption.dataset.action;
 
+        console.log("Opção selecionada:", selectedOption);
+        console.log("Ação:", action);
+
         if (action === 'showCampeoesTable') {
+            console.log("Mostrar tabela de campeões");
             showCampeoesTable();
         } else if (action === 'loadLeagueData') {
             const leagueIdsString = selectedOption.dataset.leagueIds;
             const leagueIds = leagueIdsString.split(',');
+            console.log("IDs das ligas:", leagueIds);
             loadLeagueData(leagueIds);
         }
     });
