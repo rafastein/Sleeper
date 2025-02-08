@@ -1,3 +1,5 @@
+let hamburgerMenu, sidebarMenu, hamburgerMenuContent;
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // Constantes
@@ -59,9 +61,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     const leagueData = []; // Armazena os dados das ligas
-
-    // Exibe a tabela de campeões ao carregar a página
-    showCampeoesTable();
 
     // Função genérica para configurar os botões das ligas
     function setupLeagueButton(buttonId, leagueIds) {
@@ -477,17 +476,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const sidebarMenu = document.getElementById('sidebar'); // Renomeado para evitar confusão
     const hamburgerMenuContent = document.getElementById('hamburger-menu-content');
 
-    hamburgerMenu.addEventListener('click', function () {
-        console.log("Hamburger menu clicked!"); // Adicione este log
-        sidebarMenu.classList.toggle('active');
-        hamburgerMenuContent.classList.toggle('active');
-    });
+   if (hamburgerMenu && sidebarMenu && hamburgerMenuContent) {
+        hamburgerMenu.addEventListener('click', function () {
+            console.log("Hamburger menu clicked!"); // Adicione este log
+            sidebarMenu.classList.toggle('active');
+            hamburgerMenuContent.classList.toggle('active');
+        });
 
-    // Função para fechar o menu hamburger
-    function closeHamburgerMenu() {
-        if (window.innerWidth <= 768) {
-            sidebarMenu.classList.remove('active');
-            hamburgerMenuContent.classList.remove('active');
+        // Função para fechar o menu hamburger
+        function closeHamburgerMenu() {
+            if (window.innerWidth <= 768) {
+                sidebarMenu.classList.remove('active');
+                hamburgerMenuContent.classList.remove('active');
+            }
         }
     }
+    // Exibe a tabela de campeões ao carregar a página
+    showCampeoesTable();
 });
