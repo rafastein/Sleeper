@@ -486,58 +486,17 @@ table tr:hover {
     width: 10%;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-
-    /* Estilos para o menu hamburger */
-    .hamburger {
-        display: block;
-        /* Garante que o botão hamburger seja visível */
-        position: fixed;
-        top: 1.25rem;
-        left: 1.25rem;
-        z-index: 1001;
-        background: none;
-        border: none;
-        color: var(--text-color);
-        cursor: pointer;
-        font-size: 1.5rem;
-    }
-
-    #hamburger-menu-content {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 80%;
-        /* Ajuste a largura conforme necessário */
-        height: 100%;
-        background-color: #16213e;
-        padding: 1.25rem;
-        box-shadow: var(--box-shadow);
-        z-index: 1000;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        overflow-y: auto;
-        /* Adicionado para lidar com conteúdo longo */
-    }
-
-    #hamburger-menu-content.active {
-        transform: translateX(0);
-    }
-}
-
-/* Hamburger */
+/* Estilos para o botão de menu hamburger (mantém a maioria dos estilos anteriores) */
 .hamburger {
     display: none;
-    font-size: 1.5rem;
+    font-size: 24px;
     background: none;
     border: none;
-    color: var(--text-color);
+    color: #ffffff;
     cursor: pointer;
     position: fixed;
-    top: 1.25rem;
-    left: 1.25rem;
+    top: 20px;
+    left: 20px;
     z-index: 1001;
 }
 
@@ -546,41 +505,65 @@ table tr:hover {
         display: block;
     }
 
-    #sidebar,
-    #hamburger-menu-content {
+    #sidebar {
         display: none;
         position: fixed;
         top: 0;
         left: 0;
-        width: 15.625rem;
+        width: 250px;
         height: 100%;
         background-color: #16213e;
-        padding: 1.25rem;
-        box-shadow: var(--box-shadow);
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         z-index: 1000;
         transform: translateX(-100%);
         transition: transform 0.3s ease;
     }
 
-    #sidebar.active,
-    #hamburger-menu-content.active {
+    #sidebar.active {
         transform: translateX(0);
     }
 
-    #hamburger-menu-content.active::before,
-    #sidebar.active::before {
-        content: '';
+    #hamburger-menu-content {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
+        width: 250px;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: -1;
+        background-color: #16213e;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
     }
 
-    #sidebar {
-        flex-direction: column;
-        align-items: flex-start;
+    #hamburger-menu-content.active,
+    #sidebar.active {
+        transform: translateX(0);
+        &::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
     }
+
+/* Acessibilidade (mantém a maioria dos estilos anteriores) */
+#sidebar button,
+#hamburger-menu,
+#hamburger-menu-content button {
+    outline: none;
+}
+
+#sidebar button:focus,
+#hamburger-menu:focus,
+#hamburger-menu-content button:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
