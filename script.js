@@ -3,19 +3,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const SLEEPER_API_BASE_URL = 'https://api.sleeper.app/v1';
     const LOADING_ELEMENT_ID = 'loading';
     const ERROR_MESSAGE_ELEMENT_ID = 'error-message';
-    const SIDEBAR_BUTTON_SELECTOR = '#sidebar button, #hamburger-menu-content button';
+    const SIDEBAR_BUTTON_SELECTOR = '#sidebar button'; // Removido hamburger
     const CAMPEOES_CONTAINER_ID = 'campeoes-container';
     const TABLES_CONTAINER_ID = 'tables-container';
     const COMBINED_TABLE_CONTAINER_ID = 'combined-table-container';
     const RANKING_CONTAINER_LEFT_ID = 'ranking-container-left';
     const RANKING_CONTAINER_RIGHT_ID = 'ranking-container-right';
     const COMBINED_TABLE_ID = 'combinedTable';
-    const HAMBURGER_MENU_ID = 'hamburger-menu';
+    // Removidos hamburger
     const SIDEBAR_ID = 'sidebar';
-    const HAMBURGER_MENU_CONTENT_ID = 'hamburger-menu-content';
 
     // Variáveis globais
-    let hamburgerMenu, sidebarMenu, hamburgerMenuContent;
+    // Removidos hamburger
+    
 
     // Funções para mostrar e ocultar o indicador de carregamento
     function showLoading() {
@@ -81,8 +81,6 @@ document.addEventListener('DOMContentLoaded', function () {
         for (const serie in leagueIds[year]) {
             const buttonId = `btn${serie.charAt(0).toUpperCase() + serie.slice(1)}${year}`;
             setupLeagueButton(buttonId, leagueIds[year][serie]);
-            const hamburgerButtonId = `btn${serie.charAt(0).toUpperCase() + serie.slice(1)}${year}Hamburger`;
-            setupLeagueButton(hamburgerButtonId, leagueIds[year][serie]);
         }
     }
 
@@ -100,7 +98,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(COMBINED_TABLE_CONTAINER_ID).classList.remove('hidden');
         document.getElementById(RANKING_CONTAINER_LEFT_ID).classList.remove('hidden');
         document.getElementById(RANKING_CONTAINER_RIGHT_ID).classList.remove('hidden');
-        closeHamburgerMenu();
     }
 
     // Função para mostrar a tabela de campeões
@@ -110,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(RANKING_CONTAINER_LEFT_ID).classList.add('hidden');
         document.getElementById(RANKING_CONTAINER_RIGHT_ID).classList.add('hidden');
         document.getElementById(CAMPEOES_CONTAINER_ID).classList.remove('hidden');
-        closeHamburgerMenu();
     }
 
     // Função para adicionar classes às linhas da tabela de ranking combinado
@@ -389,33 +385,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Função do menu hamburger
-    hamburgerMenu = document.getElementById(HAMBURGER_MENU_ID);
-    sidebarMenu = document.getElementById(SIDEBAR_ID);
-    hamburgerMenuContent = document.getElementById(HAMBURGER_MENU_CONTENT_ID);
-
-    if (hamburgerMenu && sidebarMenu && hamburgerMenuContent) {
-        hamburgerMenu.setAttribute('aria-expanded', 'false');
-        hamburgerMenu.addEventListener('click', function () {
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !isExpanded);
-            sidebarMenu.classList.toggle('active');
-            hamburgerMenuContent.classList.toggle('active');
-        });
-    }
-
-    // Função para fechar o menu hamburger
-    function closeHamburgerMenu() {
-        if (window.innerWidth <= 768) {
-            sidebarMenu.classList.remove('active');
-            hamburgerMenuContent.classList.remove('active');
-            hamburgerMenu?.setAttribute('aria-expanded', 'false');
-        }
-    }
-
-    // Event listeners para os botões da sidebar e menu hamburger (Campeões)
+    // Event listeners para os botões da sidebar (Campeões)
     const btnCampeoes = document.getElementById('btnCampeoes');
-    const btnCampeoesHamburger = document.getElementById('btnCampeoesHamburger');
 
     if (btnCampeoes) {
         btnCampeoes.addEventListener('click', function () {
@@ -424,41 +395,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (btnCampeoesHamburger) {
-        btnCampeoesHamburger.addEventListener('click', function () {
-            setActiveButton(this);
+    // Função para lidar com o menu mobile (select)
+    document.getElementById('mobile-nav').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+        const action = selectedOption.dataset.action;
+
+        if (action === 'showCampeoesTable') {
             showCampeoesTable();
-        });
-    }
+        } else if (action === 'loadLeagueData') {
+            const leagueIdsString = selectedOption.dataset.leagueIds;
+            const leagueIds = leagueIdsString.split(',');
+            loadLeagueData(leagueIds);
+        }
+    });
 
     // Exibe a tabela de campeões ao carregar a página
     showCampeoesTable();
 
-    // Função para copiar o conteúdo da sidebar para o menu hamburger
-    function copySidebarContent() {
-        if (!hamburgerMenuContent) {
-            console.error('Elemento hamburger-menu-content não encontrado.');
-            return;
-        }
-
-        hamburgerMenuContent.innerHTML = '';
-        const sidebarChildren = document.getElementById(SIDEBAR_ID).children;
-        for (let i = 0; i < sidebarChildren.length; i++) {
-            const clonedElement = sidebarChildren[i].cloneNode(true);
-            hamburgerMenuContent.appendChild(clonedElement);
-        }
-    }
-
-    // Chama a função para copiar o conteúdo inicialmente
-    copySidebarContent();
-
-    // Adiciona um MutationObserver para atualizar o menu hamburger sempre que a sidebar for alterada
+    //remove observer
     const sidebar = document.getElementById(SIDEBAR_ID);
-    const observer = new MutationObserver(copySidebarContent);
-    observer.observe(sidebar, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        characterData: true
-    });
 });

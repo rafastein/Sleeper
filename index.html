@@ -19,8 +19,25 @@
     <!-- Mensagem de Erro -->
     <div id="error-message" class="hidden"></div>
 
-    <!-- Botão de menu hamburger -->
-    <button id="hamburger-menu" class="hamburger" aria-label="Menu" aria-expanded="false">☰</button>
+    <!-- Menu Mobile (Select) -->
+    <select id="mobile-nav">
+        <option value="#" data-action="showCampeoesTable">Campeões</option>
+        <option value="#" disabled>2024</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="1051278540760530944,1051278597819854848">Série A</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="1126717143111917568,1126717395566989312">Série B</option>
+        <option value="#" disabled>2023</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="989658378832011264,989658509971116032">Série A</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="989661009860243456,989661264643211264">Série B</option>
+        <option value="#" disabled>2022</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="786638128248139776,786638212645892096">Série A</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="786646187062198272,786646606844981248">Série B</option>
+        <option value="#" disabled>2021</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="651842956122185728,651842832386056192">Série A</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="711300543254953984,711301089126866944">Série B</option>
+        <option value="#" disabled>2020</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="593817346833960960,593818329571971072">Série A</option>
+        <option value="#" data-action="loadLeagueData" data-league-ids="593834118790291456,593830974849073152">Série B</option>
+    </select>
 
     <div id="container">
         <!-- Sidebar (botões laterais) -->
@@ -52,36 +69,6 @@
                 <button id="btnSerieB2020">Série B</button>
             </div>
         </aside>
-
-        <!-- Menu hamburger (mesmas opções da sidebar) -->
-        <div id="hamburger-menu-content" class="hidden">
-            <button id="btnCampeoesHamburger" class="active">Campeões</button>
-            <div class="year-group">
-                <span>2024</span>
-                <button id="btnSerieA2024Hamburger">Série A</button>
-                <button id="btnSerieB2024Hamburger">Série B</button>
-            </div>
-            <div class="year-group">
-                <span>2023</span>
-                <button id="btnSerieA2023Hamburger">Série A</button>
-                <button id="btnSerieB2023Hamburger">Série B</button>
-            </div>
-            <div class="year-group">
-                <span>2022</span>
-                <button id="btnSerieA2022Hamburger">Série A</button>
-                <button id="btnSerieB2022Hamburger">Série B</button>
-            </div>
-            <div class="year-group">
-                <span>2021</span>
-                <button id="btnSerieA2021Hamburger">Série A</button>
-                <button id="btnSerieB2021Hamburger">Série B</button>
-            </div>
-            <div class="year-group">
-                <span>2020</span>
-                <button id="btnSerieA2020Hamburger">Série A</button>
-                <button id="btnSerieB2020Hamburger">Série B</button>
-            </div>
-        </div>
 
         <!-- Conteúdo principal -->
         <main id="main-content">
