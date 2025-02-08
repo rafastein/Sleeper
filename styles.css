@@ -141,18 +141,15 @@ h2 {
 
 /* Container das tabelas */
 #tables-container {
-    display: none; /* Oculto por padrão */
+    display: flex;
     width: 100%;
     padding: 0 1.25rem;
     flex: 1;
-    overflow: auto; /* Permite rolagem se o conteúdo for maior */
+    overflow: hidden;
     transition: height 0.3s ease;
 }
 
 #tables-container.active {
-    display: flex; /* Torna o container visível */
-    flex-direction: row; /* Garante que os containers filhos fiquem lado a lado */
-    flex-wrap: wrap; /* Permite que os containers filhos quebrem para a linha de baixo em telas menores */
     height: auto;
 }
 
@@ -166,10 +163,26 @@ h2 {
     box-shadow: var(--box-shadow);
     display: flex;
     flex-direction: column;
-    flex: 1 1 300px; /* Cada container ocupa pelo menos 300px, mas pode crescer */
-    margin: 0.3125rem;
+    flex: 1;
+    margin: 0 0.3125rem;
     min-width: 0;
     overflow: hidden;
+}
+
+/* Remover a margem do primeiro e último item */
+#tables-container > div:first-child {
+    margin-left: 0;
+}
+
+#tables-container > div:last-child {
+    margin-right: 0;
+}
+
+/* Oculta os contêineres individualmente quando a seção de tabelas não está ativa */
+#tables-container:not(.active) #combined-table-container,
+#tables-container:not(.active) #ranking-container-left,
+#tables-container:not(.active) #ranking-container-right {
+    display: none;
 }
 
 /* Estilos para a mensagem de erro */
@@ -193,6 +206,7 @@ table {
     overflow: hidden;
     box-shadow: var(--box-shadow);
     font-size: 0.875rem;
+    display: block;
     table-layout: fixed;
 }
 
@@ -323,7 +337,7 @@ table tr:hover {
 /* Ajusta o tamanho das tabelas e centraliza a tabela de ranking combinado */
 #combined-table-container {
     max-width: 100%;
-    margin: 0.3125rem;
+    margin: 0 0.3125rem;
     padding: 0.625rem;
     background-color: #293142;
     border-radius: var(--border-radius);
@@ -342,6 +356,7 @@ table tr:hover {
     overflow: hidden;
     box-shadow: var(--box-shadow);
     font-size: 0.875rem;
+    display: block;
     table-layout: fixed;
 }
 
@@ -473,7 +488,7 @@ table tr:hover {
 
 /* Estilos para o menu mobile (select) */
 #mobile-nav {
-    display: block; /* Mostra o menu select em telas menores */
+    display: none; /* Oculto por padrão em telas maiores */
     width: 100%;
     padding: 0.5rem;
     font-size: 1rem;
@@ -485,12 +500,12 @@ table tr:hover {
 }
 
 /* Media query para telas menores */
-@media (min-width: 769px) {
+@media (max-width: 768px) {
     #mobile-nav {
-        display: none; /* Oculta o menu select em telas maiores */
+        display: block; /* Mostra o menu select em telas menores */
     }
 
     #sidebar {
-        display: flex; /* Mostra a sidebar em telas maiores */
+        display: none; /* Oculta a sidebar em telas menores */
     }
 }
