@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Constantes
     const SLEEPER_API_BASE_URL = 'https://api.sleeper.app/v1';
     const LOADING_ELEMENT_ID = 'loading';
-    const ERROR_MESSAGE_ELEMENT_ID = 'error-message'; // Adicione um elemento com este ID no seu HTML
+    const ERROR_MESSAGE_ELEMENT_ID = 'error-message';
     const SIDEBAR_BUTTON_SELECTOR = '#sidebar button, #hamburger-menu-content button';
     const CAMPEOES_CONTAINER_ID = 'campeoes-container';
     const TABLES_CONTAINER_ID = 'tables-container';
@@ -93,14 +93,6 @@ document.addEventListener('DOMContentLoaded', function () {
             hamburgerMenuContent.appendChild(clonedElement);
         }
 
-        // Configuração dos botões do menu hamburger
-        for (const year in leagueIds) {
-            for (const serie in leagueIds[year]) {
-                const buttonId = `btn${serie.charAt(0).toUpperCase() + serie.slice(1)}${year}Hamburger`;
-                setupLeagueButton(buttonId, leagueIds[year][serie]);
-            }
-        }
-
     }
 
     // Chama a função para copiar o conteúdo inicialmente
@@ -117,26 +109,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Event listeners para os botões da sidebar e menu hamburger (Campeões)
-    document.getElementById('btnCampeoes').addEventListener('click', function () {
-        setActiveButton(this);
-        showCampeoesTable();
-    });
+    const btnCampeoes = document.getElementById('btnCampeoes');
+    if (btnCampeoes) {
+        btnCampeoes.addEventListener('click', function () {
+            setActiveButton(this);
+            showCampeoesTable();
+        });
+    }
 
     // Variáveis globais
     hamburgerMenu = document.getElementById('hamburger-menu');
     sidebarMenu = document.getElementById('sidebar'); // Renomeado para evitar confusão
     hamburgerMenuContent = document.getElementById('hamburger-menu-content');
-
-    if (hamburgerMenu) {
-        hamburgerMenu.addEventListener('click', function () {
+   if (hamburgerMenu) {
+     hamburgerMenu.addEventListener('click', function () {
             console.log("Hamburger menu clicked!"); // Adicione este log
             sidebarMenu.classList.toggle('active');
             hamburgerMenuContent.classList.toggle('active');
         });
-    }
+   }
     // Função para abrir e fechar o menu hamburger
-
-    // Função para fechar o menu hamburger
     function closeHamburgerMenu() {
         if (window.innerWidth <= 768) {
             sidebarMenu.classList.remove('active');
@@ -145,5 +137,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Exibe a tabela de campeões ao carregar a página
-    showCampeoesTable();
+    function showCampeoesTable() {
+        console.log("Exibindo a tabela de campeões");
+        document.getElementById(TABLES_CONTAINER_ID).classList.remove('active'); // Oculta as tabelas das ligas
+
+        // Oculta as tabelas de ligas individualmente
+        document.getElementById(COMBINED_TABLE_CONTAINER_ID).classList.add('hidden');
+        document.getElementById(RANKING_CONTAINER_LEFT_ID).classList.add('hidden');
+        document.getElementById(RANKING_CONTAINER_RIGHT_ID).classList.add('hidden');
+
+        document.getElementById(CAMPEOES_CONTAINER_ID).classList.remove('hidden'); // Exibe a tabela de campeões
+
+        // Fecha o menu hamburger se estiver aberto
+        closeHamburgerMenu();
+    }
+     showCampeoesTable();
+
+    for (const year in leagueIds) {
+        for (const serie in leagueIds[year]) {
+            const buttonId = `btn${serie.charAt(0).toUpperCase() + serie.slice(1)}${year}`;
+            setupLeagueButton(buttonId, leagueIds[year][serie]);
+            const hamburgerButtonId = `${buttonId}Hamburger`;
+            setupLeagueButton(hamburgerButtonId, leagueIds[year][serie]);
+        }
+    }
+
 });
