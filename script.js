@@ -136,11 +136,29 @@ document.addEventListener('DOMContentLoaded', function () {
     // Função para buscar dados da liga na API do Sleeper
     async function fetchLeagueData(leagueId, leagueNumber) {
         try {
+            console.log(`Fetching league data for league ID: ${leagueId}, league number: ${leagueNumber}`);
+
             const cacheKey = `leagueData-${leagueId}`;
             const cachedData = localStorage.getItem(cacheKey);
 
             if (cachedData) {
-                return JSON.parse(cachedData);
+                console.log(`Using cached data for league ID: ${leagueId}`);
+                const data = JSON.parse(cachedData);
+                console.log(`Cached data:`, data);
+                const leagueName = data.leagueName;
+                console.log(`League name from cache: ${leagueName}`);
+                setTimeout(() => {
+                    if (leagueNumber === 1) {
+                        const leftHeading = document.getElementById(RANKING_CONTAINER_LEFT_ID).querySelector("h2");
+                        console.log(`Left heading element:`, leftHeading);
+                        leftHeading.textContent = leagueName;
+                    } else if (leagueNumber === 2) {
+                        const rightHeading = document.getElementById(RANKING_CONTAINER_RIGHT_ID).querySelector("h2");
+                        console.log(`Right heading element:`, rightHeading);
+                        rightHeading.textContent = leagueName;
+                    }
+                }, 100);
+                return data;
             }
 
             const [leagueResponse, rostersResponse, usersResponse, winnersBracketResponse, losersBracketResponse] = await Promise.all([
@@ -163,13 +181,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 losersBracketResponse.json()
             ]);
 
+            console.log(`League data received:`, leagueData);
+
+            // Atualiza o nome da liga
+            const leagueName = leagueData.name;
+            console.log(`League name: ${leagueName}`);
+            setTimeout(() => {
+                if (leagueNumber === 1) {
+                    const leftHeading = document.getElementById(RANKING_CONTAINER_LEFT_ID).querySelector("h2");
+                    console.log(`Left heading element:`, leftHeading);
+                    leftHeading.textContent = leagueName;
+                } else if (leagueNumber === 2) {
+                    const rightHeading = document.getElementById(RANKING_CONTAINER_RIGHT_ID).querySelector("h2");
+                    console.log(`Right heading element:`, rightHeading);
+                    rightHeading.textContent = leagueName;
+                }
+            }, 100);
+
+
             const standings = calculateStandings(winnersBracketData, losersBracketData, rostersData);
             displayStandings(standings, rostersData, usersData, leagueNumber);
 
             const data = {
                 standings,
                 rostersData,
-                usersData
+                usersData,
+                leagueName  // Adicionado: salvar leagueName no objeto data
             };
 
             localStorage.setItem(cacheKey, JSON.stringify(data));
