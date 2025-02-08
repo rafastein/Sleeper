@@ -207,7 +207,7 @@ table {
     box-shadow: var(--box-shadow);
     font-size: 0.875rem;
     display: block;
-    table-layout: fixed; /* Adicionado */
+    table-layout: fixed;
 }
 
 table th,
@@ -486,7 +486,7 @@ table tr:hover {
     width: 10%;
 }
 
-/* Estilos para o botão de menu hamburger (mantém a maioria dos estilos anteriores) */
+/* Estilos para o botão de menu hamburger */
 .hamburger {
     display: none;
     font-size: 24px;
@@ -553,17 +553,4 @@ table tr:hover {
             z-index: -1;
         }
     }
-
-/* Acessibilidade (mantém a maioria dos estilos anteriores) */
-#sidebar button,
-#hamburger-menu,
-#hamburger-menu-content button {
-    outline: none;
-}
-
-#sidebar button:focus,
-#hamburger-menu:focus,
-#hamburger-menu-content button:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
 }
