@@ -458,9 +458,10 @@ table tr:hover {
 /* Media query para telas menores */
 @media (max-width: 768px) {
 
-    #mobile-menu > *:first-child {
-        display: flex;
-        justify-content: center;
+    #mobile-menu button {
+        width: 100%; /* Ocupa toda a largura disponível */
+        text-align: center; /* Centraliza o texto dentro do botão */
+        margin: 0.3125rem 0; /* Adiciona margem superior e inferior para separação */
     }
 
     #sidebar {
