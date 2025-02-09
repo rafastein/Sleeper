@@ -3,36 +3,47 @@ document.addEventListener('DOMContentLoaded', function () {
     // Constantes
     const SLEEPER_API_BASE_URL = 'https://api.sleeper.app/v1';
     const LOADING_ELEMENT_ID = 'loading';
-    const ERROR_MESSAGE_ELEMENT_ID = 'error-message'; // Adicione um elemento com este ID no seu HTML
-    const SIDEBAR_BUTTON_SELECTOR = '#sidebar button, #hamburger-menu-content button';
+    const ERROR_MESSAGE_ELEMENT_ID = 'error-message';
+    const SIDEBAR_BUTTON_SELECTOR = '#sidebar button';
+    const MOBILE_MENU_BUTTON_SELECTOR = '.mobile-menu button';
     const CAMPEOES_CONTAINER_ID = 'campeoes-container';
     const TABLES_CONTAINER_ID = 'tables-container';
     const COMBINED_TABLE_CONTAINER_ID = 'combined-table-container';
     const RANKING_CONTAINER_LEFT_ID = 'ranking-container-left';
     const RANKING_CONTAINER_RIGHT_ID = 'ranking-container-right';
     const COMBINED_TABLE_ID = 'combinedTable';
-    const HAMBURGER_MENU_ID = 'hamburger-menu';
-    const SIDEBAR_ID = 'sidebar';
-    const HAMBURGER_MENU_CONTENT_ID = 'hamburger-menu-content';
+    const MOBILE_MENU_BUTTON_ID = 'mobile-menu-button';
+    const MOBILE_MENU_ID = 'mobile-menu';
 
     // Funções para mostrar e ocultar o indicador de carregamento
     function showLoading() {
+        console.log("showLoading chamado");
         document.getElementById(LOADING_ELEMENT_ID).classList.remove('hidden');
     }
 
     function hideLoading() {
+        console.log("hideLoading chamado");
         document.getElementById(LOADING_ELEMENT_ID).classList.add('hidden');
     }
 
-    // Função para exibir mensagens de erro
-    function displayError(message) {
-        console.error(message);
-        const errorElement = document.getElementById(ERROR_MESSAGE_ELEMENT_ID);
-        if (errorElement) {
-            errorElement.textContent = message;
-            errorElement.classList.remove('hidden'); // Mostra o elemento de erro
-        }
+// Função para exibir mensagens de erro
+function displayError(message) {
+    console.error(message);
+    const errorElement = document.getElementById(ERROR_MESSAGE_ELEMENT_ID);
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('active'); // Mostra o elemento de erro
+
+           setTimeout(() => {
+               errorElement.classList.add('active');
+           }, 5000);
     }
+}
+
+// Após o carregamento da página, esconde a mensagem de erro
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById(ERROR_MESSAGE_ELEMENT_ID).classList.add('active');
+});
 
     // IDs das ligas organizados por ano e liga
     const leagueIds = {
@@ -60,105 +71,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const leagueData = []; // Armazena os dados das ligas
 
-    // Exibe a tabela de campeões ao carregar a página
-    showCampeoesTable();
-
-    // Função genérica para configurar os botões das ligas
-    function setupLeagueButton(buttonId, leagueIds) {
-        const button = document.getElementById(buttonId);
-        if (button) { // Verifica se o botão existe
-            button.addEventListener('click', function () {
-                setActiveButton(this);
-                console.log(`Exibindo liga para o botão ${buttonId}`);
-                showLeagueTables();
-                loadLeagueData(leagueIds);
-            });
-        } else {
-            console.warn(`Botão com ID "${buttonId}" não encontrado.`);
-        }
-    }
-
-    // Configuração dos botões da sidebar
-    for (const year in leagueIds) {
-        for (const serie in leagueIds[year]) {
-            const buttonId = `btn${serie.charAt(0).toUpperCase() + serie.slice(1)}${year}`;
-            setupLeagueButton(buttonId, leagueIds[year][serie]);
-            const hamburgerButtonId = `${buttonId}Hamburger`;
-            setupLeagueButton(hamburgerButtonId, leagueIds[year][serie]);
-        }
-    }
-
-    // Event listeners para os botões da sidebar e menu hamburger (Campeões)
-    document.getElementById('btnCampeoes').addEventListener('click', function () {
-        setActiveButton(this);
-        showCampeoesTable();
-    });
-    document.getElementById('btnCampeoesHamburger').addEventListener('click', function () {
-        setActiveButton(this);
-        showCampeoesTable();
-    });
-
-    // Função para definir o botão ativo
-    function setActiveButton(button) {
-        const buttons = document.querySelectorAll(SIDEBAR_BUTTON_SELECTOR);
-        buttons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-    }
-
+    //*** FUNÇÕES DE DISPLAY ***//
     // Função para mostrar as tabelas das ligas
     function showLeagueTables() {
-        console.log('Exibindo as tabelas das ligas');
-        document.getElementById(CAMPEOES_CONTAINER_ID).classList.add('hidden'); // Oculta a tabela de campeões
-        document.getElementById(TABLES_CONTAINER_ID).classList.add('active'); // Exibe as tabelas das ligas
-
-        // Exibe as tabelas de ligas
-        document.getElementById(COMBINED_TABLE_CONTAINER_ID).classList.remove('hidden');
-        document.getElementById(RANKING_CONTAINER_LEFT_ID).classList.remove('hidden');
-        document.getElementById(RANKING_CONTAINER_RIGHT_ID).classList.remove('hidden');
-
-        // Fecha o menu hamburger se estiver aberto
-        closeHamburgerMenu();
+        console.log('showLeagueTables chamado');
+        document.getElementById(CAMPEOES_CONTAINER_ID).classList.remove('active');
+        document.getElementById(TABLES_CONTAINER_ID).classList.add('active');
     }
 
     // Função para mostrar a tabela de campeões
     function showCampeoesTable() {
-        console.log("Exibindo a tabela de campeões");
-        document.getElementById(TABLES_CONTAINER_ID).classList.remove('active'); // Oculta as tabelas das ligas
-
-        // Oculta as tabelas de ligas individualmente
-        document.getElementById(COMBINED_TABLE_CONTAINER_ID).classList.add('hidden');
-        document.getElementById(RANKING_CONTAINER_LEFT_ID).classList.add('hidden');
-        document.getElementById(RANKING_CONTAINER_RIGHT_ID).classList.add('hidden');
-
-        document.getElementById(CAMPEOES_CONTAINER_ID).classList.remove('hidden'); // Exibe a tabela de campeões
-
-        // Fecha o menu hamburger se estiver aberto
-        closeHamburgerMenu();
+        console.log("showCampeoesTable chamado");
+        document.getElementById(TABLES_CONTAINER_ID).classList.remove('active');
+        document.getElementById(CAMPEOES_CONTAINER_ID).classList.add('active');
     }
 
-    // Função para adicionar classes às linhas da tabela de ranking combinado
-    function addRankingClasses() {
-        const table = document.getElementById(COMBINED_TABLE_ID);
-        const rows = table.getElementsByTagName('tr');
-
-        for (let i = 1; i < rows.length; i++) { // Começa em 1 para pular o cabeçalho
-            rows[i].classList.remove('first-place', 'second-place', 'third-place', 'bottom-three'); // Remove classes existentes
-
-            if (i === 1) {
-                rows[i].classList.add('first-place');
-            } else if (i === 2) {
-                rows[i].classList.add('second-place');
-            } else if (i === 3) {
-                rows[i].classList.add('third-place');
-            } else if (i >= 10 && i <= 12) {
-                rows[i].classList.add('bottom-three');
-            }
-        }
+    // Função para definir o botão ativo
+    function setActiveButton(button) {
+        console.log("setActiveButton chamado com:", button);
+        const buttons = document.querySelectorAll(SIDEBAR_BUTTON_SELECTOR + ', ' + MOBILE_MENU_BUTTON_SELECTOR);
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
     }
 
+    //*** FUNÇÕES DE API ***//
     // Função para buscar dados da liga na API do Sleeper
     async function fetchLeagueData(leagueId, leagueNumber) {
         try {
+            console.log(`Buscando dados da liga ${leagueId} (Liga ${leagueNumber})`);
             // Busca dados da liga
             const leagueResponse = await fetch(`${SLEEPER_API_BASE_URL}/league/${leagueId}`);
             if (!leagueResponse.ok) throw new Error("Erro ao buscar dados da liga");
@@ -195,6 +135,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const standings = calculateStandings(winnersBracketData, losersBracketData, rostersData);
             displayStandings(standings, rostersData, usersData, leagueNumber);
 
+            console.log(`Dados da liga ${leagueId} carregados com sucesso`); // Adicionado
+
             return {
                 standings,
                 rostersData,
@@ -211,16 +153,23 @@ document.addEventListener('DOMContentLoaded', function () {
     // Função para carregar os dados das ligas
     function loadLeagueData(leagueIds) {
         leagueData.length = 0; // Limpa os dados anteriores
+        console.clear(); // Limpa o console
         showLoading(); // Mostra o indicador de carregamento
         Promise.all(leagueIds.map((leagueId, index) => fetchLeagueData(leagueId, index + 1)))
             .then(data => {
+                console.log("Dados retornados da Promise.all:", data);
                 const validData = data.filter(item => item !== null); // Filtra resultados nulos
                 leagueData.push(...validData);
+                console.log("Dados válidos:", validData);
                 if (leagueData.length === leagueIds.length) {
+                    console.log("Todos os dados da liga foram carregados corretamente.");
                     const combinedStandings = calculateCombinedStandings(leagueData);
                     displayCombinedStandings(combinedStandings);
-                    addRankingClasses(); // Adiciona classes de ranking após exibir os dados
                     hideLoading(); // Esconde o indicador de carregamento
+
+                    // Adiciona classes de ranking após exibir os dados
+                    addRankingClasses();
+
                 } else {
                     displayError("Nem todos os dados da liga foram carregados corretamente.");
                     hideLoading();
@@ -232,13 +181,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    //*** FUNÇÕES DE CÁLCULO ***//
     // Função para calcular os standings com base nos brackets
     function calculateStandings(winnersBracket, losersBracket, rosters) {
         const standings = [];
 
         // Funções auxiliares para encontrar vencedores e perdedores
-        const findWinner = (bracket, matchId) => bracket.find(m => m.m === matchId) ?.w || null;
-        const findLoser = (bracket, matchId) => bracket.find(m => m.m === matchId) ?.l || null;
+        const findWinner = (bracket, matchId) => bracket.find(m => m.m === matchId)?.w || null;
+        const findLoser = (bracket, matchId) => bracket.find(m => m.m === matchId)?.l || null;
 
         // Processa os dados do winners bracket
         const week15Matches = winnersBracket.filter(match => match.r === 1);
@@ -330,59 +280,13 @@ document.addEventListener('DOMContentLoaded', function () {
             return {
                 rank: standing.rank,
                 rosterId: standing.rosterId,
-                teamName: roster ?.settings.team_name || 'Sem Nome',
-                avatar: roster ?.avatar || null,
+                teamName: roster?.settings.team_name || 'Sem Nome',
+                avatar: roster?.avatar || null,
                 points: 13 - standing.rank
             };
         });
 
         return orderedStandings;
-    }
-
-    // Função para exibir os standings nas tabelas
-    function displayStandings(standings, rosters, users, leagueNumber) {
-        const tableBody = document.querySelector(`#table${leagueNumber} tbody`);
-        tableBody.innerHTML = '';
-
-        standings.forEach(standing => {
-            const roster = rosters.find(r => r.roster_id === standing.rosterId);
-            const user = users.find(u => u.user_id === roster ?.owner_id);
-
-            if (!roster || !user) {
-                console.warn(`Roster ou usuário não encontrado para o ID: ${standing.rosterId}`);
-                return;
-            }
-
-            const row = document.createElement('tr');
-
-            const rankCell = document.createElement('td');
-            rankCell.textContent = standing.rank;
-            row.appendChild(rankCell);
-
-            const avatarCell = document.createElement('td');
-            if (user ?.avatar) {
-                const avatarImg = document.createElement('img');
-                avatarImg.src = `https://sleepercdn.com/avatars/${user.avatar}`;
-                avatarImg.alt = user.display_name || user.username || 'Sem Nome';
-                avatarImg.classList.add('avatar');
-                avatarCell.appendChild(avatarImg);
-            }
-            row.appendChild(avatarCell);
-
-            const teamNameCell = document.createElement('td');
-            teamNameCell.textContent = user.display_name || user.username || 'Sem Nome';
-            row.appendChild(teamNameCell);
-
-            const standingsCell = document.createElement('td');
-            standingsCell.textContent = `${roster.settings.wins}-${roster.settings.losses}`;
-            row.appendChild(standingsCell);
-
-            const pointsCell = document.createElement('td');
-            pointsCell.textContent = standing.points;
-            row.appendChild(pointsCell);
-
-            tableBody.appendChild(row);
-        });
     }
 
     // Função para calcular o ranking combinado
@@ -396,13 +300,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }) => {
             standings.forEach(standing => {
                 const roster = rostersData.find(r => r.roster_id === standing.rosterId);
-                const user = usersData.find(u => u.user_id === roster ?.owner_id);
-                const userId = roster ?.owner_id;
+                const user = usersData.find(u => u.user_id === roster?.owner_id);
+                const userId = roster?.owner_id;
 
                 if (!combinedStandings[userId]) {
                     combinedStandings[userId] = {
-                        avatar: user ?.avatar,
-                        teamName: user ?.display_name || user ?.username || 'Sem Nome',
+                        avatar: user?.avatar,
+                        teamName: user?.display_name || user?.username || 'Sem Nome',
                         points: 0,
                         bestRank: standing.rank,
                         fpts: 0 // Inicializa fpts em 0
@@ -411,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 combinedStandings[userId].points += standing.points;
                 combinedStandings[userId].bestRank = Math.min(combinedStandings[userId].bestRank, standing.rank);
-                combinedStandings[userId].fpts += roster ?.settings.fpts || 0; // Adiciona uma verificação para o caso de fpts ser undefined
+                combinedStandings[userId].fpts += roster?.settings.fpts || 0; // Adiciona uma verificação para o caso de fpts ser undefined
             });
         });
 
@@ -423,6 +327,48 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         return combinedStandingsArray;
+    }
+
+    //*** FUNÇÕES DE EXIBIÇÃO ***//
+    // Função para exibir os standings nas tabelas
+    function displayStandings(standings, rosters, users, leagueNumber) {
+        console.log(`displayStandings chamado para Liga ${leagueNumber}`);
+        const tableBody = document.querySelector(`#table${leagueNumber} tbody`);
+
+        console.log(`tableBody (Liga ${leagueNumber}):`, tableBody);
+
+        if (!tableBody) {
+            console.warn(`Elemento <tbody> não encontrado para a tabela ${leagueNumber}`);
+            return; // Aborta a função se o tbody não for encontrado
+        }
+
+        tableBody.innerHTML = '';
+
+        standings.forEach(standing => {
+            const roster = rosters.find(r => r.roster_id === standing.rosterId);
+            const user = users.find(u => u.user_id === roster?.owner_id);
+
+            if (!roster || !user) {
+                console.warn(`Roster ou usuário não encontrado para o ID: ${standing.rosterId}`);
+                return;
+            }
+
+            // Cria os elementos HTML como strings
+            let rowHTML = `<tr>
+                <td>${standing.rank}</td>
+                <td>`;
+            if (user?.avatar) {
+                rowHTML += `<img src="https://sleepercdn.com/avatars/${user.avatar}" alt="${standing.teamName}" class="avatar">`;
+            }
+            rowHTML += `</td>
+                <td>${user.display_name || user.username || 'Sem Nome'}</td>
+                <td>${roster.settings.wins}-${roster.settings.losses}</td>
+                <td>${standing.points}</td>
+            </tr>`;
+
+            // Adiciona a linha à tabela
+            tableBody.innerHTML += rowHTML;
+        });
     }
 
     // Função para exibir o ranking combinado
@@ -443,51 +389,115 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Função para copiar o conteúdo da sidebar para o menu hamburger
-    function copySidebarContent() {
+      //*** FUNÇÕES DE ESTILO ***//
+    function setActiveButton(button) {
+        console.log("setActiveButton chamado com:", button);
+        const buttons = document.querySelectorAll(SIDEBAR_BUTTON_SELECTOR + ', ' + MOBILE_MENU_BUTTON_SELECTOR);
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+    }
+
+    // Função para adicionar classes às linhas da tabela de ranking combinado
+    function addRankingClasses() {
+        const table = document.getElementById(COMBINED_TABLE_ID);
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) { // Começa em 1 para pular o cabeçalho
+            rows[i].classList.remove('first-place', 'second-place', 'third-place', 'bottom-three'); // Remove classes existentes
+
+            if (i === 1) {
+                rows[i].classList.add('first-place');
+            } else if (i === 2) {
+                rows[i].classList.add('second-place');
+            } else if (i === 3) {
+                rows[i].classList.add('third-place');
+            } else if (i >= 10 && i <= 12) {
+                rows[i].classList.add('bottom-three');
+            }
+        }
+    }
+
+    //*** MENU MOBILE ***//
+    // Função para copiar o conteúdo da sidebar para o menu mobile
+    function populateMobileMenu() {
+        console.log("populateMobileMenu chamado");
         const sidebar = document.getElementById('sidebar');
-        const hamburgerMenuContent = document.getElementById('hamburger-menu-content');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-        // Limpa o conteúdo existente do menu hamburger
-        hamburgerMenuContent.innerHTML = '';
+        // Limpa o conteúdo existente do menu mobile
+        mobileMenu.innerHTML = '';
 
-        // Clona os elementos da sidebar e adiciona ao menu hamburger
+        // Clona os elementos da sidebar e adiciona ao menu mobile
         const sidebarChildren = sidebar.children;
         for (let i = 0; i < sidebarChildren.length; i++) {
             const clonedElement = sidebarChildren[i].cloneNode(true);
-            hamburgerMenuContent.appendChild(clonedElement);
+            mobileMenu.appendChild(clonedElement);
         }
     }
 
-    // Chama a função para copiar o conteúdo inicialmente
-    copySidebarContent();
+    // Adiciona event listeners aos botões da sidebar e do menu mobile
+    function addEventListenersToButtons() {
+      console.log("addEventListenersToButtons chamado");
+      const buttons = document.querySelectorAll(SIDEBAR_BUTTON_SELECTOR + ', ' + MOBILE_MENU_BUTTON_SELECTOR);
+      buttons.forEach(button => {
+          button.addEventListener('click', function (event) {
+              event.preventDefault(); // Evita o comportamento padrão do botão
 
-    // Adiciona um MutationObserver para atualizar o menu hamburger sempre que a sidebar for alterada
-    const sidebar = document.getElementById('sidebar');
-    const observer = new MutationObserver(copySidebarContent);
-    observer.observe(sidebar, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        characterData: true
-    });
+              console.log(`Botão clicado: ${this.id}`);
+              setActiveButton(this);
 
-    // Função para abrir e fechar o menu hamburger
-    const hamburgerMenu = document.getElementById('hamburger-menu');
-    const sidebarMenu = document.getElementById('sidebar'); // Renomeado para evitar confusão
-    const hamburgerMenuContent = document.getElementById('hamburger-menu-content');
+              const buttonId = this.id;
+              let year, serie, serieKey;
 
-    hamburgerMenu.addEventListener('click', function () {
-        console.log("Hamburger menu clicked!"); // Adicione este log
-        sidebarMenu.classList.toggle('active');
-        hamburgerMenuContent.classList.toggle('active');
-    });
+              if (buttonId === 'btnCampeoes') {
+                  showCampeoesTable();
+              } else {
+                  showLeagueTables();
+                   // Extrai o ano e a série do ID do botão
+                  const year = buttonId.slice(-4);
+                  const serie = buttonId.slice(3, -4);
+                  const serieKey = serie.charAt(0).toLowerCase() + serie.slice(1);
 
-    // Função para fechar o menu hamburger
-    function closeHamburgerMenu() {
-        if (window.innerWidth <= 768) {
-            sidebarMenu.classList.remove('active');
-            hamburgerMenuContent.classList.remove('active');
-        }
+                  // Verifica se os IDs da liga existem para o ano e a série
+                  if (leagueIds[year] && leagueIds[year][serieKey]) {
+                      // Carrega os dados da liga
+                      loadLeagueData(leagueIds[year][serieKey]);
+                  } else {
+                      console.warn(`IDs da liga não encontrados para o botão ${buttonId}`);
+                  }
+              }
+
+              // Fecha o menu mobile se estiver aberto
+              const mobileMenu = document.getElementById(MOBILE_MENU_ID);
+              if (mobileMenu && mobileMenu.classList.contains('active')) {
+                  mobileMenu.classList.remove('active');
+              }
+          });
+      });
     }
+
+    // Obtém uma referência ao botão do menu mobile e ao menu mobile
+    const mobileMenuButton = document.getElementById(MOBILE_MENU_BUTTON_ID);
+    const mobileMenu = document.getElementById(MOBILE_MENU_ID);
+
+    // Adiciona um ouvinte de evento de clique ao botão do menu mobile
+    mobileMenuButton.addEventListener('click', function () {
+        console.log("Botão do menu mobile clicado");
+        mobileMenu.classList.toggle('active');
+        populateMobileMenu();
+        addEventListenersToButtons();
+
+    });
+
+   // Configuração inicial: exibir a tabela de campeões e definir o botão "Campeões" como ativo
+    showCampeoesTable();
+
+    // Adiciona event listeners aos botões da sidebar e do menu mobile
+    addEventListenersToButtons();
+
+    // Chama a função para popular o menu mobile
+    populateMobileMenu();
+
+     //Define o botão "Campeões" como ativo
+    setActiveButton(document.getElementById('btnCampeoes'));
 });
