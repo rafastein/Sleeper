@@ -5,9 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ranking das Ligas</title>
-    <meta name="description"
-        content="Ranking das Ligas AMBO - Confira os campeões e rankings das ligas de futebol de 2020 a 2024.">
-    <meta name="keywords" content="ranking, ligas, futebol, AMBO, campeões, série A, série B">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -19,25 +16,8 @@
     <!-- Mensagem de Erro -->
     <div id="error-message" class="hidden"></div>
 
-    <!-- Menu Mobile (Select) -->
-    <select id="mobile-nav">
-        <option value="#" data-action="showCampeoesTable">Campeões</option>
-        <option value="#" disabled>2024</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="1051278540760530944,1051278597819854848">Série A</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="1126717143111917568,1126717395566989312">Série B</option>
-        <option value="#" disabled>2023</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="989658378832011264,989658509971116032">Série A</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="989661009860243456,989661264643211264">Série B</option>
-        <option value="#" disabled>2022</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="786638128248139776,786638212645892096">Série A</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="786646187062198272,786646606844981248">Série B</option>
-        <option value="#" disabled>2021</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="651842956122185728,651842832386056192">Série A</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="711300543254953984,711301089126866944">Série B</option>
-        <option value="#" disabled>2020</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="593817346833960960,593818329571971072">Série A</option>
-        <option value="#" data-action="loadLeagueData" data-league-ids="593834118790291456,593830974849073152">Série B</option>
-    </select>
+    <!-- Botão de menu hamburger -->
+    <button id="hamburger-menu" class="hamburger" aria-label="Menu">☰</button>
 
     <div id="container">
         <!-- Sidebar (botões laterais) -->
@@ -69,6 +49,11 @@
                 <button id="btnSerieB2020">Série B</button>
             </div>
         </aside>
+
+        <!-- Menu hamburger (mesmas opções da sidebar) -->
+        <div id="hamburger-menu-content" class="hidden">
+            <!-- O conteúdo será inserido aqui via JavaScript -->
+        </div>
 
         <!-- Conteúdo principal -->
         <main id="main-content">
@@ -144,7 +129,7 @@
             <section id="tables-container" class="hidden">
                 <!-- Ranking Combinado -->
                 <div id="combined-table-container" class="hidden">
-                    <h2>Ranking Geral</h2>
+                    <h2>Ranking Combinado</h2>
                     <table id="combinedTable">
                         <thead>
                             <tr>
@@ -152,7 +137,7 @@
                                 <th></th>
                                 <th>Time</th>
                                 <th class="points-column">Pontos</th>
-                                <th>Melhor<br>Posição</th>
+                                <th>Melhor<BR>Posição</th>
                                 <th>Fpts</th>
                             </tr>
                         </thead>
@@ -164,7 +149,7 @@
 
                 <!-- Liga 1 -->
                 <div id="ranking-container-left" class="hidden">
-                    <h2></h2>
+                    <h2>Liga 1</h2>
                     <table id="table1">
                         <thead>
                             <tr>
@@ -183,7 +168,7 @@
 
                 <!-- Liga 2 -->
                 <div id="ranking-container-right" class="hidden">
-                    <h2></h2>
+                    <h2>Liga 2</h2>
                     <table id="table2">
                         <thead>
                             <tr>

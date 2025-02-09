@@ -207,7 +207,7 @@ table {
     box-shadow: var(--box-shadow);
     font-size: 0.875rem;
     display: block;
-    table-layout: fixed;
+    table-layout: fixed; /* Adicionado */
 }
 
 table th,
@@ -314,21 +314,6 @@ table tr:hover {
     transition: background-color 0.3s ease;
 }
 
-/* Define a largura das colunas da tabela de campeões */
-#campeoesTable th:nth-child(1),
-#campeoesTable td:nth-child(1) {
-    width: 10%; /* Ano */
-}
-
-#campeoesTable th:nth-child(2),
-#campeoesTable td:nth-child(2),
-#campeoesTable th:nth-child(3),
-#campeoesTable td:nth-child(3),
-#campeoesTable th:nth-child(4),
-#campeoesTable td:nth-child(4) {
-    width: 30%; /* AMBO Keeper, AMBO Série A, AMBO Série B */
-}
-
 /* Esconde a seção de ranking combinado e tabelas das ligas por padrão */
 .hidden {
     display: none;
@@ -337,8 +322,8 @@ table tr:hover {
 /* Ajusta o tamanho das tabelas e centraliza a tabela de ranking combinado */
 #combined-table-container {
     max-width: 100%;
-    margin: 0 0.3125rem;
-    padding: 0.625rem;
+    margin: 0 0;
+    padding: 0;
     background-color: #293142;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -349,13 +334,13 @@ table tr:hover {
 }
 
 #combinedTable {
-    width: 100%;
+    width: auto;
     border-collapse: collapse;
     background-color: #16213e;
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--box-shadow);
-    font-size: 0.875rem;
+    font-size: 0.675rem;
     display: block;
     table-layout: fixed;
 }
@@ -389,38 +374,6 @@ table tr:hover {
 #combinedTable tbody tr:hover {
     background-color: var(--table-row-hover-color);
     transition: background-color 0.3s ease;
-}
-
-/* Larguras das colunas da tabela de Ranking Combinado */
-#combinedTable th:nth-child(1),
-#combinedTable td:nth-child(1) {
-    width: 5%; /* Rank */
-}
-
-#combinedTable th:nth-child(2),
-#combinedTable td:nth-child(2) {
-    width: 10%; /* Avatar */
-}
-
-#combinedTable th:nth-child(3),
-#combinedTable td:nth-child(3) {
-    width: 30%; /* Time */
-}
-
-#combinedTable th:nth-child(4),
-#combinedTable td:nth-child(4) {
-    width: 15%; /* Pontos */
-}
-
-#combinedTable th:nth-child(5),
-#combinedTable td:nth-child(5) {
-    width: 15%; /* Melhor Posição */
-}
-
-#combinedTable th:nth-child(6),
-#combinedTable td:nth-child(6) {
-    width: 25%; /* Fpts */
-    word-break: break-word; /* Permite a quebra de palavras */
 }
 
 /* Estilos para as linhas de ranking */
@@ -486,26 +439,133 @@ table tr:hover {
     width: 10%;
 }
 
-/* Estilos para o menu mobile (select) */
-#mobile-nav {
-    display: none; /* Oculto por padrão em telas maiores */
-    width: 100%;
-    padding: 0.5rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: var(--border-radius);
-    background-color: var(--background-color);
-    color: var(--text-color);
-    margin-bottom: 1rem;
+/* Larguras das colunas da tabela de Ranking Combinado */
+#combinedTable th:nth-child(1),
+#combinedTable td:nth-child(1) {
+    width: 5%;
 }
 
-/* Media query para telas menores */
+#combinedTable th:nth-child(2),
+#combinedTable td:nth-child(2) {
+    width: 10%;
+}
+
+#combinedTable th:nth-child(3),
+#combinedTable td:nth-child(3) {
+    width: 40%;
+}
+
+#combinedTable th:nth-child(4),
+#combinedTable td:nth-child(4) {
+    width: 15%;
+}
+
+#combinedTable th:nth-child(5),
+#combinedTable td:nth-child(5) {
+    width: 15%;
+    word-break: break-word; /* Permite a quebra de palavras */
+}
+
+#combinedTable th:nth-child(6),
+#combinedTable td:nth-child(6) {
+    width: 15%;
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
-    #mobile-nav {
-        display: block; /* Mostra o menu select em telas menores */
+
+    /* Estilos para o menu hamburger */
+    .hamburger {
+        display: block;
+        /* Garante que o botão hamburger seja visível */
+        position: fixed;
+        top: 1.25rem;
+        left: 1.25rem;
+        z-index: 1001;
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        font-size: 1.5rem;
+    }
+
+    #hamburger-menu-content {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 80%;
+        /* Ajuste a largura conforme necessário */
+        height: 100%;
+        background-color: #16213e;
+        padding: 1.25rem;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        /* Adicionado para lidar com conteúdo longo */
+    }
+
+    #hamburger-menu-content.active {
+        transform: translateX(0);
+    }
+}
+
+/* Hamburger */
+.hamburger {
+    display: none;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    position: fixed;
+    top: 1.25rem;
+    left: 1.25rem;
+    z-index: 1001;
+}
+
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+    }
+
+    #sidebar,
+    #hamburger-menu-content {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 15.625rem;
+        height: 100%;
+        background-color: #16213e;
+        padding: 1.25rem;
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    #sidebar.active,
+    #hamburger-menu-content.active {
+        transform: translateX(0);
+    }
+
+    #hamburger-menu-content.active::before,
+    #sidebar.active::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: -1;
     }
 
     #sidebar {
-        display: none; /* Oculta a sidebar em telas menores */
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
