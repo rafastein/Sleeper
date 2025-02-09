@@ -15,16 +15,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const MOBILE_MENU_BUTTON_ID = 'mobile-menu-button';
     const MOBILE_MENU_ID = 'mobile-menu';
 
-    // Funções para mostrar e ocultar o indicador de carregamento
-    function showLoading() {
-        console.log("showLoading chamado");
-        document.getElementById(LOADING_ELEMENT_ID).classList.remove('hidden');
-    }
+// Funções para mostrar e ocultar o indicador de carregamento
 
-    function hideLoading() {
-        console.log("hideLoading chamado");
-        document.getElementById(LOADING_ELEMENT_ID).classList.add('hidden');
-    }
+ function showLoading() {
+    console.log("showLoading chamado");
+    document.getElementById(LOADING_ELEMENT_ID).classList.remove('hidden');
+       document.getElementById(LOADING_ELEMENT_ID).style.display = 'flex';
+}
+
+function hideLoading() {
+    console.log("hideLoading chamado");
+    document.getElementById(LOADING_ELEMENT_ID).classList.add('hidden');
+       document.getElementById(LOADING_ELEMENT_ID).style.display = 'none';
+}
 
 // Função para exibir mensagens de erro
 function displayError(message) {

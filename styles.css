@@ -516,3 +516,38 @@ table tr:hover {
             display: none;
         }
 }
+
+/* Estilos para o indicador de carregamento */
+#loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: var(--text-color);
+    padding: 1.25rem;
+    border-radius: 0.3125rem;
+    font-size: 1.125rem;
+    z-index: 9999;
+    display: none; /* Oculto por padrão */
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Estilos para o spinner */
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: var(--primary-color);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+/* Animação para o spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
