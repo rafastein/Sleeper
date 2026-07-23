@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -147,3 +148,207 @@
     </template>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMBO - Sleeper</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <!-- Indicador de Carregamento -->
+    <div id="loading" class="hidden">
+        <div class="spinner"></div>
+        Carregando...
+    </div>
+
+   <!-- Mensagem de Erro -->
+   <div id="error-message" class="active"></div>
+
+    <button id="mobile-menu-button" class="mobile-menu-button" aria-label="Menu">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <div id="mobile-menu" class="mobile-menu hidden">
+        <!-- Conteúdo do menu será inserido aqui via JavaScript -->
+    </div>
+
+    <div id="container">
+        <!-- Sidebar (botões laterais) -->
+        <aside id="sidebar">
+            <button id="btnCampeoes" class="active">Campeões</button>
+            <div class="year-group">
+                <span id="year-text-2024">2024</span>
+                <button id="btnSerieA2024">Série A</button>
+                <button id="btnSerieB2024">Série B</button>
+            </div>
+            <div class="year-group">
+                <span id="year-text-2023">2023</span>
+                <button id="btnSerieA2023">Série A</button>
+                <button id="btnSerieB2023">Série B</button>
+            </div>
+            <div class="year-group">
+                <span id="year-text-2022">2022</span>
+                <button id="btnSerieA2022">Série A</button>
+                <button id="btnSerieB2022">Série B</button>
+            </div>
+            <div class="year-group">
+                <span id="year-text-2021">2021</span>
+                <button id="btnSerieA2021">Série A</button>
+                <button id="btnSerieB2021">Série B</button>
+            </div>
+            <div class="year-group">
+                <span id="year-text-2020">2020</span>
+                <button id="btnSerieA2020">Série A</button>
+                <button id="btnSerieB2020">Série B</button>
+            </div>
+        </aside>
+
+        <!-- Conteúdo principal -->
+        <main id="main-content">
+            <!-- Título principal (exibido apenas nas tabelas de ligas) -->
+            <h1 id="main-title" class="hidden">AMBO</h1>
+
+            <!-- Seção de Campeões (exibida por padrão) -->
+            <section id="campeoes-container">
+                <h2>Campeões AMBO</h2>
+                <table id="campeoesTable">
+                    <thead>
+                        <tr>
+                            <th>Ano</th>
+                            <th>AMBO Keeper</th>
+                            <th>AMBO Série A</th>
+                            <th>AMBO Série B</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2024</td>
+                            <td>Jptavares</td>
+                            <td>dedebenjor</td>
+                            <td>Jptavares</td>
+                        </tr>
+                        <tr>
+                            <td>2023</td>
+                            <td>GuiZilse</td>
+                            <td>L_Bezerra</td>
+                            <td>Jotaa</td>
+                        </tr>
+                        <tr>
+                            <td>2022</td>
+                            <td>rafastein</td>
+                            <td>SCPATRIOTS</td>
+                            <td>DanHen</td>
+                        </tr>
+                        <tr>
+                            <td>2021</td>
+                            <td>CanelaShow</td>
+                            <td>SCPATRIOTS</td>
+                            <td>dedebenjor</td>
+                        </tr>
+                        <tr>
+                            <td>2020</td>
+                            <td>RobertoJr</td>
+                            <td>rdfseabra</td>
+                            <td>fabiofirmo</td>
+                        </tr>
+                        <tr>
+                            <td>2019</td>
+                            <td>Jotaa</td>
+                            <td>SCPATRIOTS</td>
+                            <td>Miranda12s</td>
+                        </tr>
+                        <tr>
+                            <td>2018</td>
+                            <td>L_Bezerra</td>
+                            <td>rafastein</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>2017</td>
+                            <td>-</td>
+                            <td>DanHen</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Container das tabelas (oculto por padrão) -->
+            <section id="tables-container">
+                <!-- Ranking Combinado -->
+                <div id="combined-table-container" class="hidden">
+                    <h2>Ranking Combinado</h2>
+                    <table id="combinedTable">
+                        <thead>
+                            <tr>
+                                <th class="rank-column">Rank</th>
+                                <th></th>
+                                <th>Time</th>
+                                <th class="points-column">Pontos</th>
+                                <th>Melhor<BR>Posição</th>
+                                <th>Fpts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Liga 1 -->
+                <div id="ranking-container-left" class="hidden">
+                    <h2>Liga 1</h2>
+                    <table id="table1">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th></th>
+                                <th>Time</th>
+                                <th>Standings</th>
+                                <th>Pontos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Liga 2 -->
+                <div id="ranking-container-right" class="hidden">
+                    <h2>Liga 2</h2>
+                    <table id="table2">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th></th>
+                                <th>Time</th>
+                                <th>Standings</th>
+                                <th>Pontos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script src="script.js"></script>
+</body>
+
+</html>
+>>>>>>> a2d4824b9e4a858430a78d9a3758a74c6ff318f2
