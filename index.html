@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07111f">
+    <meta name="description" content="Histórico de campeões e rankings das ligas AMBO no Sleeper.">
+    <title>AMBO • Central Sleeper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="config.js" defer></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="page-glow page-glow--one" aria-hidden="true"></div>
+    <div class="page-glow page-glow--two" aria-hidden="true"></div>
+
+    <button id="mobile-menu-button" class="mobile-menu-button" type="button" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
+    <button id="menu-backdrop" class="menu-backdrop" type="button" aria-label="Fechar menu" tabindex="-1"></button>
+
+    <div class="app-shell">
+        <aside id="sidebar" class="sidebar" aria-label="Navegação principal">
+            <div class="brand">
+                <div class="brand__mark" aria-hidden="true">A</div>
+                <div>
+                    <strong>AMBO</strong>
+                    <span>Central Sleeper</span>
+                </div>
+            </div>
+
+            <nav id="navigation" class="navigation"></nav>
+
+            <div class="sidebar__footer">
+                <span class="status-dot" aria-hidden="true"></span>
+                Dados via Sleeper API
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <p id="page-eyebrow" class="eyebrow">Histórico oficial</p>
+                    <h1 id="page-title">Hall de campeões</h1>
+                    <p id="page-description" class="page-description">A história das ligas AMBO reunida em um só lugar.</p>
+                </div>
+                <div id="last-update" class="last-update" aria-live="polite"></div>
+            </header>
+
+            <div id="error-message" class="alert" role="alert" hidden></div>
+
+            <section id="champions-view" class="view" aria-labelledby="page-title">
+                <div id="champion-stats" class="stats-grid"></div>
+
+                <article class="panel panel--featured">
+                    <div class="panel__header">
+                        <div>
+                            <p class="panel__eyebrow">Linha do tempo</p>
+                            <h2>Campeões AMBO</h2>
+                        </div>
+                        <span id="champions-range" class="pill"></span>
+                    </div>
+                    <div class="table-scroll">
+                        <table id="champions-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Ano</th>
+                                    <th scope="col">AMBO Keeper</th>
+                                    <th scope="col">AMBO Série A</th>
+                                    <th scope="col">AMBO Série B</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+            <section id="ranking-view" class="view" aria-labelledby="page-title" hidden>
+                <div id="season-stats" class="stats-grid"></div>
+
+                <article class="panel panel--featured">
+                    <div class="panel__header">
+                        <div>
+                            <p class="panel__eyebrow">Pontuação somada nas duas ligas</p>
+                            <h2>Ranking combinado</h2>
+                        </div>
+                        <span id="ranking-status" class="pill"></span>
+                    </div>
+                    <div class="table-scroll">
+                        <table id="combined-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="col-rank">Pos.</th>
+                                    <th scope="col" class="col-avatar"><span class="sr-only">Avatar</span></th>
+                                    <th scope="col">Manager</th>
+                                    <th scope="col">Pontos</th>
+                                    <th scope="col">Melhor posição</th>
+                                    <th scope="col">FPTS</th>
+                                    <th scope="col">Ligas</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <div id="league-panels" class="league-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="loading" class="loading-overlay" role="status" aria-live="polite" hidden>
+        <div class="loader" aria-hidden="true"></div>
+        <strong>Buscando dados no Sleeper</strong>
+        <span>Montando as classificações...</span>
+    </div>
+
+    <template id="league-panel-template">
+        <article class="panel league-panel">
+            <div class="panel__header">
+                <div>
+                    <p class="panel__eyebrow league-number"></p>
+                    <h2 class="league-name"></h2>
+                </div>
+                <span class="pill league-season"></span>
+            </div>
+            <div class="table-scroll">
+                <table class="league-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="col-rank">Pos.</th>
+                            <th scope="col" class="col-avatar"><span class="sr-only">Avatar</span></th>
+                            <th scope="col">Equipe</th>
+                            <th scope="col">Campanha</th>
+                            <th scope="col">Pontos</th>
+                            <th scope="col">FPTS</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </article>
+    </template>
+</body>
+</html>
