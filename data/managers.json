@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-24T06:39:44.880Z",
+  "generatedAt": "2026-07-24T11:09:33.771Z",
   "managers": [
     {
       "canonicalId": "brunocamposl",
@@ -63,11 +63,53 @@
       ]
     },
     {
+      "canonicalId": "diegoespindola",
+      "displayName": "diegoespindola",
+      "sleeperUserIds": [
+        "478661138788118528"
+      ],
+      "aliases": [
+        "diegoespindola"
+      ]
+    },
+    {
       "canonicalId": "fabiofirmo",
       "displayName": "fabiofirmo",
-      "sleeperUserIds": [],
+      "sleeperUserIds": [
+        "593834876340318208"
+      ],
       "aliases": [
         "fabiofirmo"
+      ]
+    },
+    {
+      "canonicalId": "felipevasconcelos",
+      "displayName": "felipevasconcelos",
+      "sleeperUserIds": [
+        "462465679883235328"
+      ],
+      "aliases": [
+        "felipevasconcelos"
+      ]
+    },
+    {
+      "canonicalId": "george77",
+      "displayName": "George77",
+      "sleeperUserIds": [
+        "459039615156744192"
+      ],
+      "aliases": [
+        "George77"
+      ]
+    },
+    {
+      "canonicalId": "ggmota",
+      "displayName": "Ggmota",
+      "sleeperUserIds": [
+        "722109616988721152"
+      ],
+      "aliases": [
+        "Ggmota"
       ]
     },
     {
@@ -107,7 +149,9 @@
         "867415604578131968"
       ],
       "aliases": [
-        "JotaCPanthers_BR"
+        "jotace87",
+        "JotaCPanthers_BR",
+        "PanterinhasNE"
       ]
     },
     {
@@ -127,7 +171,18 @@
         "455115982172581888"
       ],
       "aliases": [
-        "L_Bezerra"
+        "L_Bezerra",
+        "OlindaFalcons"
+      ]
+    },
+    {
+      "canonicalId": "lsutigers",
+      "displayName": "LSU_Tigers",
+      "sleeperUserIds": [
+        "466669691117498368"
+      ],
+      "aliases": [
+        "LSU_Tigers"
       ]
     },
     {
@@ -171,6 +226,16 @@
       ]
     },
     {
+      "canonicalId": "rafamontatrades",
+      "displayName": "Rafamontatrades",
+      "sleeperUserIds": [
+        "456664069433192448"
+      ],
+      "aliases": [
+        "Rafamontatrades"
+      ]
+    },
+    {
       "canonicalId": "rafastein",
       "displayName": "rafastein",
       "sleeperUserIds": [
@@ -181,9 +246,21 @@
       ]
     },
     {
+      "canonicalId": "ramosiano",
+      "displayName": "Ramosiano",
+      "sleeperUserIds": [
+        "468633587067908096"
+      ],
+      "aliases": [
+        "Ramosiano"
+      ]
+    },
+    {
       "canonicalId": "rdfseabra",
       "displayName": "rdfseabra",
-      "sleeperUserIds": [],
+      "sleeperUserIds": [
+        "459007552965832704"
+      ],
       "aliases": [
         "rdfseabra"
       ]
@@ -216,6 +293,16 @@
       ],
       "aliases": [
         "romeroferraz"
+      ]
+    },
+    {
+      "canonicalId": "rosarinhowoods",
+      "displayName": "RosarinhoWoods",
+      "sleeperUserIds": [
+        "589183856876228608"
+      ],
+      "aliases": [
+        "RosarinhoWoods"
       ]
     },
     {
@@ -255,6 +342,7 @@
         "860271647331045376"
       ],
       "aliases": [
+        "galoinacio",
         "TiagoGalo"
       ]
     }

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-24T06:39:44.880Z",
+  "generatedAt": "2026-07-24T11:09:33.771Z",
   "snapshots": [
     {
       "year": 2025,
       "seriesKey": "serieA",
-      "generatedAt": "2026-07-24T06:39:44.880Z",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
       "leagues": [
         "1253457352703614976",
         "1253457635739447296"
@@ -15,10 +15,110 @@
     {
       "year": 2025,
       "seriesKey": "serieB",
-      "generatedAt": "2026-07-24T06:39:44.880Z",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
       "leagues": [
         "1253459941541281792",
         "1253460428399321088"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2024,
+      "seriesKey": "serieA",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "1051278540760530944",
+        "1051278597819854848"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2024,
+      "seriesKey": "serieB",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "1126717143111917568",
+        "1126717395566989312"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2023,
+      "seriesKey": "serieA",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "989658378832011264",
+        "989658509971116032"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2023,
+      "seriesKey": "serieB",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "989661009860243456",
+        "989661264643211264"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2022,
+      "seriesKey": "serieA",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "786638128248139776",
+        "786638212645892096"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2022,
+      "seriesKey": "serieB",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "786646187062198272",
+        "786646606844981248"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2021,
+      "seriesKey": "serieA",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "651842956122185728",
+        "651842832386056192"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2021,
+      "seriesKey": "serieB",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "711300543254953984",
+        "711301089126866944"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2020,
+      "seriesKey": "serieA",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "593817346833960960",
+        "593818329571971072"
+      ],
+      "usedFallback": false
+    },
+    {
+      "year": 2020,
+      "seriesKey": "serieB",
+      "generatedAt": "2026-07-24T11:09:33.771Z",
+      "leagues": [
+        "593834118790291456",
+        "593830974849073152"
       ],
       "usedFallback": false
     }

@@ -2,19 +2,19 @@
   "schemaVersion": 1,
   "generatedAt": "2026-07-24T11:09:33.771Z",
   "source": "Sleeper API",
-  "year": 2025,
+  "year": 2021,
   "seriesKey": "serieA",
   "seriesLabel": "Série A",
   "leagues": [
     {
       "index": 0,
-      "leagueId": "1253457352703614976",
+      "leagueId": "651842956122185728",
       "league": {
-        "league_id": "1253457352703614976",
+        "league_id": "651842956122185728",
         "name": "AMBO A1",
-        "season": "2025",
+        "season": "2021",
         "status": "complete",
-        "previous_league_id": "1051278540760530944",
+        "previous_league_id": "593817346833960960",
         "settings": {
           "playoff_teams": 6
         }
@@ -22,7 +22,7 @@
       "rosters": [
         {
           "roster_id": 1,
-          "owner_id": "458977644550025216",
+          "owner_id": "449036084039380992",
           "metadata": {
             "allow_pn_news": "off",
             "allow_pn_scoring": "on",
@@ -37,129 +37,125 @@
             "p_nick_5549": "OTB",
             "p_nick_5850": "Negociável",
             "p_nick_6130": "Negociável",
-            "record": "LLWLWWLWWLWWWL",
-            "streak": "1L"
+            "record": "WLLWLLWLLLLLWW",
+            "streak": "2W"
           },
           "settings": {
-            "wins": 8,
-            "losses": 6,
+            "wins": 5,
+            "losses": 9,
             "ties": 0,
-            "fpts": 1422,
-            "fpts_decimal": 62,
-            "fpts_against": 1383,
-            "fpts_against_decimal": 24
+            "fpts": 1409,
+            "fpts_decimal": 92,
+            "fpts_against": 1381,
+            "fpts_against_decimal": 34
           }
         },
         {
           "roster_id": 2,
           "owner_id": "445582191489970176",
           "metadata": {
-            "record": "LWWLWLLLLLLLLW",
-            "streak": "1W"
-          },
-          "settings": {
-            "wins": 4,
-            "losses": 10,
-            "ties": 0,
-            "fpts": 1244,
-            "fpts_decimal": 82,
-            "fpts_against": 1511,
-            "fpts_against_decimal": 76
-          }
-        },
-        {
-          "roster_id": 3,
-          "owner_id": "449069284769918976",
-          "metadata": {
-            "allow_pn_news": "off",
-            "allow_pn_scoring": "on",
-            "record": "WWLWLLLLLWWWLL",
-            "streak": "2L"
+            "record": "LLWLWLLLWWLWWL",
+            "streak": "1L"
           },
           "settings": {
             "wins": 6,
             "losses": 8,
             "ties": 0,
-            "fpts": 1323,
-            "fpts_decimal": 98,
-            "fpts_against": 1453,
-            "fpts_against_decimal": 56
+            "fpts": 1462,
+            "fpts_decimal": 12,
+            "fpts_against": 1451,
+            "fpts_against_decimal": 12
+          }
+        },
+        {
+          "roster_id": 3,
+          "owner_id": "450476069154189312",
+          "metadata": {
+            "allow_pn_news": "off",
+            "allow_pn_scoring": "on",
+            "record": "LWWWWLWWLWWWLW",
+            "streak": "1W"
+          },
+          "settings": {
+            "wins": 10,
+            "losses": 4,
+            "ties": 0,
+            "fpts": 1638,
+            "fpts_decimal": 90,
+            "fpts_against": 1393,
+            "fpts_against_decimal": 50
           }
         },
         {
           "roster_id": 4,
           "owner_id": "455115982172581888",
           "metadata": {
-            "allow_pn_inactive_starters": "on",
-            "allow_pn_player_injury_status": "on",
-            "allow_pn_scoring": "on",
-            "record": "LLWWWLLLWLLLWL",
-            "restrict_pn_scoring_starters_only": "on",
-            "streak": "1L"
-          },
-          "settings": {
-            "wins": 5,
-            "losses": 9,
-            "ties": 0,
-            "fpts": 1391,
-            "fpts_decimal": 2,
-            "fpts_against": 1541,
-            "fpts_against_decimal": 52
-          }
-        },
-        {
-          "roster_id": 5,
-          "owner_id": "460216259665981440",
-          "metadata": {
-            "allow_pn_news": "off",
-            "allow_pn_scoring": "on",
-            "record": "WLLWWLWWWWLLLW",
-            "streak": "1W"
+            "record": "WLWWLLLLWWWLWW",
+            "streak": "2W"
           },
           "settings": {
             "wins": 8,
             "losses": 6,
             "ties": 0,
-            "fpts": 1584,
-            "fpts_decimal": 8,
-            "fpts_against": 1455,
-            "fpts_against_decimal": 26
+            "fpts": 1500,
+            "fpts_decimal": 64,
+            "fpts_against": 1421,
+            "fpts_against_decimal": 34
+          }
+        },
+        {
+          "roster_id": 5,
+          "owner_id": "449069284769918976",
+          "metadata": {
+            "allow_pn_news": "off",
+            "allow_pn_scoring": "on",
+            "record": "WWLLWLWWWLLLLL",
+            "streak": "5L"
+          },
+          "settings": {
+            "wins": 6,
+            "losses": 8,
+            "ties": 0,
+            "fpts": 1418,
+            "fpts_decimal": 28,
+            "fpts_against": 1493,
+            "fpts_against_decimal": 86
           }
         },
         {
           "roster_id": 6,
-          "owner_id": "714183253740851200",
+          "owner_id": "593834876340318208",
           "metadata": {
             "allow_pn_scoring": "off",
-            "record": "LWWLLLWLLWLLLL",
+            "record": "LLWWWWWLLLLWWL",
             "restrict_pn_scoring_starters_only": "on",
-            "streak": "4L"
+            "streak": "1L"
           },
           "settings": {
-            "wins": 4,
-            "losses": 10,
+            "wins": 7,
+            "losses": 7,
             "ties": 0,
-            "fpts": 1401,
-            "fpts_decimal": 80,
-            "fpts_against": 1572,
-            "fpts_against_decimal": 86
+            "fpts": 1609,
+            "fpts_decimal": 96,
+            "fpts_against": 1568,
+            "fpts_against_decimal": 32
           }
         },
         {
           "roster_id": 7,
           "owner_id": "449023164270243840",
           "metadata": {
-            "record": "WWLLLWLLWLLWLL",
+            "record": "LWWLWWLLLWWWLL",
             "streak": "2L"
           },
           "settings": {
-            "wins": 5,
-            "losses": 9,
+            "wins": 7,
+            "losses": 7,
             "ties": 0,
-            "fpts": 1325,
-            "fpts_decimal": 24,
-            "fpts_against": 1448,
-            "fpts_against_decimal": 28
+            "fpts": 1596,
+            "fpts_decimal": 60,
+            "fpts_against": 1646,
+            "fpts_against_decimal": 52
           }
         },
         {
@@ -170,90 +166,86 @@
             "league_avatar": "",
             "league_description": "10 Team Half PPR League",
             "league_name": "AMBO A1",
-            "record": "WWLLWWWWWLWWWW",
-            "streak": "4W"
-          },
-          "settings": {
-            "wins": 11,
-            "losses": 3,
-            "ties": 0,
-            "fpts": 1630,
-            "fpts_decimal": 64,
-            "fpts_against": 1409,
-            "fpts_against_decimal": 92
-          }
-        },
-        {
-          "roster_id": 9,
-          "owner_id": "867416391458897920",
-          "metadata": {
-            "allow_pn_inactive_starters": "on",
-            "allow_pn_player_injury_status": "off",
-            "allow_pn_scoring": "off",
-            "p_nick_289": "Negociável",
-            "record": "LLLWWWLLLLWLWW",
-            "restrict_pn_scoring_starters_only": "on",
-            "streak": "2W"
-          },
-          "settings": {
-            "wins": 6,
-            "losses": 8,
-            "ties": 0,
-            "fpts": 1417,
-            "fpts_decimal": 92,
-            "fpts_against": 1474,
-            "fpts_against_decimal": 62
-          }
-        },
-        {
-          "roster_id": 10,
-          "owner_id": "459817765377667072",
-          "metadata": {
-            "record": "LLWWLLWWLWLLWW",
-            "streak": "2W"
-          },
-          "settings": {
-            "wins": 7,
-            "losses": 7,
-            "ties": 0,
-            "fpts": 1380,
-            "fpts_decimal": 32,
-            "fpts_against": 1331,
-            "fpts_against_decimal": 80
-          }
-        },
-        {
-          "roster_id": 11,
-          "owner_id": "867415604578131968",
-          "metadata": {
-            "record": "WLLLLWWWLWWWWL",
+            "record": "LLLWWWLWWLWWWL",
             "streak": "1L"
           },
           "settings": {
             "wins": 8,
             "losses": 6,
             "ties": 0,
-            "fpts": 1471,
-            "fpts_decimal": 30,
-            "fpts_against": 1308,
-            "fpts_against_decimal": 2
+            "fpts": 1352,
+            "fpts_decimal": 6,
+            "fpts_against": 1467,
+            "fpts_against_decimal": 72
+          }
+        },
+        {
+          "roster_id": 9,
+          "owner_id": "459814872146767872",
+          "metadata": {
+            "p_nick_289": "Negociável",
+            "record": "WLLLLWWWLLWLLW",
+            "streak": "1W"
+          },
+          "settings": {
+            "wins": 6,
+            "losses": 8,
+            "ties": 0,
+            "fpts": 1433,
+            "fpts_decimal": 90,
+            "fpts_against": 1551,
+            "fpts_against_decimal": 6
+          }
+        },
+        {
+          "roster_id": 10,
+          "owner_id": "459007552965832704",
+          "metadata": {
+            "record": "WWLLLWWWWWLLWW",
+            "streak": "2W"
+          },
+          "settings": {
+            "wins": 9,
+            "losses": 5,
+            "ties": 0,
+            "fpts": 1447,
+            "fpts_decimal": 22,
+            "fpts_against": 1385,
+            "fpts_against_decimal": 76
+          }
+        },
+        {
+          "roster_id": 11,
+          "owner_id": "460262982534819840",
+          "metadata": {
+            "record": "LWWLLLLWWLLWLW",
+            "streak": "1W"
+          },
+          "settings": {
+            "wins": 6,
+            "losses": 8,
+            "ties": 0,
+            "fpts": 1474,
+            "fpts_decimal": 88,
+            "fpts_against": 1489,
+            "fpts_against_decimal": 22
           }
         },
         {
           "roster_id": 12,
-          "owner_id": "455157080240680960",
+          "owner_id": "455196161398009856",
           "metadata": {
-            "record": "WWWWLWWWWWWWLW",
-            "streak": "1W"
+            "record": "WWLWLWLLLWWLLL",
+            "streak": "3L"
           },
           "settings": {
-            "wins": 12,
-            "losses": 2,
+            "wins": 6,
+            "losses": 8,
             "ties": 0,
-            "fpts": 1581,
-            "fpts_decimal": 4,
-            "fpts_against": 1283,
-            "fpts_against_decimal": 94
+            "fpts": 1357,
+            "fpts_decimal": 10,
+            "fpts_against": 1451,
+            "fpts_against_decimal": 82
           }
         }
       ],
@@ -265,7 +257,6 @@
           "avatar": "ab879cb3e6a53b5d4fbd45cc205d9478",
           "metadata": {
             "allow_pn": "on",
-            "allow_sms": "on",
             "archived": "off",
             "mention_pn": "on"
           }
@@ -281,13 +272,43 @@
           }
         },
         {
+          "user_id": "449036084039380992",
+          "username": null,
+          "display_name": "DanHen",
+          "avatar": "8241cac2814c37ac82d3b6239b3810bc",
+          "metadata": {
+            "allow_pn": "on",
+            "archived": "on",
+            "mention_pn": "on"
+          }
+        },
+        {
           "user_id": "449069284769918976",
           "username": null,
           "display_name": "NelSat",
-          "avatar": "ddfbc47c05ba1c5ba50a05f0cc741a4c",
+          "avatar": "c5e0fbbf86ba6ed513fc879f4c0544ea",
           "metadata": {
             "allow_pn": "on",
             "archived": "off",
+            "mascot_item_type_id_leg_1": "panpan",
+            "mascot_item_type_id_leg_10": "panpan",
+            "mascot_item_type_id_leg_11": "panpan",
+            "mascot_item_type_id_leg_12": "panpan",
+            "mascot_item_type_id_leg_13": "panpan",
+            "mascot_item_type_id_leg_14": "panpan",
+            "mascot_item_type_id_leg_15": "panpan",
+            "mascot_item_type_id_leg_16": "panpan",
+            "mascot_item_type_id_leg_17": "panpan",
+            "mascot_item_type_id_leg_18": "panpan",
+            "mascot_item_type_id_leg_2": "panpan",
+            "mascot_item_type_id_leg_3": "panpan",
+            "mascot_item_type_id_leg_4": "panpan",
+            "mascot_item_type_id_leg_5": "panpan",
+            "mascot_item_type_id_leg_6": "panpan",
+            "mascot_item_type_id_leg_7": "panpan",
+            "mascot_item_type_id_leg_8": "panpan",
+            "mascot_item_type_id_leg_9": "panpan",
+            "mascot_message_emotion_leg_1": "taunting",
             "mention_pn": "on"
           }
         },
@@ -296,6 +317,671 @@
           "username": null,
           "display_name": "Sank",
           "avatar": "3ce71295a5556aea3d63145973b566e0",
+          "metadata": {
+            "allow_pn": "on",
+            "mascot_item_type_id_leg_1": "panpan",
+            "mascot_item_type_id_leg_10": "panpan",
+            "mascot_item_type_id_leg_11": "panpan",
+            "mascot_item_type_id_leg_12": "panpan",
+            "mascot_item_type_id_leg_13": "panpan",
+            "mascot_item_type_id_leg_14": "panpan",
+            "mascot_item_type_id_leg_15": "panpan",
+            "mascot_item_type_id_leg_16": "panpan",
+            "mascot_item_type_id_leg_17": "panpan",
+            "mascot_item_type_id_leg_18": "panpan",
+            "mascot_item_type_id_leg_2": "panpan",
+            "mascot_item_type_id_leg_3": "panpan",
+            "mascot_item_type_id_leg_4": "panpan",
+            "mascot_item_type_id_leg_5": "panpan",
+            "mascot_item_type_id_leg_6": "panpan",
+            "mascot_item_type_id_leg_7": "panpan",
+            "mascot_item_type_id_leg_8": "panpan",
+            "mascot_item_type_id_leg_9": "panpan",
+            "mascot_message_emotion_leg_1": "idle",
+            "mention_pn": "on"
+          }
+        },
+        {
+          "user_id": "450476069154189312",
+          "username": null,
+          "display_name": "SCPATRIOTS",
+          "avatar": "1e95955c4b8d2bd5c8f2c391c87c51b1",
+          "metadata": {
+            "allow_pn": "on",
+            "mention_pn": "on"
+          }
+        },
+        {
+          "user_id": "455115982172581888",
+          "username": null,
+          "display_name": "OlindaFalcons",
+          "avatar": "28c10cc8e49e9adaf274d5a0dcdbd767",
+          "metadata": {
+            "allow_pn": "on",
+            "archived": "off",
+            "mention_pn": "on",
+            "team_name": "Olinda Falcons 1"
+          }
+        },
+        {
+          "user_id": "455196161398009856",
+          "username": null,
+          "display_name": "GuiZilse",
+          "avatar": "4cd377c306da19621012531d8c7b0066",
+          "metadata": {
+            "allow_pn": "on",
+            "mention_pn": "on"
+          }
+        },
+        {
+          "user_id": "459007552965832704",
+          "username": null,
+          "display_name": "rdfseabra",
+          "avatar": "7f8f7cd78e9eec544dd552b064de67dd",
+          "metadata": {
+            "allow_pn": "on",
+            "avatar": "https://sleepercdn.com/uploads/efb225083e84535fe7338a0b2203eb5f.jpg",
+            "mention_pn": "on",
+            "team_name": "Invictus"
+          }
+        },
+        {
+          "user_id": "459814872146767872",
+          "username": null,
+          "display_name": "rafastein",
+          "avatar": "b6f7eee9c000b1d41716eb7fa8608042",
+          "metadata": {
+            "allow_pn": "on",
+            "mascot_item_type_id_leg_1": "doge",
+            "mascot_item_type_id_leg_10": "doge",
+            "mascot_item_type_id_leg_11": "doge",
+            "mascot_item_type_id_leg_12": "doge",
+            "mascot_item_type_id_leg_13": "doge",
+            "mascot_item_type_id_leg_14": "doge",
+            "mascot_item_type_id_leg_15": "doge",
+            "mascot_item_type_id_leg_16": "doge",
+            "mascot_item_type_id_leg_17": "doge",
+            "mascot_item_type_id_leg_18": "doge",
+            "mascot_item_type_id_leg_2": "doge",
+            "mascot_item_type_id_leg_3": "doge",
+            "mascot_item_type_id_leg_4": "doge",
+            "mascot_item_type_id_leg_5": "doge",
+            "mascot_item_type_id_leg_6": "doge",
+            "mascot_item_type_id_leg_7": "doge",
+            "mascot_item_type_id_leg_8": "doge",
+            "mascot_item_type_id_leg_9": "doge",
+            "mascot_message_emotion_leg_1": "idle",
+            "mention_pn": "on"
+          }
+        },
+        {
+          "user_id": "460262982534819840",
+          "username": null,
+          "display_name": "RobertoJr",
+          "avatar": "b788d89d28da8e58b70109e22c54a645",
+          "metadata": {
+            "allow_pn": "on",
+            "mention_pn": "on",
+            "show_mascots": "on",
+            "team_name": "Bucs da Massa I"
+          }
+        },
+        {
+          "user_id": "593834876340318208",
+          "username": null,
+          "display_name": "fabiofirmo",
+          "avatar": "23fe4994d864928df8f99d56b60c9179",
+          "metadata": {
+            "allow_pn": "off",
+            "avatar": "https://sleepercdn.com/uploads/635d928afbd36a9ff5b9346ef8b0ad0b.jpg",
+            "join_voice_pn": "off",
+            "mascot_message": "off",
+            "mention_pn": "on",
+            "player_like_pn": "off",
+            "player_nickname_update": "off",
+            "team_name": "Jamaicandeias Horses I",
+            "team_name_update": "off",
+            "trade_block_pn": "off",
+            "transaction_commissioner": "off",
+            "transaction_free_agent": "off",
+            "transaction_trade": "off",
+            "transaction_waiver": "off",
+            "user_message_pn": "off"
+          }
+        }
+      ],
+      "winnersBracket": [
+        {
+          "m": 1,
+          "r": 1,
+          "l": 6,
+          "w": 8,
+          "t1": 8,
+          "t2": 6
+        },
+        {
+          "m": 2,
+          "r": 1,
+          "l": 4,
+          "w": 7,
+          "t1": 7,
+          "t2": 4
+        },
+        {
+          "m": 3,
+          "r": 2,
+          "l": 8,
+          "w": 3,
+          "t1": 3,
+          "t2": 8,
+          "t2_from": {
+            "w": 1
+          }
+        },
+        {
+          "m": 4,
+          "r": 2,
+          "l": 7,
+          "w": 10,
+          "t1": 10,
+          "t2": 7,
+          "t2_from": {
+            "w": 2
+          }
+        },
+        {
+          "p": 5,
+          "m": 5,
+          "r": 2,
+          "l": 4,
+          "w": 6,
+          "t1": 6,
+          "t2": 4,
+          "t2_from": {
+            "l": 2
+          },
+          "t1_from": {
+            "l": 1
+          }
+        },
+        {
+          "p": 1,
+          "m": 6,
+          "r": 3,
+          "l": 10,
+          "w": 3,
+          "t1": 3,
+          "t2": 10,
+          "t2_from": {
+            "w": 4
+          },
+          "t1_from": {
+            "w": 3
+          }
+        },
+        {
+          "p": 3,
+          "m": 7,
+          "r": 3,
+          "l": 8,
+          "w": 7,
+          "t1": 8,
+          "t2": 7,
+          "t2_from": {
+            "l": 4
+          },
+          "t1_from": {
+            "l": 3
+          }
+        }
+      ],
+      "losersBracket": [
+        {
+          "m": 1,
+          "r": 1,
+          "l": 5,
+          "w": 12,
+          "t1": 5,
+          "t2": 12
+        },
+        {
+          "m": 2,
+          "r": 1,
+          "l": 1,
+          "w": 9,
+          "t1": 1,
+          "t2": 9
+        },
+        {
+          "m": 3,
+          "r": 2,
+          "l": 12,
+          "w": 11,
+          "t1": 11,
+          "t2": 12,
+          "t2_from": {
+            "w": 1
+          }
+        },
+        {
+          "m": 4,
+          "r": 2,
+          "l": 9,
+          "w": 2,
+          "t1": 2,
+          "t2": 9,
+          "t2_from": {
+            "w": 2
+          }
+        },
+        {
+          "p": 5,
+          "m": 5,
+          "r": 2,
+          "l": 5,
+          "w": 1,
+          "t1": 5,
+          "t2": 1,
+          "t2_from": {
+            "l": 2
+          },
+          "t1_from": {
+            "l": 1
+          }
+        },
+        {
+          "p": 1,
+          "m": 6,
+          "r": 3,
+          "l": 2,
+          "w": 11,
+          "t1": 11,
+          "t2": 2,
+          "t2_from": {
+            "w": 4
+          },
+          "t1_from": {
+            "w": 3
+          }
+        },
+        {
+          "p": 3,
+          "m": 7,
+          "r": 3,
+          "l": 9,
+          "w": 12,
+          "t1": 12,
+          "t2": 9,
+          "t2_from": {
+            "l": 4
+          },
+          "t1_from": {
+            "l": 3
+          }
+        }
+      ],
+      "standings": [
+        {
+          "rank": 1,
+          "rosterId": 3,
+          "points": 12,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 2,
+          "rosterId": 10,
+          "points": 11,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 3,
+          "rosterId": 7,
+          "points": 10,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 4,
+          "rosterId": 8,
+          "points": 9,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 5,
+          "rosterId": 6,
+          "points": 8,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 6,
+          "rosterId": 4,
+          "points": 7,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 7,
+          "rosterId": 11,
+          "points": 6,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 8,
+          "rosterId": 2,
+          "points": 5,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 9,
+          "rosterId": 12,
+          "points": 4,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 10,
+          "rosterId": 9,
+          "points": 3,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 11,
+          "rosterId": 1,
+          "points": 2,
+          "source": "playoff-bracket"
+        },
+        {
+          "rank": 12,
+          "rosterId": 5,
+          "points": 1,
+          "source": "playoff-bracket"
+        }
+      ],
+      "usedFallback": false,
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "rosterCount": 12,
+        "expectedPointTotal": 78,
+        "actualPointTotal": 78
+      }
+    },
+    {
+      "index": 1,
+      "leagueId": "651842832386056192",
+      "league": {
+        "league_id": "651842832386056192",
+        "name": "AMBO A2",
+        "season": "2021",
+        "status": "complete",
+        "previous_league_id": "593818329571971072",
+        "settings": {
+          "playoff_teams": 6
+        }
+      },
+      "rosters": [
+        {
+          "roster_id": 1,
+          "owner_id": "449036084039380992",
+          "metadata": {
+            "p_nick_1479": "Negociável",
+            "p_nick_2168": "Negociável",
+            "p_nick_2197": "Negociável",
+            "p_nick_2238": "Negociável",
+            "p_nick_3157": "OTB",
+            "p_nick_3163": "Negociável",
+            "p_nick_3200": "OTB",
+            "p_nick_3286": "OTB",
+            "p_nick_4018": "Negociável",
+            "p_nick_4055": "Negociável",
+            "p_nick_4949": "Negociável",
+            "p_nick_5000": "",
+            "p_nick_616": "Negociável",
+            "p_nick_676": "Negociável",
+            "record": "LWLLLLLLLLLWWL",
+            "streak": "1L"
+          },
+          "settings": {
+            "wins": 3,
+            "losses": 11,
+            "ties": 0,
+            "fpts": 1381,
+            "fpts_decimal": 24,
+            "fpts_against": 1558,
+            "fpts_against_decimal": 70
+          }
+        },
+        {
+          "roster_id": 2,
+          "owner_id": "445582191489970176",
+          "metadata": {
+            "record": "LLWWWWWLLLLLWW",
+            "streak": "2W"
+          },
+          "settings": {
+            "wins": 7,
+            "losses": 7,
+            "ties": 0,
+            "fpts": 1500,
+            "fpts_decimal": 26,
+            "fpts_against": 1532,
+            "fpts_against_decimal": 50
+          }
+        },
+        {
+          "roster_id": 3,
+          "owner_id": "450476069154189312",
+          "metadata": {
+            "record": "LWWWWLLWWWWLWW",
+            "streak": "2W"
+          },
+          "settings": {
+            "wins": 10,
+            "losses": 4,
+            "ties": 0,
+            "fpts": 1522,
+            "fpts_decimal": 46,
+            "fpts_against": 1396,
+            "fpts_against_decimal": 36
+          }
+        },
+        {
+          "roster_id": 4,
+          "owner_id": "455115982172581888",
+          "metadata": {
+            "record": "WLLLLLWWWLLWLW",
+            "streak": "1W"
+          },
+          "settings": {
+            "wins": 6,
+            "losses": 8,
+            "ties": 0,
+            "fpts": 1399,
+            "fpts_decimal": 18,
+            "fpts_against": 1505,
+            "fpts_against_decimal": 52
+          }
+        },
+        {
+          "roster_id": 5,
+          "owner_id": "449069284769918976",
+          "metadata": {
+            "record": "WWWWWWWWLWWWLW",
+            "streak": "1W"
+          },
+          "settings": {
+            "wins": 12,
+            "losses": 2,
+            "ties": 0,
+            "fpts": 1781,
+            "fpts_decimal": 76,
+            "fpts_against": 1479,
+            "fpts_against_decimal": 74
+          }
+        },
+        {
+          "roster_id": 6,
+          "owner_id": "593834876340318208",
+          "metadata": {
+            "allow_pn_news": "off",
+            "allow_pn_scoring": "off",
+            "record": "LLLLWWLWWLWWLL",
+            "restrict_pn_scoring_starters_only": "on",
+            "streak": "2L"
+          },
+          "settings": {
+            "wins": 6,
+            "losses": 8,
+            "ties": 0,
+            "fpts": 1378,
+            "fpts_decimal": 30,
+            "fpts_against": 1494,
+            "fpts_against_decimal": 6
+          }
+        },
+        {
+          "roster_id": 7,
+          "owner_id": "449023164270243840",
+          "metadata": {
+            "record": "LWWWWWLWLWWLWW",
+            "streak": "2W"
+          },
+          "settings": {
+            "wins": 10,
+            "losses": 4,
+            "ties": 0,
+            "fpts": 1553,
+            "fpts_decimal": 42,
+            "fpts_against": 1397,
+            "fpts_against_decimal": 0
+          }
+        },
+        {
+          "roster_id": 8,
+          "owner_id": "449600776445095936",
+          "metadata": {
+            "allow_pn_scoring": "on",
+            "record": "WLWLLLWLLLLLLL",
+            "restrict_pn_scoring_starters_only": "on",
+            "streak": "7L"
+          },
+          "settings": {
+            "wins": 3,
+            "losses": 11,
+            "ties": 0,
+            "fpts": 1309,
+            "fpts_decimal": 12,
+            "fpts_against": 1481,
+            "fpts_against_decimal": 30
+          }
+        },
+        {
+          "roster_id": 9,
+          "owner_id": "459814872146767872",
+          "metadata": {
+            "p_nick_DET": "Troco por TE",
+            "record": "WWLWLLWLWWWWWL",
+            "streak": "1L"
+          },
+          "settings": {
+            "wins": 9,
+            "losses": 5,
+            "ties": 0,
+            "fpts": 1470,
+            "fpts_decimal": 84,
+            "fpts_against": 1317,
+            "fpts_against_decimal": 66
+          }
+        },
+        {
+          "roster_id": 10,
+          "owner_id": "459007552965832704",
+          "metadata": {
+            "allow_pn_news": "off",
+            "allow_pn_scoring": "off",
+            "record": "WLLLLWWWWWLLWL",
+            "streak": "1L"
+          },
+          "settings": {
+            "wins": 7,
+            "losses": 7,
+            "ties": 0,
+            "fpts": 1479,
+            "fpts_decimal": 88,
+            "fpts_against": 1472,
+            "fpts_against_decimal": 98
+          }
+        },
+        {
+          "roster_id": 11,
+          "owner_id": "460262982534819840",
+          "metadata": {
+            "record": "WLLWLWLLLLLWLW",
+            "streak": "1W"
+          },
+          "settings": {
+            "wins": 5,
+            "losses": 9,
+            "ties": 0,
+            "fpts": 1304,
+            "fpts_decimal": 18,
+            "fpts_against": 1459,
+            "fpts_against_decimal": 99
+          }
+        },
+        {
+          "roster_id": 12,
+          "owner_id": "455196161398009856",
+          "metadata": {
+            "record": "LWWLWLLLWWWLLL",
+            "streak": "3L"
+          },
+          "settings": {
+            "wins": 6,
+            "losses": 8,
+            "ties": 0,
+            "fpts": 1329,
+            "fpts_decimal": 82,
+            "fpts_against": 1314,
+            "fpts_against_decimal": 64
+          }
+        }
+      ],
+      "users": [
+        {
+          "user_id": "445582191489970176",
+          "username": null,
+          "display_name": "CanelaShow",
+          "avatar": "ab879cb3e6a53b5d4fbd45cc205d9478",
+          "metadata": {
+            "allow_pn": "on",
+            "archived": "off",
+            "mention_pn": "on"
+          }
+        },
+        {
+          "user_id": "449023164270243840",
+          "username": null,
+          "display_name": "Miranda12s",
+          "avatar": "7fb450a5b9acf255a2a563067dcd7bbe",
+          "metadata": {
+            "allow_pn": "on",
+            "mention_pn": "on"
+          }
+        },
+        {
+          "user_id": "449036084039380992",
+          "username": null,
+          "display_name": "DanHen",
+          "avatar": "8241cac2814c37ac82d3b6239b3810bc",
+          "metadata": {
+            "allow_pn": "on",
+            "archived": "on",
+            "mention_pn": "on"
+          }
+        },
+        {
+          "user_id": "449069284769918976",
+          "username": null,
+          "display_name": "NelSat",
+          "avatar": "c5e0fbbf86ba6ed513fc879f4c0544ea",
           "metadata": {
             "allow_pn": "on",
             "archived": "off",
@@ -322,110 +1008,131 @@
           }
         },
         {
+          "user_id": "449600776445095936",
+          "username": null,
+          "display_name": "Sank",
+          "avatar": "3ce71295a5556aea3d63145973b566e0",
+          "metadata": {
+            "allow_pn": "off",
+            "join_voice_pn": "off",
+            "mascot_item_type_id_leg_1": "goat",
+            "mascot_item_type_id_leg_10": "goat",
+            "mascot_item_type_id_leg_11": "goat",
+            "mascot_item_type_id_leg_12": "goat",
+            "mascot_item_type_id_leg_13": "goat",
+            "mascot_item_type_id_leg_14": "goat",
+            "mascot_item_type_id_leg_15": "goat",
+            "mascot_item_type_id_leg_16": "goat",
+            "mascot_item_type_id_leg_17": "goat",
+            "mascot_item_type_id_leg_18": "goat",
+            "mascot_item_type_id_leg_2": "goat",
+            "mascot_item_type_id_leg_3": "goat",
+            "mascot_item_type_id_leg_4": "goat",
+            "mascot_item_type_id_leg_5": "goat",
+            "mascot_item_type_id_leg_6": "goat",
+            "mascot_item_type_id_leg_7": "goat",
+            "mascot_item_type_id_leg_8": "goat",
+            "mascot_item_type_id_leg_9": "goat",
+            "mascot_message": "off",
+            "mascot_message_emotion_leg_1": "idle",
+            "mention_pn": "on",
+            "player_like_pn": "off",
+            "player_nickname_update": "off",
+            "team_name_update": "off",
+            "trade_block_pn": "off",
+            "transaction_commissioner": "on",
+            "transaction_free_agent": "on",
+            "transaction_trade": "on",
+            "transaction_waiver": "on",
+            "user_message_pn": "off"
+          }
+        },
+        {
+          "user_id": "450476069154189312",
+          "username": null,
+          "display_name": "SCPATRIOTS",
+          "avatar": "1e95955c4b8d2bd5c8f2c391c87c51b1",
+          "metadata": {
+            "allow_pn": "on",
+            "mention_pn": "on"
+          }
+        },
+        {
           "user_id": "455115982172581888",
           "username": null,
-          "display_name": "L_Bezerra",
+          "display_name": "OlindaFalcons",
           "avatar": "28c10cc8e49e9adaf274d5a0dcdbd767",
           "metadata": {
             "allow_pn": "on",
             "archived": "off",
-            "league_report_pn": "off",
-            "mascot_message": "on",
             "mention_pn": "on",
-            "player_like_pn": "on",
-            "player_nickname_update": "on",
-            "team_name": "Olinda Falcons 1",
-            "team_name_update": "on",
-            "trade_block_pn": "on",
-            "transaction_commissioner": "on",
-            "transaction_free_agent": "on",
-            "transaction_trade": "on",
-            "transaction_waiver": "on",
-            "user_message_pn": "on"
+            "team_name": "Olinda Falcons 2"
           }
         },
         {
-          "user_id": "455157080240680960",
+          "user_id": "455196161398009856",
           "username": null,
-          "display_name": "Jotaa",
-          "avatar": "0b0c6764f4ca773e86260b43c1731dfe",
+          "display_name": "GuiZilse",
+          "avatar": "4cd377c306da19621012531d8c7b0066",
           "metadata": {
             "allow_pn": "on",
             "mention_pn": "on"
           }
         },
         {
-          "user_id": "458977644550025216",
+          "user_id": "459007552965832704",
           "username": null,
-          "display_name": "dedebenjor",
-          "avatar": "44a4e2e8cd9b40c7bd857f787032a537",
+          "display_name": "rdfseabra",
+          "avatar": "7f8f7cd78e9eec544dd552b064de67dd",
           "metadata": {
             "allow_pn": "on",
+            "avatar": "https://sleepercdn.com/uploads/994a267adb80a4913eb414ecb0b5ce3c.jpg",
             "mention_pn": "on",
-            "team_name": "Recife Bucs"
+            "team_name": "Invictus II"
           }
         },
         {
-          "user_id": "459817765377667072",
+          "user_id": "459814872146767872",
           "username": null,
-          "display_name": "pedrocabesa",
-          "avatar": "cfb4e2b49d379e36a8e06f69ffb7b55c",
+          "display_name": "rafastein",
+          "avatar": "b6f7eee9c000b1d41716eb7fa8608042",
           "metadata": {
             "allow_pn": "on",
             "mention_pn": "on"
           }
         },
         {
-          "user_id": "460216259665981440",
+          "user_id": "460262982534819840",
           "username": null,
-          "display_name": "Jptavares",
-          "avatar": "0b0c6764f4ca773e86260b43c1731dfe",
+          "display_name": "RobertoJr",
+          "avatar": "b788d89d28da8e58b70109e22c54a645",
           "metadata": {
             "allow_pn": "on",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "714183253740851200",
-          "username": null,
-          "display_name": "romeroferraz",
-          "avatar": "4f4090e5e9c3941414db40a871e3e909",
-          "metadata": {
-            "allow_pn": "on",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "867415604578131968",
-          "username": null,
-          "display_name": "JotaCPanthers_BR",
-          "avatar": "e89982d70ab4e77725206867bc56655c",
-          "metadata": {
-            "allow_pn": "on",
-            "archived": "off",
-            "avatar": "https://sleepercdn.com/uploads/cdc8cd758cf740153a7f49271557a58e",
             "mention_pn": "on",
-            "team_name": "VSA Pitus"
+            "team_name": "Bucs da Massa II"
           }
         },
         {
-          "user_id": "867416391458897920",
+          "user_id": "593834876340318208",
           "username": null,
-          "display_name": "steniookita",
-          "avatar": "f05401a6397fdfdc03fe578916331987",
+          "display_name": "fabiofirmo",
+          "avatar": "23fe4994d864928df8f99d56b60c9179",
           "metadata": {
-            "allow_pn": "on",
-            "league_report_pn": "on",
+            "allow_pn": "off",
+            "avatar": "https://sleepercdn.com/uploads/2d9595e33257930423599efd201460ab.jpg",
+            "join_voice_pn": "off",
+            "mascot_message": "off",
             "mention_pn": "on",
-            "player_like_pn": "on",
-            "player_nickname_update": "on",
-            "team_name_update": "on",
-            "trade_block_pn": "on",
-            "transaction_commissioner": "on",
-            "transaction_free_agent": "on",
-            "transaction_trade": "on",
-            "transaction_waiver": "on",
-            "user_message_pn": "on"
+            "player_like_pn": "off",
+            "player_nickname_update": "off",
+            "team_name": "Jamaicandeias Horses II",
+            "team_name_update": "off",
+            "trade_block_pn": "off",
+            "transaction_commissioner": "off",
+            "transaction_free_agent": "off",
+            "transaction_trade": "off",
+            "transaction_waiver": "off",
+            "user_message_pn": "off"
           }
         }
       ],
@@ -433,111 +1140,26 @@
         {
           "m": 1,
           "r": 1,
-          "l": 1,
-          "w": 11,
-          "t1": 11,
-          "t2": 1
-        },
-        {
-          "m": 2,
-          "r": 1,
-          "l": 5,
-          "w": 10,
-          "t1": 10,
-          "t2": 5
-        },
-        {
-          "m": 3,
-          "r": 2,
-          "l": 11,
-          "w": 12,
-          "t1": 12,
-          "t2": 11,
-          "t2_from": {
-            "w": 1
-          }
-        },
-        {
-          "m": 4,
-          "r": 2,
-          "l": 10,
-          "w": 8,
-          "t1": 8,
-          "t2": 10,
-          "t2_from": {
-            "w": 2
-          }
-        },
-        {
-          "p": 5,
-          "m": 5,
-          "r": 2,
-          "l": 1,
-          "w": 5,
-          "t1": 1,
-          "t2": 5,
-          "t2_from": {
-            "l": 2
-          },
-          "t1_from": {
-            "l": 1
-          }
-        },
-        {
-          "p": 1,
-          "m": 6,
-          "r": 3,
-          "l": 12,
-          "w": 8,
-          "t1": 12,
-          "t2": 8,
-          "t2_from": {
-            "w": 4
-          },
-          "t1_from": {
-            "w": 3
-          }
-        },
-        {
-          "p": 3,
-          "m": 7,
-          "r": 3,
-          "l": 11,
-          "w": 10,
-          "t1": 11,
-          "t2": 10,
-          "t2_from": {
-            "l": 4
-          },
-          "t1_from": {
-            "l": 3
-          }
-        }
-      ],
-      "losersBracket": [
-        {
-          "m": 1,
-          "r": 1,
-          "l": 7,
-          "w": 6,
-          "t1": 7,
-          "t2": 6
-        },
-        {
-          "m": 2,
-          "r": 1,
-          "l": 2,
-          "w": 4,
-          "t1": 2,
-          "t2": 4
-        },
-        {
-          "m": 3,
-          "r": 2,
-          "l": 6,
-          "w": 9,
+          "l": 9,
+          "w": 2,
           "t1": 9,
-          "t2": 6,
+          "t2": 2
+        },
+        {
+          "m": 2,
+          "r": 1,
+          "l": 10,
+          "w": 3,
+          "t1": 10,
+          "t2": 3
+        },
+        {
+          "m": 3,
+          "r": 2,
+          "l": 2,
+          "w": 5,
+          "t1": 5,
+          "t2": 2,
           "t2_from": {
             "w": 1
           }
@@ -546,21 +1168,21 @@
           "m": 4,
           "r": 2,
           "l": 3,
-          "w": 4,
-          "t1": 3,
-          "t2": 4,
+          "w": 7,
+          "t1": 7,
+          "t2": 3,
           "t2_from": {
             "w": 2
           }
         },
         {
-          "m": 5,
           "p": 5,
+          "m": 5,
           "r": 2,
-          "l": 7,
-          "w": 2,
-          "t1": 7,
-          "t2": 2,
+          "l": 9,
+          "w": 10,
+          "t1": 9,
+          "t2": 10,
           "t2_from": {
             "l": 2
           },
@@ -569,13 +1191,13 @@
           }
         },
         {
-          "m": 6,
           "p": 1,
+          "m": 6,
           "r": 3,
-          "l": 9,
-          "w": 4,
-          "t1": 9,
-          "t2": 4,
+          "l": 7,
+          "w": 5,
+          "t1": 5,
+          "t2": 7,
           "t2_from": {
             "w": 4
           },
@@ -584,12 +1206,12 @@
           }
         },
         {
-          "m": 7,
           "p": 3,
+          "m": 7,
           "r": 3,
-          "l": 6,
-          "w": 3,
-          "t1": 6,
+          "l": 3,
+          "w": 2,
+          "t1": 2,
           "t2": 3,
           "t2_from": {
             "l": 4
@@ -599,630 +1221,30 @@
           }
         }
       ],
-      "standings": [
-        {
-          "rank": 1,
-          "rosterId": 8,
-          "points": 12,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 2,
-          "rosterId": 12,
-          "points": 11,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 3,
-          "rosterId": 10,
-          "points": 10,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 4,
-          "rosterId": 11,
-          "points": 9,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 5,
-          "rosterId": 5,
-          "points": 8,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 6,
-          "rosterId": 1,
-          "points": 7,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 7,
-          "rosterId": 4,
-          "points": 6,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 8,
-          "rosterId": 9,
-          "points": 5,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 9,
-          "rosterId": 3,
-          "points": 4,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 10,
-          "rosterId": 6,
-          "points": 3,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 11,
-          "rosterId": 2,
-          "points": 2,
-          "source": "playoff-bracket"
-        },
-        {
-          "rank": 12,
-          "rosterId": 7,
-          "points": 1,
-          "source": "playoff-bracket"
-        }
-      ],
-      "usedFallback": false,
-      "validation": {
-        "valid": true,
-        "errors": [],
-        "rosterCount": 12,
-        "expectedPointTotal": 78,
-        "actualPointTotal": 78
-      }
-    },
-    {
-      "index": 1,
-      "leagueId": "1253457635739447296",
-      "league": {
-        "league_id": "1253457635739447296",
-        "name": "AMBO A2",
-        "season": "2025",
-        "status": "complete",
-        "previous_league_id": "1051278597819854848",
-        "settings": {
-          "playoff_teams": 6
-        }
-      },
-      "rosters": [
-        {
-          "roster_id": 1,
-          "owner_id": "458977644550025216",
-          "metadata": {
-            "p_nick_1479": "Negociável",
-            "p_nick_2168": "Negociável",
-            "p_nick_2197": "Negociável",
-            "p_nick_2238": "Negociável",
-            "p_nick_3157": "OTB",
-            "p_nick_3163": "Negociável",
-            "p_nick_3200": "OTB",
-            "p_nick_3286": "OTB",
-            "p_nick_4018": "Negociável",
-            "p_nick_4055": "Negociável",
-            "p_nick_4949": "Negociável",
-            "p_nick_5000": "",
-            "p_nick_616": "Negociável",
-            "p_nick_676": "Negociável",
-            "record": "LWLLLLWLLLWLWL",
-            "streak": "1L"
-          },
-          "settings": {
-            "wins": 4,
-            "losses": 10,
-            "ties": 0,
-            "fpts": 1308,
-            "fpts_decimal": 68,
-            "fpts_against": 1474,
-            "fpts_against_decimal": 20
-          }
-        },
-        {
-          "roster_id": 2,
-          "owner_id": "445582191489970176",
-          "metadata": {
-            "record": "LWWLWLWWLWLLWW",
-            "streak": "2W"
-          },
-          "settings": {
-            "wins": 8,
-            "losses": 6,
-            "ties": 0,
-            "fpts": 1632,
-            "fpts_decimal": 99,
-            "fpts_against": 1360,
-            "fpts_against_decimal": 90
-          }
-        },
-        {
-          "roster_id": 3,
-          "owner_id": "449069284769918976",
-          "metadata": {
-            "record": "WLWWWLLLWWLWWL",
-            "streak": "1L"
-          },
-          "settings": {
-            "wins": 8,
-            "losses": 6,
-            "ties": 0,
-            "fpts": 1359,
-            "fpts_decimal": 24,
-            "fpts_against": 1328,
-            "fpts_against_decimal": 16
-          }
-        },
-        {
-          "roster_id": 4,
-          "owner_id": "455115982172581888",
-          "metadata": {
-            "allow_pn_inactive_starters": "on",
-            "allow_pn_player_injury_status": "on",
-            "allow_pn_scoring": "on",
-            "record": "WLLLWWLWWWLLLW",
-            "restrict_pn_scoring_starters_only": "on",
-            "streak": "1W"
-          },
-          "settings": {
-            "wins": 7,
-            "losses": 7,
-            "ties": 0,
-            "fpts": 1427,
-            "fpts_decimal": 40,
-            "fpts_against": 1493,
-            "fpts_against_decimal": 52
-          }
-        },
-        {
-          "roster_id": 5,
-          "owner_id": "460216259665981440",
-          "metadata": {
-            "record": "LLWLLLWLLLLWWW",
-            "streak": "3W"
-          },
-          "settings": {
-            "wins": 5,
-            "losses": 9,
-            "ties": 0,
-            "fpts": 1548,
-            "fpts_decimal": 52,
-            "fpts_against": 1600,
-            "fpts_against_decimal": 46
-          }
-        },
-        {
-          "roster_id": 6,
-          "owner_id": "714183253740851200",
-          "metadata": {
-            "allow_pn_news": "off",
-            "allow_pn_scoring": "off",
-            "record": "LLLWWWLLLWLWLL",
-            "restrict_pn_scoring_starters_only": "on",
-            "streak": "2L"
-          },
-          "settings": {
-            "wins": 5,
-            "losses": 9,
-            "ties": 0,
-            "fpts": 1361,
-            "fpts_decimal": 54,
-            "fpts_against": 1512,
-            "fpts_against_decimal": 74
-          }
-        },
-        {
-          "roster_id": 7,
-          "owner_id": "449023164270243840",
-          "metadata": {
-            "record": "WWWWLLLWLLWLWL",
-            "streak": "1L"
-          },
-          "settings": {
-            "wins": 7,
-            "losses": 7,
-            "ties": 0,
-            "fpts": 1245,
-            "fpts_decimal": 24,
-            "fpts_against": 1303,
-            "fpts_against_decimal": 32
-          }
-        },
-        {
-          "roster_id": 8,
-          "owner_id": "449600776445095936",
-          "metadata": {
-            "allow_pn_scoring": "on",
-            "record": "WWWWLLWLWWWWLL",
-            "restrict_pn_scoring_starters_only": "on",
-            "streak": "2L"
-          },
-          "settings": {
-            "wins": 9,
-            "losses": 5,
-            "ties": 0,
-            "fpts": 1476,
-            "fpts_decimal": 72,
-            "fpts_against": 1377,
-            "fpts_against_decimal": 30
-          }
-        },
-        {
-          "roster_id": 9,
-          "owner_id": "867416391458897920",
-          "metadata": {
-            "allow_pn_inactive_starters": "on",
-            "allow_pn_player_injury_status": "off",
-            "allow_pn_scoring": "off",
-            "p_nick_DET": "Troco por TE",
-            "record": "WLLWLWWWLLLLLW",
-            "restrict_pn_scoring_starters_only": "on",
-            "streak": "1W"
-          },
-          "settings": {
-            "wins": 6,
-            "losses": 8,
-            "ties": 0,
-            "fpts": 1423,
-            "fpts_decimal": 64,
-            "fpts_against": 1484,
-            "fpts_against_decimal": 28
-          }
-        },
-        {
-          "roster_id": 10,
-          "owner_id": "459817765377667072",
-          "metadata": {
-            "allow_pn_news": "off",
-            "allow_pn_scoring": "off",
-            "record": "WWLLLWLWWLWWLL",
-            "streak": "2L"
-          },
-          "settings": {
-            "wins": 7,
-            "losses": 7,
-            "ties": 0,
-            "fpts": 1403,
-            "fpts_decimal": 42,
-            "fpts_against": 1313,
-            "fpts_against_decimal": 36
-          }
-        },
-        {
-          "roster_id": 11,
-          "owner_id": "867415604578131968",
-          "metadata": {
-            "record": "LLLLWWLLWWWLLW",
-            "streak": "1W"
-          },
-          "settings": {
-            "wins": 6,
-            "losses": 8,
-            "ties": 0,
-            "fpts": 1432,
-            "fpts_decimal": 12,
-            "fpts_against": 1553,
-            "fpts_against_decimal": 76
-          }
-        },
-        {
-          "roster_id": 12,
-          "owner_id": "455157080240680960",
-          "metadata": {
-            "record": "LWWWWWWWWLWWWW",
-            "streak": "4W"
-          },
-          "settings": {
-            "wins": 12,
-            "losses": 2,
-            "ties": 0,
-            "fpts": 1489,
-            "fpts_decimal": 96,
-            "fpts_against": 1307,
-            "fpts_against_decimal": 48
-          }
-        }
-      ],
-      "users": [
-        {
-          "user_id": "445582191489970176",
-          "username": null,
-          "display_name": "CanelaShow",
-          "avatar": "ab879cb3e6a53b5d4fbd45cc205d9478",
-          "metadata": {
-            "allow_pn": "on",
-            "allow_sms": "on",
-            "archived": "off",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "449023164270243840",
-          "username": null,
-          "display_name": "Miranda12s",
-          "avatar": "7fb450a5b9acf255a2a563067dcd7bbe",
-          "metadata": {
-            "allow_pn": "on",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "449069284769918976",
-          "username": null,
-          "display_name": "NelSat",
-          "avatar": "ddfbc47c05ba1c5ba50a05f0cc741a4c",
-          "metadata": {
-            "allow_pn": "on",
-            "archived": "off",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "449600776445095936",
-          "username": null,
-          "display_name": "Sank",
-          "avatar": "3ce71295a5556aea3d63145973b566e0",
-          "metadata": {
-            "allow_pn": "on",
-            "mascot_item_type_id_leg_13": "goat",
-            "team_name_update": "off",
-            "join_voice_pn": "off",
-            "transaction_free_agent": "on",
-            "mascot_item_type_id_leg_17": "goat",
-            "mascot_item_type_id_leg_12": "goat",
-            "mascot_item_type_id_leg_1": "goat",
-            "player_like_pn": "off",
-            "mascot_item_type_id_leg_9": "goat",
-            "mascot_item_type_id_leg_4": "goat",
-            "transaction_commissioner": "on",
-            "mascot_item_type_id_leg_3": "goat",
-            "mascot_item_type_id_leg_18": "goat",
-            "mascot_item_type_id_leg_10": "goat",
-            "mascot_item_type_id_leg_5": "goat",
-            "mascot_message": "off",
-            "trade_block_pn": "off",
-            "mascot_item_type_id_leg_7": "goat",
-            "archived": "off",
-            "mascot_item_type_id_leg_14": "goat",
-            "mascot_item_type_id_leg_6": "goat",
-            "user_message_pn": "off",
-            "mascot_item_type_id_leg_11": "goat",
-            "mascot_item_type_id_leg_2": "goat",
-            "mention_pn": "on",
-            "player_nickname_update": "off",
-            "transaction_waiver": "on",
-            "mascot_item_type_id_leg_15": "goat",
-            "mascot_message_emotion_leg_1": "idle",
-            "mascot_item_type_id_leg_8": "goat",
-            "mascot_item_type_id_leg_16": "goat",
-            "transaction_trade": "on"
-          }
-        },
-        {
-          "user_id": "455115982172581888",
-          "username": null,
-          "display_name": "L_Bezerra",
-          "avatar": "28c10cc8e49e9adaf274d5a0dcdbd767",
-          "metadata": {
-            "allow_pn": "on",
-            "archived": "off",
-            "league_report_pn": "off",
-            "mascot_message": "on",
-            "mention_pn": "on",
-            "player_like_pn": "on",
-            "player_nickname_update": "on",
-            "team_name": "Olinda Falcons 2",
-            "team_name_update": "on",
-            "trade_block_pn": "on",
-            "transaction_commissioner": "on",
-            "transaction_free_agent": "on",
-            "transaction_trade": "on",
-            "transaction_waiver": "on",
-            "user_message_pn": "on"
-          }
-        },
-        {
-          "user_id": "455157080240680960",
-          "username": null,
-          "display_name": "Jotaa",
-          "avatar": "0b0c6764f4ca773e86260b43c1731dfe",
-          "metadata": {
-            "allow_pn": "on",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "458977644550025216",
-          "username": null,
-          "display_name": "dedebenjor",
-          "avatar": "44a4e2e8cd9b40c7bd857f787032a537",
-          "metadata": {
-            "allow_pn": "on",
-            "mention_pn": "on",
-            "team_name": "Recife Bucs"
-          }
-        },
-        {
-          "user_id": "459817765377667072",
-          "username": null,
-          "display_name": "pedrocabesa",
-          "avatar": "cfb4e2b49d379e36a8e06f69ffb7b55c",
-          "metadata": {
-            "allow_pn": "on",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "460216259665981440",
-          "username": null,
-          "display_name": "Jptavares",
-          "avatar": "0b0c6764f4ca773e86260b43c1731dfe",
-          "metadata": {
-            "allow_pn": "on",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "714183253740851200",
-          "username": null,
-          "display_name": "romeroferraz",
-          "avatar": "4f4090e5e9c3941414db40a871e3e909",
-          "metadata": {
-            "allow_pn": "on",
-            "mention_pn": "on"
-          }
-        },
-        {
-          "user_id": "867415604578131968",
-          "username": null,
-          "display_name": "JotaCPanthers_BR",
-          "avatar": "e89982d70ab4e77725206867bc56655c",
-          "metadata": {
-            "allow_pn": "on",
-            "archived": "off",
-            "avatar": "https://sleepercdn.com/uploads/cdc8cd758cf740153a7f49271557a58e",
-            "mention_pn": "on",
-            "team_name": "VSA Pitus"
-          }
-        },
-        {
-          "user_id": "867416391458897920",
-          "username": null,
-          "display_name": "steniookita",
-          "avatar": "f05401a6397fdfdc03fe578916331987",
-          "metadata": {
-            "allow_pn": "on",
-            "league_report_pn": "on",
-            "mention_pn": "on",
-            "player_like_pn": "on",
-            "player_nickname_update": "on",
-            "team_name_update": "on",
-            "trade_block_pn": "on",
-            "transaction_commissioner": "on",
-            "transaction_free_agent": "on",
-            "transaction_trade": "on",
-            "transaction_waiver": "on",
-            "user_message_pn": "on"
-          }
-        }
-      ],
-      "winnersBracket": [
-        {
-          "m": 1,
-          "r": 1,
-          "l": 3,
-          "w": 4,
-          "t1": 3,
-          "t2": 4
-        },
-        {
-          "m": 2,
-          "r": 1,
-          "l": 10,
-          "w": 2,
-          "t1": 10,
-          "t2": 2
-        },
-        {
-          "m": 3,
-          "r": 2,
-          "l": 4,
-          "w": 12,
-          "t1": 12,
-          "t2": 4,
-          "t2_from": {
-            "w": 1
-          }
-        },
-        {
-          "m": 4,
-          "r": 2,
-          "l": 8,
-          "w": 2,
-          "t1": 8,
-          "t2": 2,
-          "t2_from": {
-            "w": 2
-          }
-        },
-        {
-          "p": 5,
-          "m": 5,
-          "r": 2,
-          "l": 10,
-          "w": 3,
-          "t1": 3,
-          "t2": 10,
-          "t2_from": {
-            "l": 2
-          },
-          "t1_from": {
-            "l": 1
-          }
-        },
-        {
-          "p": 1,
-          "m": 6,
-          "r": 3,
-          "l": 12,
-          "w": 2,
-          "t1": 12,
-          "t2": 2,
-          "t2_from": {
-            "w": 4
-          },
-          "t1_from": {
-            "w": 3
-          }
-        },
-        {
-          "p": 3,
-          "m": 7,
-          "r": 3,
-          "l": 4,
-          "w": 8,
-          "t1": 4,
-          "t2": 8,
-          "t2_from": {
-            "l": 4
-          },
-          "t1_from": {
-            "l": 3
-          }
-        }
-      ],
       "losersBracket": [
         {
           "m": 1,
           "r": 1,
-          "l": 6,
-          "w": 5,
-          "t1": 5,
-          "t2": 6
+          "l": 11,
+          "w": 1,
+          "t1": 11,
+          "t2": 1
         },
         {
           "m": 2,
           "r": 1,
-          "l": 1,
-          "w": 9,
-          "t1": 1,
-          "t2": 9
+          "l": 8,
+          "w": 12,
+          "t1": 8,
+          "t2": 12
         },
         {
           "m": 3,
           "r": 2,
-          "l": 5,
-          "w": 7,
-          "t1": 7,
-          "t2": 5,
+          "l": 1,
+          "w": 4,
+          "t1": 4,
+          "t2": 1,
           "t2_from": {
             "w": 1
           }
@@ -1230,10 +1252,10 @@
         {
           "m": 4,
           "r": 2,
-          "l": 9,
-          "w": 11,
-          "t1": 11,
-          "t2": 9,
+          "l": 12,
+          "w": 6,
+          "t1": 6,
+          "t2": 12,
           "t2_from": {
             "w": 2
           }
@@ -1242,10 +1264,10 @@
           "p": 5,
           "m": 5,
           "r": 2,
-          "l": 1,
-          "w": 6,
-          "t1": 6,
-          "t2": 1,
+          "l": 8,
+          "w": 11,
+          "t1": 11,
+          "t2": 8,
           "t2_from": {
             "l": 2
           },
@@ -1257,10 +1279,10 @@
           "p": 1,
           "m": 6,
           "r": 3,
-          "l": 11,
-          "w": 7,
-          "t1": 7,
-          "t2": 11,
+          "l": 4,
+          "w": 6,
+          "t1": 4,
+          "t2": 6,
           "t2_from": {
             "w": 4
           },
@@ -1272,10 +1294,10 @@
           "p": 3,
           "m": 7,
           "r": 3,
-          "l": 9,
-          "w": 5,
-          "t1": 5,
-          "t2": 9,
+          "l": 12,
+          "w": 1,
+          "t1": 1,
+          "t2": 12,
           "t2_from": {
             "l": 4
           },
@@ -1287,73 +1309,73 @@
       "standings": [
         {
           "rank": 1,
-          "rosterId": 2,
+          "rosterId": 5,
           "points": 12,
           "source": "playoff-bracket"
         },
         {
           "rank": 2,
-          "rosterId": 12,
+          "rosterId": 7,
           "points": 11,
           "source": "playoff-bracket"
         },
         {
           "rank": 3,
-          "rosterId": 8,
+          "rosterId": 2,
           "points": 10,
           "source": "playoff-bracket"
         },
         {
           "rank": 4,
-          "rosterId": 4,
+          "rosterId": 3,
           "points": 9,
           "source": "playoff-bracket"
         },
         {
           "rank": 5,
-          "rosterId": 3,
+          "rosterId": 10,
           "points": 8,
           "source": "playoff-bracket"
         },
         {
           "rank": 6,
-          "rosterId": 10,
+          "rosterId": 9,
           "points": 7,
           "source": "playoff-bracket"
         },
         {
           "rank": 7,
-          "rosterId": 7,
+          "rosterId": 6,
           "points": 6,
           "source": "playoff-bracket"
         },
         {
           "rank": 8,
-          "rosterId": 11,
+          "rosterId": 4,
           "points": 5,
           "source": "playoff-bracket"
         },
         {
           "rank": 9,
-          "rosterId": 5,
+          "rosterId": 1,
           "points": 4,
           "source": "playoff-bracket"
         },
         {
           "rank": 10,
-          "rosterId": 9,
+          "rosterId": 12,
           "points": 3,
           "source": "playoff-bracket"
         },
         {
           "rank": 11,
-          "rosterId": 6,
+          "rosterId": 11,
           "points": 2,
           "source": "playoff-bracket"
         },
         {
           "rank": 12,
-          "rosterId": 1,
+          "rosterId": 8,
           "points": 1,
           "source": "playoff-bracket"
         }
