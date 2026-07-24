@@ -362,7 +362,7 @@
             fetchOptionalBracket(leagueId, 'losers_bracket')
         ]);
 
-        const calculated = calculateStandings(winnersBracket, losersBracket, rosters);
+        const calculated = calculateStandings(winnersBracket, losersBracket, rosters, league);
 
         return {
             index,
@@ -391,26 +391,71 @@
         return (a.roster_id || 0) - (b.roster_id || 0);
     }
 
-    /**
-     * O campo `p` do bracket informa a colocação disputada.
-     * Ex.: p: 1 -> vencedor em 1º e perdedor em 2º.
-     * Isso evita depender da ordem dos jogos dentro do JSON.
-     */
-    function calculateStandings(winnersBracket, losersBracket, rosters) {
-        const rankByRoster = new Map();
-        const bracketMatches = [...(winnersBracket || []), ...(losersBracket || [])]
-            .filter(match => Number.isInteger(match?.p))
-            .sort((a, b) => a.p - b.p);
+    function getBracketRosterIds(bracket) {
+        const rosterIds = new Set();
 
-        bracketMatches.forEach(match => {
-            const winnerId = Number(match.w);
-            const loserId = Number(match.l);
-            if (Number.isInteger(winnerId) && winnerId > 0) rankByRoster.set(winnerId, match.p);
-            if (Number.isInteger(loserId) && loserId > 0) rankByRoster.set(loserId, match.p + 1);
+        (bracket || []).forEach(match => {
+            ['t1', 't2', 'w', 'l'].forEach(key => {
+                const rosterId = Number(match?.[key]);
+                if (Number.isInteger(rosterId) && rosterId > 0) rosterIds.add(rosterId);
+            });
         });
 
+        return rosterIds;
+    }
+
+    function applyPlacementMatches(rankByRoster, bracket, rankOffset = 0) {
+        (bracket || [])
+            .filter(match => Number.isInteger(match?.p))
+            .sort((a, b) => a.p - b.p)
+            .forEach(match => {
+                const winnerId = Number(match.w);
+                const loserId = Number(match.l);
+                const baseRank = Number(match.p) + rankOffset;
+
+                if (Number.isInteger(winnerId) && winnerId > 0) {
+                    rankByRoster.set(winnerId, baseRank);
+                }
+
+                if (Number.isInteger(loserId) && loserId > 0) {
+                    rankByRoster.set(loserId, baseRank + 1);
+                }
+            });
+    }
+
+    /**
+     * O campo `p` informa a colocação disputada dentro de cada bracket.
+     * No winners bracket, p: 1 representa 1º/2º, p: 3 representa 3º/4º etc.
+     * No losers bracket, o Sleeper reinicia essa numeração em 1; por isso é
+     * necessário somar a quantidade de times dos playoffs para obter 7º–12º.
+     */
+    function calculateStandings(winnersBracket, losersBracket, rosters, league) {
+        const rankByRoster = new Map();
+        const configuredPlayoffTeams = Number(league?.settings?.playoff_teams);
+        const inferredPlayoffTeams = getBracketRosterIds(winnersBracket).size;
+        const playoffTeamCount = Number.isInteger(configuredPlayoffTeams) && configuredPlayoffTeams > 0
+            ? Math.min(configuredPlayoffTeams, rosters.length)
+            : inferredPlayoffTeams;
+
+        applyPlacementMatches(rankByRoster, winnersBracket, 0);
+
+        const losersPlacementRanks = (losersBracket || [])
+            .filter(match => Number.isInteger(match?.p))
+            .map(match => Number(match.p));
+
+        // Algumas respostas podem trazer posições absolutas no losers bracket.
+        // Só aplicamos o deslocamento quando a numeração reinicia em 1.
+        const losersRankOffset = losersPlacementRanks.length > 0
+            && playoffTeamCount > 0
+            && Math.min(...losersPlacementRanks) <= playoffTeamCount
+            ? playoffTeamCount
+            : 0;
+
+        applyPlacementMatches(rankByRoster, losersBracket, losersRankOffset);
+
+        const occupiedRanks = new Set(rankByRoster.values());
         const availableRanks = Array.from({ length: rosters.length }, (_, index) => index + 1)
-            .filter(rank => ![...rankByRoster.values()].includes(rank));
+            .filter(rank => !occupiedRanks.has(rank));
 
         const unrankedRosters = rosters
             .filter(roster => !rankByRoster.has(roster.roster_id))
@@ -420,13 +465,19 @@
             rankByRoster.set(roster.roster_id, availableRanks[index]);
         });
 
+        const fallbackRosterIds = new Set(unrankedRosters.map(roster => roster.roster_id));
         const standings = rosters
-            .map(roster => ({
-                rank: rankByRoster.get(roster.roster_id),
-                rosterId: roster.roster_id,
-                points: rosters.length + 1 - rankByRoster.get(roster.roster_id),
-                source: unrankedRosters.includes(roster) ? 'regular-season-fallback' : 'playoff-bracket'
-            }))
+            .map(roster => {
+                const rank = rankByRoster.get(roster.roster_id);
+                return {
+                    rank,
+                    rosterId: roster.roster_id,
+                    points: rosters.length + 1 - rank,
+                    source: fallbackRosterIds.has(roster.roster_id)
+                        ? 'regular-season-fallback'
+                        : 'playoff-bracket'
+                };
+            })
             .sort((a, b) => a.rank - b.rank);
 
         return {
