@@ -1,12 +1,5 @@
 # Changelog
 
-## 5.3.1 — Ajuste visual do ranking histórico
-
-- Remove a coluna **Pontos** da tabela do ranking histórico.
-- Remove a métrica de pontos dos cards históricos no celular.
-- Mantém os pontos internamente para cálculos, perfis, exportação e desempates secundários.
-- Atualiza a versão do cache do PWA para aplicar o ajuste imediatamente.
-
 ## 5.3.0 — Liga Keeper por temporada
 
 - Keeper adicionada à navegação de 2020 a 2025;

@@ -74,3 +74,38 @@ test('ranking histórico usa títulos como ordenação padrão na URL', () => {
     assert.equal(route.sort, 'titles');
     assert.equal(search, '?view=history');
 });
+
+
+test('serializa e restaura uma rota Keeper', () => {
+    const search = core.serializeRoute({ view: 'season', year: 2025, series: 'keeper' });
+    const route = core.parseRoute(search, { years: [2025] });
+
+    assert.equal(route.view, 'season');
+    assert.equal(route.series, 'keeper');
+    assert.equal(route.year, 2025);
+});
+
+test('descoberta por nome encontra somente a liga Keeper', () => {
+    const leagues = [
+        { league_id: '1', name: 'AMBO Keeper' },
+        { league_id: '2', name: 'AMBO Série B 1' },
+        { league_id: '3', name: 'Outra Keeper Experimental' }
+    ];
+    const result = core.filterLeagueIdsForDiscovery(leagues, {
+        nameIncludes: ['ambo', 'keeper']
+    });
+
+    assert.deepEqual(result, ['1']);
+});
+
+test('descoberta por previous_league_id continua funcionando', () => {
+    const leagues = [
+        { league_id: 'nova-a', name: 'Liga A', previous_league_id: 'antiga-a' },
+        { league_id: 'nova-b', name: 'Liga B', previous_league_id: 'outra' }
+    ];
+    const result = core.filterLeagueIdsForDiscovery(leagues, {
+        previousLeagueIds: ['antiga-a']
+    });
+
+    assert.deepEqual(result, ['nova-a']);
+});

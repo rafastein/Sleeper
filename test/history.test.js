@@ -194,3 +194,22 @@ test('ordenação por títulos desempata por vices e depois por terceiros lugare
 
     assert.deepEqual(ranking.map(manager => manager.managerName), ['Primeiro', 'Segundo', 'Terceiro']);
 });
+
+
+test('Hall oficial reconhece títulos da categoria Keeper', () => {
+    const awards = core.buildOfficialTitleAwards([
+        { year: 2022, keeper: 'rafastein' }
+    ], {
+        managers: [{
+            canonicalId: 'rafa',
+            displayName: 'rafastein',
+            aliases: ['rafastein'],
+            sleeperUserIds: []
+        }]
+    }, 'keeper');
+
+    assert.equal(awards.length, 1);
+    assert.equal(awards[0].seriesKey, 'keeper');
+    assert.equal(awards[0].seriesLabel, 'Keeper');
+    assert.equal(awards[0].canonicalId, 'rafa');
+});

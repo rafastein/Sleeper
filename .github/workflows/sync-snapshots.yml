@@ -8,7 +8,7 @@ on:
         required: false
         type: string
       series:
-        description: "serieA ou serieB; deixe vazio para sincronizar ambas"
+        description: "keeper, serieA ou serieB; deixe vazio para sincronizar todas"
         required: false
         type: string
         default: ""

@@ -34,7 +34,7 @@ function printHelp() {
 
 Opções:
   --year ANO          Limita a sincronização a uma temporada (pode repetir)
-  --series CHAVE      Limita a serieA ou serieB (pode repetir)
+  --series CHAVE      Limita a keeper, serieA ou serieB (pode repetir)
   --allow-fallback    Aceita classificação regular provisória
   --dry-run           Valida sem gravar arquivos
 `);
@@ -165,11 +165,24 @@ async function resolveLeagueIds(year, seriesKey, seasonConfig, discoveryUsers) {
     const previousLeagueIds = Array.isArray(seasonConfig?.previousLeagueIds)
         ? seasonConfig.previousLeagueIds.map(String)
         : [];
-    const expectedLeagues = Number(seasonConfig?.expectedLeagues || previousLeagueIds.length || 2);
+    const nameIncludes = Array.isArray(seasonConfig?.nameIncludes)
+        ? seasonConfig.nameIncludes.map(String).filter(Boolean)
+        : [];
+    const expectedLeagues = Number(seasonConfig?.expectedLeagues || previousLeagueIds.length || 1);
 
-    if (!previousLeagueIds.length) throw new Error(`${year}/${seriesKey}: previousLeagueIds ausentes`);
+    if (!previousLeagueIds.length && !nameIncludes.length) {
+        throw new Error(`${year}/${seriesKey}: previousLeagueIds ou nameIncludes ausentes`);
+    }
 
-    let userId = String(seasonConfig?.userId || discoveryUsers.users?.[discoveryKey]?.userId || '');
+    const persistedByUsername = Object.values(discoveryUsers.users || {}).find(item =>
+        core.normalizeAlias(item?.username) === core.normalizeAlias(username)
+    );
+    let userId = String(
+        seasonConfig?.userId
+        || discoveryUsers.users?.[discoveryKey]?.userId
+        || persistedByUsername?.userId
+        || ''
+    );
     let resolvedUser = null;
 
     if (!userId) {
@@ -187,17 +200,13 @@ async function resolveLeagueIds(year, seriesKey, seasonConfig, discoveryUsers) {
     };
 
     const leagues = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(userId)}/leagues/nfl/${year}`);
-    const previousSet = new Set(previousLeagueIds);
-    const ids = [...new Set(
-        (leagues || [])
-            .filter(league => previousSet.has(String(league?.previous_league_id || '')))
-            .sort((a, b) => String(a?.name || '').localeCompare(String(b?.name || ''), 'pt-BR'))
-            .map(league => String(league?.league_id || ''))
-            .filter(Boolean)
-    )];
+    const ids = core.filterLeagueIdsForDiscovery(leagues, seasonConfig);
 
     if (ids.length !== expectedLeagues) {
-        throw new Error(`${year}/${seriesKey}: encontradas ${ids.length} de ${expectedLeagues} ligas renovadas`);
+        const candidates = (leagues || [])
+            .map(league => `${league?.name || 'Sem nome'} (${league?.league_id || '?'})`)
+            .join(', ');
+        throw new Error(`${year}/${seriesKey}: encontradas ${ids.length} de ${expectedLeagues} ligas. Candidatas: ${candidates || 'nenhuma'}`);
     }
 
     return ids;

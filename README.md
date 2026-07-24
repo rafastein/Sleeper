@@ -69,7 +69,8 @@ npm run sync -- --year 2025 --series serieA
 
 O menu **Ranking histórico** consolida o Hall oficial de campeões com os snapshots validados disponíveis. É possível filtrar por:
 
-- Séries A e B combinadas;
+- Keeper, Série A e Série B combinadas;
+- somente Keeper;
 - somente Série A;
 - somente Série B.
 
@@ -83,7 +84,7 @@ A tabela pode ser ordenada por:
 
 ### Regra das estatísticas históricas
 
-Cada snapshot de ano e série gera um ranking combinado das duas ligas daquele recorte.
+Cada snapshot de ano e categoria gera um ranking final daquele recorte. Série A e Série B combinam duas ligas; a Keeper usa sua liga única.
 
 - **Pontos históricos:** soma dos pontos combinados em todos os recortes;
 - **Título:** 1º lugar no ranking combinado anual da série;
@@ -94,6 +95,15 @@ Cada snapshot de ano e série gera um ranking combinado das duas ligas daquele r
 - **FPTS acumulado:** soma dos FPTS das ligas disputadas.
 
 Snapshots marcados como provisórios não entram no ranking histórico oficial.
+
+
+### Liga Keeper
+
+A Keeper aparece junto da Série A e da Série B em todas as temporadas configuradas de 2020 a 2025. O sincronizador reutiliza o `user_id` já salvo para `rafastein` e seleciona a liga pelo nome. Para gerar apenas os snapshots da Keeper:
+
+```bash
+npm run sync -- --series keeper
+```
 
 ### Perfis individuais
 

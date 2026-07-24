@@ -698,6 +698,7 @@
                 createElement('td', 'points-value', manager.titles),
                 createElement('td', '', manager.secondPlaces),
                 createElement('td', '', manager.thirdPlaces),
+                createElement('td', '', manager.totalPoints),
                 createElement('td', '', manager.participations),
                 createElement('td', '', formatPlacement(manager.bestFinish)),
                 createElement('td', '', Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—')
@@ -715,6 +716,7 @@
                 metrics: [
                     { label: 'Vices', value: manager.secondPlaces },
                     { label: '3º lugares', value: manager.thirdPlaces },
+                    { label: 'Pontos', value: manager.totalPoints },
                     { label: 'Média', value: Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—' }
                 ]
             }));

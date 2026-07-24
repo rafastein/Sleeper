@@ -308,6 +308,38 @@
 
 
 
+    function filterLeagueIdsForDiscovery(leagues, discoveryConfig = {}) {
+        const previousLeagueIds = Array.isArray(discoveryConfig.previousLeagueIds)
+            ? discoveryConfig.previousLeagueIds.map(String).filter(Boolean)
+            : [];
+        const includeTokens = Array.isArray(discoveryConfig.nameIncludes)
+            ? discoveryConfig.nameIncludes.map(normalizeAlias).filter(Boolean)
+            : [];
+        const excludeTokens = Array.isArray(discoveryConfig.nameExcludes)
+            ? discoveryConfig.nameExcludes.map(normalizeAlias).filter(Boolean)
+            : [];
+        const previousSet = new Set(previousLeagueIds);
+
+        if (!previousSet.size && !includeTokens.length) return [];
+
+        return [...new Set(
+            (leagues || [])
+                .filter(league => {
+                    const previousId = String(league?.previous_league_id || '');
+                    const normalizedName = normalizeAlias(league?.name || '');
+                    const matchesPrevious = !previousSet.size || previousSet.has(previousId);
+                    const matchesName = !includeTokens.length
+                        || includeTokens.every(token => normalizedName.includes(token));
+                    const isExcluded = excludeTokens.some(token => normalizedName.includes(token));
+                    return matchesPrevious && matchesName && !isExcluded;
+                })
+                .sort((a, b) => String(a?.name || '').localeCompare(String(b?.name || ''), 'pt-BR')
+                    || String(a?.league_id || '').localeCompare(String(b?.league_id || '')))
+                .map(league => String(league?.league_id || ''))
+                .filter(Boolean)
+        )];
+    }
+
     function buildHistoricalEntries(snapshotPayloads, registry = { managers: [] }) {
         const entries = [];
 
@@ -348,13 +380,13 @@
     function buildOfficialTitleAwards(champions = [], registry = { managers: [] }, seriesKey = 'all') {
         const identityIndex = createIdentityIndex(registry);
         const awards = new Map();
-        const seriesLabels = { serieA: 'Série A', serieB: 'Série B' };
+        const seriesLabels = { keeper: 'Keeper', serieA: 'Série A', serieB: 'Série B' };
 
         (champions || []).forEach(row => {
             const year = Number(row?.year);
             if (!Number.isInteger(year)) return;
 
-            ['serieA', 'serieB'].forEach(key => {
+            ['keeper', 'serieA', 'serieB'].forEach(key => {
                 if (seriesKey !== 'all' && key !== seriesKey) return;
                 const rawName = row?.[key];
                 if (!rawName) return;
@@ -591,7 +623,7 @@
     function parseRoute(search, options = {}) {
         const params = new URLSearchParams(String(search || '').replace(/^\?/, ''));
         const allowedViews = new Set(['champions', 'history', 'profile', 'season']);
-        const allowedSeries = new Set(['all', 'serieA', 'serieB']);
+        const allowedSeries = new Set(['all', 'keeper', 'serieA', 'serieB']);
         const allowedHistorySorts = new Set(['points', 'titles', 'podiums', 'average']);
         const allowedSeasonSorts = new Set(['points', 'fpts', 'bestRank', 'name']);
         const configuredYears = new Set((options.years || []).map(Number));
@@ -659,6 +691,7 @@
         createIdentityIndex,
         resolveCanonicalManager,
         calculateCombinedStandings,
+        filterLeagueIdsForDiscovery,
         buildHistoricalEntries,
         buildOfficialTitleAwards,
         sortHistoricalRanking,
