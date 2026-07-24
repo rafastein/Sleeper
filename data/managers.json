@@ -1,93 +1,65 @@
 {
   "schemaVersion": 1,
-  "generatedAt": null,
+  "generatedAt": "2026-07-24T06:39:44.880Z",
   "managers": [
     {
-      "canonicalId": "jptavares",
-      "displayName": "Jptavares",
-      "sleeperUserIds": [],
+      "canonicalId": "brunocamposl",
+      "displayName": "brunocamposl",
+      "sleeperUserIds": [
+        "455127152711430144"
+      ],
       "aliases": [
-        "Jptavares"
-      ]
-    },
-    {
-      "canonicalId": "dedebenjor",
-      "displayName": "dedebenjor",
-      "sleeperUserIds": [],
-      "aliases": [
-        "dedebenjor"
-      ]
-    },
-    {
-      "canonicalId": "guizilse",
-      "displayName": "GuiZilse",
-      "sleeperUserIds": [],
-      "aliases": [
-        "GuiZilse"
-      ]
-    },
-    {
-      "canonicalId": "lbezerra",
-      "displayName": "L_Bezerra",
-      "sleeperUserIds": [],
-      "aliases": [
-        "L_Bezerra"
-      ]
-    },
-    {
-      "canonicalId": "jotaa",
-      "displayName": "Jotaa",
-      "sleeperUserIds": [],
-      "aliases": [
-        "Jotaa"
-      ]
-    },
-    {
-      "canonicalId": "rafastein",
-      "displayName": "rafastein",
-      "sleeperUserIds": [],
-      "aliases": [
-        "rafastein"
-      ]
-    },
-    {
-      "canonicalId": "scpatriots",
-      "displayName": "SCPATRIOTS",
-      "sleeperUserIds": [],
-      "aliases": [
-        "SCPATRIOTS"
-      ]
-    },
-    {
-      "canonicalId": "danhen",
-      "displayName": "DanHen",
-      "sleeperUserIds": [],
-      "aliases": [
-        "DanHen"
+        "brunocamposl"
       ]
     },
     {
       "canonicalId": "canelashow",
       "displayName": "CanelaShow",
-      "sleeperUserIds": [],
+      "sleeperUserIds": [
+        "445582191489970176"
+      ],
       "aliases": [
         "CanelaShow"
       ]
     },
     {
-      "canonicalId": "robertojr",
-      "displayName": "RobertoJr",
-      "sleeperUserIds": [],
+      "canonicalId": "chamon",
+      "displayName": "Chamon",
+      "sleeperUserIds": [
+        "460430879521501184"
+      ],
       "aliases": [
-        "RobertoJr"
+        "Chamon"
       ]
     },
     {
-      "canonicalId": "rdfseabra",
-      "displayName": "rdfseabra",
-      "sleeperUserIds": [],
+      "canonicalId": "cowboi1",
+      "displayName": "CowBoi1",
+      "sleeperUserIds": [
+        "593833332224086016"
+      ],
       "aliases": [
-        "rdfseabra"
+        "CowBoi1"
+      ]
+    },
+    {
+      "canonicalId": "danhen",
+      "displayName": "DanHen",
+      "sleeperUserIds": [
+        "449036084039380992"
+      ],
+      "aliases": [
+        "DanHen"
+      ]
+    },
+    {
+      "canonicalId": "dedebenjor",
+      "displayName": "dedebenjor",
+      "sleeperUserIds": [
+        "458977644550025216"
+      ],
+      "aliases": [
+        "dedebenjor"
       ]
     },
     {
@@ -99,11 +71,191 @@
       ]
     },
     {
+      "canonicalId": "guizilse",
+      "displayName": "GuiZilse",
+      "sleeperUserIds": [
+        "455196161398009856"
+      ],
+      "aliases": [
+        "GuiZilse"
+      ]
+    },
+    {
+      "canonicalId": "helber61",
+      "displayName": "Helber61",
+      "sleeperUserIds": [
+        "867480740827414528"
+      ],
+      "aliases": [
+        "Helber61"
+      ]
+    },
+    {
+      "canonicalId": "jotaa",
+      "displayName": "Jotaa",
+      "sleeperUserIds": [
+        "455157080240680960"
+      ],
+      "aliases": [
+        "Jotaa"
+      ]
+    },
+    {
+      "canonicalId": "jotacpanthersbr",
+      "displayName": "JotaCPanthers_BR",
+      "sleeperUserIds": [
+        "867415604578131968"
+      ],
+      "aliases": [
+        "JotaCPanthers_BR"
+      ]
+    },
+    {
+      "canonicalId": "jptavares",
+      "displayName": "Jptavares",
+      "sleeperUserIds": [
+        "460216259665981440"
+      ],
+      "aliases": [
+        "Jptavares"
+      ]
+    },
+    {
+      "canonicalId": "lbezerra",
+      "displayName": "L_Bezerra",
+      "sleeperUserIds": [
+        "455115982172581888"
+      ],
+      "aliases": [
+        "L_Bezerra"
+      ]
+    },
+    {
       "canonicalId": "miranda12s",
       "displayName": "Miranda12s",
-      "sleeperUserIds": [],
+      "sleeperUserIds": [
+        "449023164270243840"
+      ],
       "aliases": [
         "Miranda12s"
+      ]
+    },
+    {
+      "canonicalId": "nelsat",
+      "displayName": "NelSat",
+      "sleeperUserIds": [
+        "449069284769918976"
+      ],
+      "aliases": [
+        "NelSat"
+      ]
+    },
+    {
+      "canonicalId": "pedrocabesa",
+      "displayName": "pedrocabesa",
+      "sleeperUserIds": [
+        "459817765377667072"
+      ],
+      "aliases": [
+        "pedrocabesa"
+      ]
+    },
+    {
+      "canonicalId": "pernambucopower",
+      "displayName": "PernambucoPower",
+      "sleeperUserIds": [
+        "603655066318069760"
+      ],
+      "aliases": [
+        "PernambucoPower"
+      ]
+    },
+    {
+      "canonicalId": "rafastein",
+      "displayName": "rafastein",
+      "sleeperUserIds": [
+        "459814872146767872"
+      ],
+      "aliases": [
+        "rafastein"
+      ]
+    },
+    {
+      "canonicalId": "rdfseabra",
+      "displayName": "rdfseabra",
+      "sleeperUserIds": [],
+      "aliases": [
+        "rdfseabra"
+      ]
+    },
+    {
+      "canonicalId": "reloginho0",
+      "displayName": "ReLoGinho0",
+      "sleeperUserIds": [
+        "847142056257228800"
+      ],
+      "aliases": [
+        "ReLoGinho0"
+      ]
+    },
+    {
+      "canonicalId": "robertojr",
+      "displayName": "RobertoJr",
+      "sleeperUserIds": [
+        "460262982534819840"
+      ],
+      "aliases": [
+        "RobertoJr"
+      ]
+    },
+    {
+      "canonicalId": "romeroferraz",
+      "displayName": "romeroferraz",
+      "sleeperUserIds": [
+        "714183253740851200"
+      ],
+      "aliases": [
+        "romeroferraz"
+      ]
+    },
+    {
+      "canonicalId": "sank",
+      "displayName": "Sank",
+      "sleeperUserIds": [
+        "449600776445095936"
+      ],
+      "aliases": [
+        "Sank"
+      ]
+    },
+    {
+      "canonicalId": "scpatriots",
+      "displayName": "SCPATRIOTS",
+      "sleeperUserIds": [
+        "450476069154189312"
+      ],
+      "aliases": [
+        "SCPATRIOTS"
+      ]
+    },
+    {
+      "canonicalId": "steniookita",
+      "displayName": "steniookita",
+      "sleeperUserIds": [
+        "867416391458897920"
+      ],
+      "aliases": [
+        "steniookita"
+      ]
+    },
+    {
+      "canonicalId": "tiagogalo",
+      "displayName": "TiagoGalo",
+      "sleeperUserIds": [
+        "860271647331045376"
+      ],
+      "aliases": [
+        "TiagoGalo"
       ]
     }
   ]
