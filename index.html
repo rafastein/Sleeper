@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#07111f">
     <meta name="description" content="Histórico de campeões e rankings das ligas AMBO no Sleeper.">
+    <meta property="og:title" content="AMBO • Central Sleeper">
+    <meta property="og:description" content="Rankings, campeões e histórico das ligas AMBO.">
+    <meta property="og:type" content="website">
     <title>AMBO • Central Sleeper</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,9 +51,17 @@
                     <h1 id="page-title">Hall de campeões</h1>
                     <p id="page-description" class="page-description">A história das ligas AMBO reunida em um só lugar.</p>
                 </div>
-                <div id="last-update" class="last-update" aria-live="polite"></div>
+                <div class="topbar__meta">
+                    <div id="last-update" class="last-update" aria-live="polite"></div>
+                    <div class="page-actions" aria-label="Ações da página">
+                        <button id="copy-link" class="action-button" type="button">Copiar link</button>
+                        <button id="share-page" class="action-button" type="button">Compartilhar</button>
+                        <button id="export-csv" class="action-button action-button--primary" type="button">Exportar CSV</button>
+                    </div>
+                </div>
             </header>
 
+            <div id="action-feedback" class="action-feedback" role="status" aria-live="polite" hidden></div>
             <div id="error-message" class="alert" role="alert" hidden></div>
 
             <section id="champions-view" class="view" aria-labelledby="page-title">
@@ -64,7 +75,7 @@
                         </div>
                         <span id="champions-range" class="pill"></span>
                     </div>
-                    <div class="table-scroll">
+                    <div class="table-scroll desktop-table">
                         <table id="champions-table">
                             <thead>
                                 <tr>
@@ -77,6 +88,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="champions-cards" class="mobile-cards" aria-label="Campeões por temporada"></div>
                 </article>
             </section>
 
@@ -93,6 +105,10 @@
                     </div>
 
                     <div class="history-toolbar" aria-label="Filtros do ranking histórico">
+                        <label class="field-label field-label--search" for="history-search">
+                            Buscar manager
+                            <input id="history-search" type="search" placeholder="Digite um nome" autocomplete="off">
+                        </label>
                         <label class="field-label" for="history-series-filter">
                             Série
                             <select id="history-series-filter">
@@ -110,14 +126,15 @@
                                 <option value="average">Melhor média</option>
                             </select>
                         </label>
+                        <span id="history-results" class="toolbar-result" aria-live="polite"></span>
                     </div>
 
                     <div id="history-empty" class="empty-state" hidden>
-                        <strong>Nenhum snapshot histórico disponível</strong>
-                        <span>Execute a sincronização de todas as temporadas para gerar o ranking.</span>
+                        <strong>Nenhum resultado encontrado</strong>
+                        <span>Limpe a busca ou execute a sincronização das temporadas para preencher o ranking.</span>
                     </div>
 
-                    <div id="history-table-wrap" class="table-scroll">
+                    <div id="history-table-wrap" class="table-scroll desktop-table">
                         <table id="history-table" class="history-table">
                             <thead>
                                 <tr>
@@ -135,6 +152,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="history-cards" class="mobile-cards" aria-label="Ranking histórico"></div>
                     <p class="panel-note">Títulos e pódios são calculados pelo ranking combinado anual de cada série. Snapshots provisórios não entram nas estatísticas históricas.</p>
                 </article>
             </section>
@@ -162,7 +180,7 @@
                         </div>
                         <span id="profile-scope" class="pill"></span>
                     </div>
-                    <div class="table-scroll">
+                    <div class="table-scroll desktop-table">
                         <table id="profile-history-table" class="profile-history-table">
                             <thead>
                                 <tr>
@@ -178,6 +196,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="profile-cards" class="mobile-cards" aria-label="Trajetória do manager"></div>
                 </article>
             </section>
 
@@ -185,14 +204,34 @@
                 <div id="season-stats" class="stats-grid"></div>
 
                 <article class="panel panel--featured">
-                    <div class="panel__header">
+                    <div class="panel__header panel__header--wrap">
                         <div>
                             <p class="panel__eyebrow">Pontuação somada nas duas ligas</p>
                             <h2>Ranking combinado</h2>
                         </div>
                         <span id="ranking-status" class="pill"></span>
                     </div>
-                    <div class="table-scroll">
+                    <div class="history-toolbar" aria-label="Filtros do ranking da temporada">
+                        <label class="field-label field-label--search" for="season-search">
+                            Buscar manager
+                            <input id="season-search" type="search" placeholder="Digite um nome" autocomplete="off">
+                        </label>
+                        <label class="field-label" for="season-sort">
+                            Ordenar por
+                            <select id="season-sort">
+                                <option value="points">Pontos do ranking</option>
+                                <option value="fpts">FPTS acumulado</option>
+                                <option value="bestRank">Melhor posição</option>
+                                <option value="name">Nome</option>
+                            </select>
+                        </label>
+                        <span id="season-results" class="toolbar-result" aria-live="polite"></span>
+                    </div>
+                    <div id="season-empty" class="empty-state" hidden>
+                        <strong>Nenhum manager encontrado</strong>
+                        <span>Limpe a busca para visualizar a classificação completa.</span>
+                    </div>
+                    <div id="combined-table-wrap" class="table-scroll desktop-table">
                         <table id="combined-table">
                             <thead>
                                 <tr>
@@ -208,6 +247,7 @@
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="combined-cards" class="mobile-cards" aria-label="Ranking combinado"></div>
                 </article>
 
                 <div id="league-panels" class="league-grid"></div>
@@ -230,7 +270,7 @@
                 </div>
                 <span class="pill league-season"></span>
             </div>
-            <div class="table-scroll">
+            <div class="table-scroll desktop-table">
                 <table class="league-table">
                     <thead>
                         <tr>
@@ -245,6 +285,7 @@
                     <tbody></tbody>
                 </table>
             </div>
+            <div class="mobile-cards league-mobile-cards" aria-label="Classificação da liga"></div>
         </article>
     </template>
 </body>

@@ -430,6 +430,110 @@
             .find(manager => manager.canonicalId === String(canonicalId)) || null;
     }
 
+    function filterBySearch(rows, query, fields = []) {
+        const normalizedQuery = normalizeAlias(query);
+        if (!normalizedQuery) return [...(rows || [])];
+
+        return (rows || []).filter(row => fields.some(field => {
+            const value = typeof field === 'function' ? field(row) : row?.[field];
+            return normalizeAlias(value).includes(normalizedQuery);
+        }));
+    }
+
+    function sortSeasonRanking(rows, sortBy = 'points') {
+        const list = [...(rows || [])];
+        const byName = (a, b) => String(a.managerName || '').localeCompare(String(b.managerName || ''), 'pt-BR');
+        const comparators = {
+            points: (a, b) => Number(b.points || 0) - Number(a.points || 0)
+                || Number(a.bestRank || Infinity) - Number(b.bestRank || Infinity)
+                || Number(b.fpts || 0) - Number(a.fpts || 0)
+                || byName(a, b),
+            fpts: (a, b) => Number(b.fpts || 0) - Number(a.fpts || 0)
+                || Number(b.points || 0) - Number(a.points || 0)
+                || byName(a, b),
+            bestRank: (a, b) => Number(a.bestRank || Infinity) - Number(b.bestRank || Infinity)
+                || Number(b.points || 0) - Number(a.points || 0)
+                || byName(a, b),
+            name: byName
+        };
+        return list.sort(comparators[sortBy] || comparators.points);
+    }
+
+    function csvEscape(value) {
+        const text = value === null || value === undefined ? '' : String(value);
+        return /[";\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+    }
+
+    function rowsToCsv(columns, rows) {
+        const normalizedColumns = (columns || []).map(column =>
+            typeof column === 'string'
+                ? { key: column, label: column }
+                : column
+        );
+        const header = normalizedColumns.map(column => csvEscape(column.label)).join(';');
+        const body = (rows || []).map((row, rowIndex) => normalizedColumns.map(column => {
+            const value = typeof column.value === 'function' ? column.value(row, rowIndex) : row?.[column.key];
+            return csvEscape(value);
+        }).join(';'));
+        return [header, ...body].join('\r\n');
+    }
+
+    function parseRoute(search, options = {}) {
+        const params = new URLSearchParams(String(search || '').replace(/^\?/, ''));
+        const allowedViews = new Set(['champions', 'history', 'profile', 'season']);
+        const allowedSeries = new Set(['all', 'serieA', 'serieB']);
+        const allowedHistorySorts = new Set(['points', 'titles', 'podiums', 'average']);
+        const allowedSeasonSorts = new Set(['points', 'fpts', 'bestRank', 'name']);
+        const configuredYears = new Set((options.years || []).map(Number));
+
+        const view = allowedViews.has(params.get('view')) ? params.get('view') : 'champions';
+        const series = allowedSeries.has(params.get('series')) ? params.get('series') : 'all';
+        const yearValue = Number(params.get('year'));
+        const year = Number.isInteger(yearValue) && (!configuredYears.size || configuredYears.has(yearValue))
+            ? yearValue
+            : null;
+        const historySort = allowedHistorySorts.has(params.get('sort')) ? params.get('sort') : 'points';
+        const seasonSort = allowedSeasonSorts.has(params.get('sort')) ? params.get('sort') : 'points';
+
+        if (view === 'season' && (!year || series === 'all')) {
+            return { view: 'champions' };
+        }
+        if (view === 'profile' && !params.get('manager')) {
+            return { view: 'history', series, sort: historySort, query: params.get('q') || '' };
+        }
+
+        return {
+            view,
+            year,
+            series,
+            sort: view === 'season' ? seasonSort : historySort,
+            query: params.get('q') || '',
+            manager: params.get('manager') || null
+        };
+    }
+
+    function serializeRoute(route = {}) {
+        const params = new URLSearchParams();
+        const view = route.view || 'champions';
+        params.set('view', view);
+
+        if (view === 'history') {
+            if (route.series && route.series !== 'all') params.set('series', route.series);
+            if (route.sort && route.sort !== 'points') params.set('sort', route.sort);
+            if (route.query) params.set('q', route.query);
+        } else if (view === 'profile') {
+            if (route.manager) params.set('manager', route.manager);
+            if (route.series && route.series !== 'all') params.set('series', route.series);
+        } else if (view === 'season') {
+            if (route.year) params.set('year', String(route.year));
+            if (route.series) params.set('series', route.series);
+            if (route.sort && route.sort !== 'points') params.set('sort', route.sort);
+            if (route.query) params.set('q', route.query);
+        }
+
+        return `?${params.toString()}`;
+    }
+
     return Object.freeze({
         normalizeAlias,
         getRosterPoints,
@@ -448,6 +552,12 @@
         buildHistoricalEntries,
         sortHistoricalRanking,
         aggregateHistoricalRanking,
-        getHistoricalProfile
+        getHistoricalProfile,
+        filterBySearch,
+        sortSeasonRanking,
+        csvEscape,
+        rowsToCsv,
+        parseRoute,
+        serializeRoute
     });
 }));

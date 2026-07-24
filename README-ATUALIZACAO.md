@@ -1,4 +1,4 @@
-# Atualização segura para a Etapa 2
+# Atualização segura para a Etapa 3
 
 ## Antes de copiar os arquivos
 
@@ -12,36 +12,34 @@ Isso baixa eventuais commits criados pela Action de snapshots.
 
 ## Pacote de atualização segura
 
-O ZIP de atualização não contém a pasta `data/`. Portanto, ele não substitui:
+O ZIP de atualização não contém a pasta `data/`. Portanto, ele preserva:
 
 - `data/managers.json`;
 - `data/discovery-users.json`;
 - `data/snapshots/manifest.json`;
-- snapshots já gerados.
+- todos os snapshots já gerados.
 
-Copie os arquivos do ZIP para a raiz do projeto e permita a substituição dos arquivos com o mesmo nome.
-
-Depois execute:
+Copie os arquivos para a raiz do projeto e permita a substituição dos arquivos com o mesmo nome. Depois execute:
 
 ```bash
 npm run check
 git add .
-git commit -m "Adiciona ranking histórico e perfis"
+git commit -m "Adiciona URLs compartilháveis, filtros e exportação"
 git push
 ```
 
-## Preencher o ranking histórico
+A Vercel publicará a nova versão automaticamente após o push na branch `main`.
 
-No GitHub:
+## Conferência rápida
 
-1. abra **Actions**;
-2. escolha **Atualizar snapshots**;
-3. clique em **Run workflow**;
-4. deixe o campo do ano vazio;
-5. execute.
+Depois do deploy:
 
-A Action sincronizará todos os anos configurados. Quando ela criar o commit em `data/`, o Vercel publicará a nova base automaticamente.
+1. abra uma temporada e copie o link;
+2. cole o link em uma nova aba e confirme que a mesma temporada abre;
+3. teste a busca e a ordenação;
+4. exporte um CSV;
+5. confira os cards em uma tela de celular.
 
 ## Pacote completo
 
-Use o ZIP completo somente quando o projeto ainda não recebeu a Etapa 1 ou quando você deseja reinstalar toda a estrutura. Se já houver snapshots gerados, faça backup da pasta `data/` antes de substituir o projeto completo.
+Use o ZIP completo somente para reinstalar toda a estrutura. Se já houver snapshots reais, faça backup da pasta `data/` antes de substituir o projeto completo.

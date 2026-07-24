@@ -4,6 +4,7 @@
     const API_BASE_URL = 'https://api.sleeper.app/v1';
     const AVATAR_BASE_URL = 'https://sleepercdn.com/avatars/thumbs';
     const REQUEST_TIMEOUT_MS = 15000;
+    const SEARCH_DEBOUNCE_MS = 180;
     const config = window.AMBO_CONFIG;
     const core = window.AMBO_CORE;
 
@@ -11,8 +12,12 @@
         throw new Error('Configuração ou núcleo de cálculo não carregado.');
     }
 
+    const configuredYears = Object.keys(config.leagueIds).map(Number);
+
     const state = {
         activeButton: null,
+        championsButton: null,
+        historyButton: null,
         requestToken: 0,
         resolvedLeagueIds: new Map(),
         managerRegistryPromise: null,
@@ -24,8 +29,17 @@
         historyManifest: null,
         historyFilter: 'all',
         historySort: 'points',
-        historyButton: null,
-        currentProfileId: null
+        historyQuery: '',
+        currentHistoryRanking: [],
+        currentProfileId: null,
+        currentProfile: null,
+        currentSeason: null,
+        seasonSort: 'points',
+        seasonQuery: '',
+        currentView: 'champions',
+        feedbackTimer: null,
+        historySearchTimer: null,
+        seasonSearchTimer: null
     };
 
     const elements = {
@@ -40,14 +54,22 @@
         lastUpdate: document.getElementById('last-update'),
         loading: document.getElementById('loading'),
         error: document.getElementById('error-message'),
+        actionFeedback: document.getElementById('action-feedback'),
+        copyLink: document.getElementById('copy-link'),
+        sharePage: document.getElementById('share-page'),
+        exportCsv: document.getElementById('export-csv'),
         championStats: document.getElementById('champion-stats'),
         championsBody: document.querySelector('#champions-table tbody'),
         championsRange: document.getElementById('champions-range'),
+        championsCards: document.getElementById('champions-cards'),
         historyStats: document.getElementById('history-stats'),
         historyBody: document.querySelector('#history-table tbody'),
+        historyCards: document.getElementById('history-cards'),
         historyStatus: document.getElementById('history-status'),
         historySeriesFilter: document.getElementById('history-series-filter'),
         historySort: document.getElementById('history-sort'),
+        historySearch: document.getElementById('history-search'),
+        historyResults: document.getElementById('history-results'),
         historyEmpty: document.getElementById('history-empty'),
         historyTableWrap: document.getElementById('history-table-wrap'),
         profileBack: document.getElementById('profile-back'),
@@ -58,9 +80,16 @@
         profileStats: document.getElementById('profile-stats'),
         profileScope: document.getElementById('profile-scope'),
         profileHistoryBody: document.querySelector('#profile-history-table tbody'),
+        profileCards: document.getElementById('profile-cards'),
         seasonStats: document.getElementById('season-stats'),
         combinedBody: document.querySelector('#combined-table tbody'),
+        combinedCards: document.getElementById('combined-cards'),
+        combinedTableWrap: document.getElementById('combined-table-wrap'),
         rankingStatus: document.getElementById('ranking-status'),
+        seasonSearch: document.getElementById('season-search'),
+        seasonSort: document.getElementById('season-sort'),
+        seasonResults: document.getElementById('season-results'),
+        seasonEmpty: document.getElementById('season-empty'),
         leaguePanels: document.getElementById('league-panels'),
         leaguePanelTemplate: document.getElementById('league-panel-template'),
         sidebar: document.getElementById('sidebar'),
@@ -84,11 +113,43 @@
         elements.error.hidden = !message;
     }
 
+    function showFeedback(message) {
+        window.clearTimeout(state.feedbackTimer);
+        elements.actionFeedback.textContent = message;
+        elements.actionFeedback.hidden = false;
+        state.feedbackTimer = window.setTimeout(() => {
+            elements.actionFeedback.hidden = true;
+        }, 2600);
+    }
+
+    function updateDocumentTitle() {
+        document.title = `${elements.pageTitle.textContent} • AMBO`;
+    }
+
     function formatNumber(value, fractionDigits = 2) {
         return new Intl.NumberFormat('pt-BR', {
             minimumFractionDigits: fractionDigits,
             maximumFractionDigits: fractionDigits
-        }).format(Number.isFinite(value) ? value : 0);
+        }).format(Number.isFinite(Number(value)) ? Number(value) : 0);
+    }
+
+    function formatPlacement(value, digits = 0) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) return '—';
+        return `${formatNumber(number, digits)}º`;
+    }
+
+    function formatDateTime(value) {
+        if (!value) return null;
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return null;
+        return new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(date);
     }
 
     function getRosterPoints(roster, key = 'fpts') {
@@ -148,11 +209,11 @@
         return cell;
     }
 
-    function applyRankClass(row, rank, total) {
-        if (rank === 1) row.classList.add('rank-row--first');
-        if (rank === 2) row.classList.add('rank-row--second');
-        if (rank === 3) row.classList.add('rank-row--third');
-        if (total >= 8 && rank > total - 3) row.classList.add('rank-row--bottom');
+    function applyRankClass(element, rank, total) {
+        if (rank === 1) element.classList.add('rank-row--first');
+        if (rank === 2) element.classList.add('rank-row--second');
+        if (rank === 3) element.classList.add('rank-row--third');
+        if (total >= 8 && rank > total - 3) element.classList.add('rank-row--bottom');
     }
 
     function createStatCard(label, value, detail) {
@@ -169,29 +230,66 @@
         container.replaceChildren(...stats.map(stat => createStatCard(stat.label, stat.value, stat.detail)));
     }
 
+    function createMobileMetric(label, value) {
+        const metric = createElement('div', 'mobile-metric');
+        metric.append(
+            createElement('span', '', label),
+            createElement('strong', '', value)
+        );
+        return metric;
+    }
+
+    function createMobileRankingCard({ rank, total, avatar, name, meta, score, metrics, onNameClick }) {
+        const card = createElement('article', 'mobile-ranking-card');
+        applyRankClass(card, rank, total);
+
+        const header = createElement('div', 'mobile-ranking-card__header');
+        header.appendChild(createElement('span', 'rank-number', rank));
+        header.appendChild(createAvatar(avatar, name));
+
+        const entity = createElement('div', 'mobile-ranking-card__entity');
+        if (onNameClick) {
+            const button = createElement('button', 'manager-link', name);
+            button.type = 'button';
+            button.addEventListener('click', onNameClick);
+            entity.appendChild(button);
+        } else {
+            entity.appendChild(createElement('span', 'entity-name', name));
+        }
+        entity.appendChild(createElement('span', 'entity-meta', meta));
+        header.appendChild(entity);
+        header.appendChild(createElement('strong', 'mobile-ranking-card__score', score));
+
+        const metricsGrid = createElement('div', 'mobile-ranking-card__metrics');
+        metrics.forEach(metric => metricsGrid.appendChild(createMobileMetric(metric.label, metric.value)));
+        card.append(header, metricsGrid);
+        return card;
+    }
+
     function showOnlyView(viewName) {
         const views = {
             champions: elements.championsView,
             history: elements.historyView,
             profile: elements.profileView,
-            ranking: elements.rankingView
+            season: elements.rankingView
         };
 
         Object.entries(views).forEach(([name, view]) => {
             view.hidden = name !== viewName;
         });
-    }
-
-    function formatPlacement(value, digits = 0) {
-        const number = Number(value);
-        if (!Number.isFinite(number)) return '—';
-        return `${formatNumber(number, digits)}º`;
+        state.currentView = viewName;
     }
 
     function setActiveButton(button) {
-        if (state.activeButton) state.activeButton.classList.remove('is-active');
+        if (state.activeButton) {
+            state.activeButton.classList.remove('is-active');
+            state.activeButton.removeAttribute('aria-current');
+        }
         state.activeButton = button;
-        if (button) button.classList.add('is-active');
+        if (button) {
+            button.classList.add('is-active');
+            button.setAttribute('aria-current', 'page');
+        }
     }
 
     function closeMobileMenu() {
@@ -211,6 +309,31 @@
         elements.mobileMenuButton.setAttribute('aria-label', willOpen ? 'Fechar menu' : 'Abrir menu');
     }
 
+    function writeRoute(route, mode = 'push') {
+        const url = `${window.location.pathname}${core.serializeRoute(route)}${window.location.hash}`;
+        const method = mode === 'replace' ? 'replaceState' : 'pushState';
+        window.history[method]({ route }, '', url);
+    }
+
+    function currentHistoryRoute() {
+        return {
+            view: 'history',
+            series: state.historyFilter,
+            sort: state.historySort,
+            query: state.historyQuery
+        };
+    }
+
+    function currentSeasonRoute() {
+        return {
+            view: 'season',
+            year: state.currentSeason?.year,
+            series: state.currentSeason?.seriesKey,
+            sort: state.seasonSort,
+            query: state.seasonQuery
+        };
+    }
+
     function renderNavigation() {
         const fragment = document.createDocumentFragment();
 
@@ -222,6 +345,7 @@
             createElement('span', '', 'Campeões')
         );
         championsButton.addEventListener('click', () => showChampions(championsButton));
+        state.championsButton = championsButton;
         fragment.appendChild(championsButton);
 
         const historyButton = createElement('button', 'nav-button');
@@ -235,8 +359,7 @@
         state.historyButton = historyButton;
         fragment.appendChild(historyButton);
 
-        const years = Object.keys(config.leagueIds).map(Number).sort((a, b) => b - a);
-        years.forEach(year => {
+        configuredYears.slice().sort((a, b) => b - a).forEach(year => {
             fragment.appendChild(createElement('p', 'nav-year', year));
 
             Object.entries(config.series).forEach(([seriesKey, seriesLabel]) => {
@@ -257,7 +380,6 @@
         });
 
         elements.navigation.replaceChildren(fragment);
-        showChampions(championsButton);
     }
 
     function getTitleCounts() {
@@ -273,20 +395,36 @@
 
     function renderChampions() {
         const rows = config.champions.slice().sort((a, b) => b.year - a.year);
-        const fragment = document.createDocumentFragment();
+        const tableFragment = document.createDocumentFragment();
+        const cardFragment = document.createDocumentFragment();
 
         rows.forEach(champion => {
             const row = document.createElement('tr');
             row.appendChild(createElement('td', '', champion.year));
-
             ['keeper', 'serieA', 'serieB'].forEach(key => {
                 const value = champion[key];
                 row.appendChild(createElement('td', value ? 'champion-name' : 'empty-value', value || '—'));
             });
-            fragment.appendChild(row);
+            tableFragment.appendChild(row);
+
+            const card = createElement('article', 'mobile-champion-card');
+            card.appendChild(createElement('strong', 'mobile-champion-card__year', champion.year));
+            const grid = createElement('div', 'mobile-champion-card__grid');
+            [
+                ['Keeper', champion.keeper || '—'],
+                ['Série A', champion.serieA || '—'],
+                ['Série B', champion.serieB || '—']
+            ].forEach(([label, value]) => {
+                const item = createElement('div', 'mobile-champion-item');
+                item.append(createElement('span', '', label), createElement('strong', '', value));
+                grid.appendChild(item);
+            });
+            card.appendChild(grid);
+            cardFragment.appendChild(card);
         });
 
-        elements.championsBody.replaceChildren(fragment);
+        elements.championsBody.replaceChildren(tableFragment);
+        elements.championsCards.replaceChildren(cardFragment);
 
         const years = rows.map(row => row.year);
         const titleCounts = getTitleCounts();
@@ -301,8 +439,10 @@
         ]);
     }
 
-    function showChampions(button) {
+    function showChampions(button = state.championsButton, options = {}) {
         state.requestToken += 1;
+        state.currentSeason = null;
+        state.currentProfile = null;
         showLoading(false);
         showError();
         setActiveButton(button);
@@ -314,6 +454,8 @@
         elements.lastUpdate.textContent = `Base cadastrada até ${Math.max(...config.champions.map(item => item.year))}`;
         showOnlyView('champions');
         renderChampions();
+        updateDocumentTitle();
+        if (options.updateUrl !== false) writeRoute({ view: 'champions' }, options.replace ? 'replace' : 'push');
     }
 
     async function fetchJson(url) {
@@ -322,14 +464,10 @@
 
         try {
             const response = await fetch(url, { signal: controller.signal });
-            if (!response.ok) {
-                throw new Error(`requisição retornou ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`requisição retornou ${response.status}`);
             return await response.json();
         } catch (error) {
-            if (error.name === 'AbortError') {
-                throw new Error('tempo de resposta excedido');
-            }
+            if (error.name === 'AbortError') throw new Error('tempo de resposta excedido');
             throw error;
         } finally {
             window.clearTimeout(timeoutId);
@@ -373,40 +511,18 @@
         const basePath = String(dataConfig.snapshotsBasePath || 'data/snapshots').replace(/\/$/, '');
         const payload = await fetchOptionalJson(`${basePath}/${year}/${seriesKey}.json`);
         if (!payload) return null;
-
-        if (payload.schemaVersion !== 1 || !Array.isArray(payload.leagues)) {
-            console.warn(`Snapshot ${year}/${seriesKey} ignorado: formato inválido.`);
-            return null;
-        }
+        if (payload.schemaVersion !== 1 || !Array.isArray(payload.leagues)) return null;
 
         const validationErrors = [];
         payload.leagues.forEach((leagueSnapshot, index) => {
             const result = core.validateLeagueSnapshot(leagueSnapshot);
-            if (!result.valid) {
-                validationErrors.push(`Liga ${index + 1}: ${result.errors.join('; ')}`);
-            }
+            if (!result.valid) validationErrors.push(`Liga ${index + 1}: ${result.errors.join('; ')}`);
         });
-
         if (validationErrors.length) {
             console.error(`Snapshot ${year}/${seriesKey} inválido:`, validationErrors);
             return null;
         }
-
         return payload;
-    }
-
-
-    function formatDateTime(value) {
-        if (!value) return null;
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return null;
-        return new Intl.DateTimeFormat('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).format(date);
     }
 
     function getHistoryScopeLabel(seriesKey = state.historyFilter) {
@@ -433,13 +549,7 @@
 
                 const payload = await fetchOptionalJson(`${basePath}/${year}/${seriesKey}.json`);
                 if (!payload || payload.schemaVersion !== 1 || !Array.isArray(payload.leagues)) return null;
-
-                const invalidLeague = payload.leagues.find(league => !core.validateLeagueSnapshot(league).valid);
-                if (invalidLeague) {
-                    console.warn(`Snapshot histórico ${year}/${seriesKey} ignorado por falha de validação.`);
-                    return null;
-                }
-
+                if (payload.leagues.some(league => !core.validateLeagueSnapshot(league).valid)) return null;
                 return payload;
             }));
 
@@ -448,13 +558,7 @@
             state.historyEntries = entries;
             state.historyPayloads = payloads;
             state.historyManifest = manifest || { schemaVersion: 1, generatedAt: null, snapshots: [] };
-
-            return {
-                registry,
-                manifest: state.historyManifest,
-                payloads,
-                entries
-            };
+            return { registry, manifest: state.historyManifest, payloads, entries };
         })();
 
         try {
@@ -466,28 +570,28 @@
     }
 
     function renderHistoricalRanking() {
-        const ranking = core.aggregateHistoricalRanking(state.historyEntries, {
+        const fullRanking = core.aggregateHistoricalRanking(state.historyEntries, {
             seriesKey: state.historyFilter,
             sortBy: state.historySort
         });
+        const ranking = core.filterBySearch(fullRanking, state.historyQuery, ['managerName']);
         const pointsRanking = core.aggregateHistoricalRanking(state.historyEntries, {
             seriesKey: state.historyFilter,
             sortBy: 'points'
         });
         const officialEntries = state.historyEntries.filter(entry =>
-            !entry.provisional
-            && (state.historyFilter === 'all' || entry.seriesKey === state.historyFilter)
+            !entry.provisional && (state.historyFilter === 'all' || entry.seriesKey === state.historyFilter)
         );
         const recuts = new Set(officialEntries.map(entry => `${entry.year}:${entry.seriesKey}`));
         const provisionalRecuts = new Set(state.historyEntries
             .filter(entry => entry.provisional && (state.historyFilter === 'all' || entry.seriesKey === state.historyFilter))
             .map(entry => `${entry.year}:${entry.seriesKey}`));
         const leader = pointsRanking[0];
-        const expectedYears = Object.keys(config.leagueIds).length;
-        const expectedRecuts = expectedYears * (state.historyFilter === 'all' ? Object.keys(config.series).length : 1);
+        const expectedRecuts = configuredYears.length * (state.historyFilter === 'all' ? Object.keys(config.series).length : 1);
 
+        state.currentHistoryRanking = ranking;
         setStats(elements.historyStats, [
-            { label: 'Managers ranqueados', value: ranking.length, detail: getHistoryScopeLabel() },
+            { label: 'Managers ranqueados', value: fullRanking.length, detail: state.historyQuery ? `${ranking.length} visível(is) na busca` : getHistoryScopeLabel() },
             { label: 'Recortes oficiais', value: recuts.size, detail: `${expectedRecuts} possíveis na configuração` },
             { label: 'Líder histórico', value: leader?.managerName || '—', detail: leader ? `${leader.totalPoints} pontos acumulados` : 'Sem dados oficiais' },
             { label: 'Período coberto', value: officialEntries.length ? `${Math.min(...officialEntries.map(item => item.year))}–${Math.max(...officialEntries.map(item => item.year))}` : '—', detail: provisionalRecuts.size ? `${provisionalRecuts.size} recorte(s) provisório(s) omitido(s)` : 'Somente snapshots validados' }
@@ -496,10 +600,12 @@
         elements.historyStatus.textContent = recuts.size
             ? `${recuts.size} recorte${recuts.size === 1 ? '' : 's'} oficial${recuts.size === 1 ? '' : 'is'}`
             : 'Sem snapshots oficiais';
+        elements.historyResults.textContent = `${ranking.length} de ${fullRanking.length} manager${fullRanking.length === 1 ? '' : 's'}`;
         elements.historyEmpty.hidden = ranking.length > 0;
         elements.historyTableWrap.hidden = ranking.length === 0;
 
-        const fragment = document.createDocumentFragment();
+        const tableFragment = document.createDocumentFragment();
+        const cardFragment = document.createDocumentFragment();
         ranking.forEach((manager, index) => {
             const rank = index + 1;
             const row = document.createElement('tr');
@@ -507,7 +613,6 @@
 
             const avatarCell = createElement('td', 'col-avatar');
             avatarCell.appendChild(createAvatar(manager.avatar, manager.managerName));
-
             const managerCell = document.createElement('td');
             const managerButton = createElement('button', 'manager-link', manager.managerName);
             managerButton.type = 'button';
@@ -528,36 +633,55 @@
                 createElement('td', '', formatPlacement(manager.bestFinish)),
                 createElement('td', '', formatPlacement(manager.averageFinish, 2))
             );
-            fragment.appendChild(row);
+            tableFragment.appendChild(row);
+
+            cardFragment.appendChild(createMobileRankingCard({
+                rank,
+                total: ranking.length,
+                avatar: manager.avatar,
+                name: manager.managerName,
+                meta: `${manager.firstYear}–${manager.lastYear} · ${manager.leagueAppearances} ligas`,
+                score: `${manager.totalPoints} pts`,
+                onNameClick: () => showManagerProfile(manager.canonicalId),
+                metrics: [
+                    { label: 'Títulos', value: manager.titles },
+                    { label: 'Pódios', value: manager.podiums },
+                    { label: 'Participações', value: manager.participations },
+                    { label: 'Média', value: formatPlacement(manager.averageFinish, 2) }
+                ]
+            }));
         });
-        elements.historyBody.replaceChildren(fragment);
+        elements.historyBody.replaceChildren(tableFragment);
+        elements.historyCards.replaceChildren(cardFragment);
     }
 
-    async function showHistoricalRanking(button = state.historyButton) {
+    async function showHistoricalRanking(button = state.historyButton, options = {}) {
         const currentRequest = ++state.requestToken;
+        state.currentSeason = null;
+        state.currentProfile = null;
         setActiveButton(button);
         closeMobileMenu();
         showError();
         showLoading(true);
         showOnlyView('history');
 
-        elements.pageEyebrow.textContent = 'Arquivo histórico';
-        elements.pageTitle.textContent = 'Ranking de todos os tempos';
-        elements.pageDescription.textContent = 'Pontos, títulos, pódios e médias calculados a partir dos snapshots oficiais das Séries A e B.';
+        elements.pageEyebrow.textContent = 'Central histórica';
+        elements.pageTitle.textContent = 'Ranking histórico';
+        elements.pageDescription.textContent = 'Pontos, títulos, pódios e médias acumulados a partir dos snapshots oficiais.';
         elements.lastUpdate.textContent = 'Carregando histórico validado...';
+        updateDocumentTitle();
 
         try {
             const data = await loadHistoricalData();
             if (currentRequest !== state.requestToken) return;
             renderHistoricalRanking();
             const updatedAt = formatDateTime(data.manifest?.generatedAt);
-            elements.lastUpdate.textContent = updatedAt
-                ? `Snapshots atualizados em ${updatedAt}`
-                : `${data.payloads.length} snapshots disponíveis`;
+            elements.lastUpdate.textContent = updatedAt ? `Snapshots · ${updatedAt}` : 'Snapshots oficiais';
+            if (options.updateUrl !== false) writeRoute(currentHistoryRoute(), options.replace ? 'replace' : 'push');
         } catch (error) {
             if (currentRequest !== state.requestToken) return;
-            console.error(error);
             elements.historyBody.replaceChildren();
+            elements.historyCards.replaceChildren();
             elements.historyStats.replaceChildren();
             elements.historyStatus.textContent = 'Histórico indisponível';
             elements.historyEmpty.hidden = false;
@@ -569,19 +693,25 @@
         }
     }
 
-    function showManagerProfile(canonicalId) {
+    async function showManagerProfile(canonicalId, options = {}) {
+        if (!state.historyEntries.length) await loadHistoricalData();
         const profile = core.getHistoricalProfile(state.historyEntries, canonicalId, {
             seriesKey: state.historyFilter
         });
 
         if (!profile) {
             showError('Não há dados históricos oficiais suficientes para abrir este perfil.');
+            await showHistoricalRanking(state.historyButton, { updateUrl: false });
+            writeRoute(currentHistoryRoute(), 'replace');
             return;
         }
 
         state.currentProfileId = canonicalId;
+        state.currentProfile = profile;
+        state.currentSeason = null;
         showError();
         showOnlyView('profile');
+        setActiveButton(state.historyButton);
         closeMobileMenu();
 
         elements.pageEyebrow.textContent = 'Perfil histórico';
@@ -592,6 +722,7 @@
         elements.profileName.textContent = profile.managerName;
         elements.profileMeta.textContent = `${profile.participations} participação${profile.participations === 1 ? '' : 'ões'} em rankings combinados · ${profile.leagueAppearances} liga${profile.leagueAppearances === 1 ? '' : 's'} disputada${profile.leagueAppearances === 1 ? '' : 's'}`;
         elements.profileScope.textContent = getHistoryScopeLabel();
+        updateDocumentTitle();
 
         const badges = [];
         if (profile.titles) badges.push(createElement('span', 'profile-badge profile-badge--gold', `${profile.titles} título${profile.titles === 1 ? '' : 's'}`));
@@ -608,19 +739,20 @@
             { label: 'FPTS acumulado', value: formatNumber(profile.totalFpts), detail: `${profile.leagueAppearances} participações em ligas` }
         ]);
 
-        const fragment = document.createDocumentFragment();
+        const tableFragment = document.createDocumentFragment();
+        const cardFragment = document.createDocumentFragment();
         profile.history.forEach(entry => {
+            const openSeason = () => {
+                const navButton = state.navButtons.get(`${entry.year}:${entry.seriesKey}`) || null;
+                loadSeason(entry.year, entry.seriesKey, navButton);
+            };
             const row = document.createElement('tr');
             const yearCell = document.createElement('td');
             const seasonButton = createElement('button', 'season-link', entry.year);
             seasonButton.type = 'button';
             seasonButton.title = `Abrir ${entry.seriesLabel} de ${entry.year}`;
-            seasonButton.addEventListener('click', () => {
-                const navButton = state.navButtons.get(`${entry.year}:${entry.seriesKey}`) || null;
-                loadSeason(entry.year, entry.seriesKey, navButton);
-            });
+            seasonButton.addEventListener('click', openSeason);
             yearCell.appendChild(seasonButton);
-
             row.append(
                 yearCell,
                 createElement('td', '', entry.seriesLabel),
@@ -630,22 +762,36 @@
                 createElement('td', '', formatNumber(entry.fpts)),
                 createElement('td', '', entry.leagueAppearances)
             );
-            fragment.appendChild(row);
+            tableFragment.appendChild(row);
+
+            cardFragment.appendChild(createMobileRankingCard({
+                rank: entry.rank,
+                total: Math.max(profile.history.length, 8),
+                avatar: null,
+                name: `${entry.year} · ${entry.seriesLabel}`,
+                meta: `${entry.leagueAppearances} liga${entry.leagueAppearances === 1 ? '' : 's'} disputada${entry.leagueAppearances === 1 ? '' : 's'}`,
+                score: `${entry.points} pts`,
+                onNameClick: openSeason,
+                metrics: [
+                    { label: 'Colocação', value: formatPlacement(entry.rank) },
+                    { label: 'Melhor liga', value: formatPlacement(entry.bestLeagueRank) },
+                    { label: 'FPTS', value: formatNumber(entry.fpts) },
+                    { label: 'Série', value: entry.seriesLabel }
+                ]
+            }));
         });
-        elements.profileHistoryBody.replaceChildren(fragment);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        elements.profileHistoryBody.replaceChildren(tableFragment);
+        elements.profileCards.replaceChildren(cardFragment);
+        window.scrollTo({ top: 0, behavior: options.scroll === false ? 'auto' : 'smooth' });
+        if (options.updateUrl !== false) {
+            writeRoute({ view: 'profile', manager: canonicalId, series: state.historyFilter }, options.replace ? 'replace' : 'push');
+        }
     }
 
     async function resolveLeagueIds(year, seriesKey) {
         const seasonConfig = config.leagueIds[year]?.[seriesKey];
-
-        if (Array.isArray(seasonConfig)) {
-            return seasonConfig.map(String);
-        }
-
-        if (!seasonConfig || typeof seasonConfig !== 'object') {
-            throw new Error('não há configuração de liga para esta temporada');
-        }
+        if (Array.isArray(seasonConfig)) return seasonConfig.map(String);
+        if (!seasonConfig || typeof seasonConfig !== 'object') throw new Error('não há configuração de liga para esta temporada');
 
         const username = String(seasonConfig.username || '').trim();
         const previousLeagueIds = Array.isArray(seasonConfig.previousLeagueIds)
@@ -653,34 +799,23 @@
             : [];
         const expectedLeagues = Number(seasonConfig.expectedLeagues || previousLeagueIds.length || 2);
         const discoveryKey = String(seasonConfig.discoveryKey || core.normalizeAlias(username));
-
-        if (!previousLeagueIds.length) {
-            throw new Error('a descoberta automática está incompleta no config.js');
-        }
+        if (!previousLeagueIds.length) throw new Error('a descoberta automática está incompleta no config.js');
 
         const cacheKey = `${year}:${seriesKey}`;
-        if (state.resolvedLeagueIds.has(cacheKey)) {
-            return state.resolvedLeagueIds.get(cacheKey);
-        }
+        if (state.resolvedLeagueIds.has(cacheKey)) return state.resolvedLeagueIds.get(cacheKey);
 
         const discoveryRequest = (async () => {
             const persistedUsers = await loadDiscoveryUsers();
             let userId = String(seasonConfig.userId || persistedUsers[discoveryKey]?.userId || '').trim();
-
             if (!userId) {
-                if (!username) {
-                    throw new Error(`user_id persistente ausente para ${seriesKey}`);
-                }
+                if (!username) throw new Error(`user_id persistente ausente para ${seriesKey}`);
                 const user = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(username)}`);
                 userId = String(user?.user_id || '');
                 if (!userId) throw new Error(`usuário ${username} não encontrado no Sleeper`);
             }
 
             const leagues = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(userId)}/leagues/nfl/${year}`);
-            if (!Array.isArray(leagues)) {
-                throw new Error(`a API não retornou as ligas do usuário ${userId} em ${year}`);
-            }
-
+            if (!Array.isArray(leagues)) throw new Error(`a API não retornou as ligas do usuário ${userId} em ${year}`);
             const previousIds = new Set(previousLeagueIds);
             const matchedLeagueIds = [...new Set(
                 leagues
@@ -689,16 +824,13 @@
                     .map(league => String(league?.league_id || ''))
                     .filter(Boolean)
             )];
-
             if (matchedLeagueIds.length !== expectedLeagues) {
                 throw new Error(`foram encontradas ${matchedLeagueIds.length} de ${expectedLeagues} ligas renovadas em ${year}`);
             }
-
             return matchedLeagueIds;
         })();
 
         state.resolvedLeagueIds.set(cacheKey, discoveryRequest);
-
         try {
             return await discoveryRequest;
         } catch (error) {
@@ -724,9 +856,7 @@
             fetchOptionalBracket(leagueId, 'winners_bracket'),
             fetchOptionalBracket(leagueId, 'losers_bracket')
         ]);
-
         const calculated = core.calculateStandings(winnersBracket, losersBracket, rosters, league);
-
         return {
             index,
             leagueId,
@@ -744,70 +874,119 @@
         return core.calculateCombinedStandings(leagueSnapshots, registry);
     }
 
-    function renderCombinedStandings(standings) {
-        const fragment = document.createDocumentFragment();
+    function renderCombinedStandings(standings, totalManagers) {
+        const tableFragment = document.createDocumentFragment();
+        const cardFragment = document.createDocumentFragment();
 
-        standings.forEach((standing, index) => {
-            const rank = index + 1;
+        standings.forEach(standing => {
+            const officialRank = standing.officialRank;
             const row = document.createElement('tr');
-            applyRankClass(row, rank, standings.length);
-
+            applyRankClass(row, officialRank, totalManagers);
             const avatarCell = createElement('td', 'col-avatar');
             avatarCell.appendChild(createAvatar(standing.avatar, standing.managerName));
-
-            const pointsCell = createElement('td', 'points-value', standing.points);
             row.append(
-                createRankCell(rank),
+                createRankCell(officialRank),
                 avatarCell,
                 createEntityCell(standing.managerName, `${standing.appearances} participação${standing.appearances === 1 ? '' : 'ões'} na rodada`),
-                pointsCell,
-                createElement('td', '', `${standing.bestRank}º`),
+                createElement('td', 'points-value', standing.points),
+                createElement('td', '', formatPlacement(standing.bestRank)),
                 createElement('td', '', formatNumber(standing.fpts)),
                 createElement('td', '', standing.appearances)
             );
-            fragment.appendChild(row);
+            tableFragment.appendChild(row);
+
+            cardFragment.appendChild(createMobileRankingCard({
+                rank: officialRank,
+                total: totalManagers,
+                avatar: standing.avatar,
+                name: standing.managerName,
+                meta: `${standing.appearances} liga${standing.appearances === 1 ? '' : 's'} combinada${standing.appearances === 1 ? '' : 's'}`,
+                score: `${standing.points} pts`,
+                metrics: [
+                    { label: 'Melhor posição', value: formatPlacement(standing.bestRank) },
+                    { label: 'FPTS', value: formatNumber(standing.fpts) },
+                    { label: 'Ligas', value: standing.appearances },
+                    { label: 'Posição oficial', value: formatPlacement(officialRank) }
+                ]
+            }));
         });
 
-        elements.combinedBody.replaceChildren(fragment);
+        elements.combinedBody.replaceChildren(tableFragment);
+        elements.combinedCards.replaceChildren(cardFragment);
     }
 
-    function renderLeaguePanel(snapshot) {
+    function getLeagueRows(snapshot, query = '') {
+        const rows = snapshot.standings.map(standing => {
+            const roster = snapshot.rosters.find(item => item.roster_id === standing.rosterId);
+            const user = getUserForRoster(roster, snapshot.users);
+            const wins = Number(roster?.settings?.wins || 0);
+            const losses = Number(roster?.settings?.losses || 0);
+            const ties = Number(roster?.settings?.ties || 0);
+            return {
+                standing,
+                roster,
+                user,
+                managerName: getManagerName(user, roster),
+                teamName: getTeamName(user, roster),
+                campaign: ties ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`,
+                fpts: getRosterPoints(roster)
+            };
+        });
+        return core.filterBySearch(rows, query, ['managerName', 'teamName']);
+    }
+
+    function renderLeaguePanel(snapshot, query = '') {
         const panel = elements.leaguePanelTemplate.content.firstElementChild.cloneNode(true);
         panel.querySelector('.league-number').textContent = `Liga ${snapshot.index + 1}`;
         panel.querySelector('.league-name').textContent = snapshot.league.name || `Liga ${snapshot.index + 1}`;
         panel.querySelector('.league-season').textContent = snapshot.usedFallback ? 'Classificação parcial' : `Temporada ${snapshot.league.season}`;
 
         const body = panel.querySelector('tbody');
-        const fragment = document.createDocumentFragment();
+        const cards = panel.querySelector('.league-mobile-cards');
+        const tableFragment = document.createDocumentFragment();
+        const cardFragment = document.createDocumentFragment();
+        const rows = getLeagueRows(snapshot, query);
 
-        snapshot.standings.forEach(standing => {
-            const roster = snapshot.rosters.find(item => item.roster_id === standing.rosterId);
-            const user = getUserForRoster(roster, snapshot.users);
-            const managerName = getManagerName(user, roster);
-            const teamName = getTeamName(user, roster);
-            const wins = Number(roster?.settings?.wins || 0);
-            const losses = Number(roster?.settings?.losses || 0);
-            const ties = Number(roster?.settings?.ties || 0);
-            const campaign = ties ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`;
-
+        rows.forEach(item => {
+            const { standing, roster, user, managerName, teamName, campaign, fpts } = item;
             const row = document.createElement('tr');
             applyRankClass(row, standing.rank, snapshot.standings.length);
-
             const avatarCell = createElement('td', 'col-avatar');
             avatarCell.appendChild(createAvatar(user?.avatar, managerName));
-
             row.append(
                 createRankCell(standing.rank),
                 avatarCell,
                 createEntityCell(teamName, managerName),
                 createElement('td', '', campaign),
                 createElement('td', 'points-value', standing.points),
-                createElement('td', '', formatNumber(getRosterPoints(roster)))
+                createElement('td', '', formatNumber(fpts))
             );
-            fragment.appendChild(row);
+            tableFragment.appendChild(row);
+
+            cardFragment.appendChild(createMobileRankingCard({
+                rank: standing.rank,
+                total: snapshot.standings.length,
+                avatar: user?.avatar,
+                name: teamName,
+                meta: managerName,
+                score: `${standing.points} pts`,
+                metrics: [
+                    { label: 'Campanha', value: campaign },
+                    { label: 'FPTS', value: formatNumber(fpts) },
+                    { label: 'Colocação', value: formatPlacement(standing.rank) },
+                    { label: 'Fonte', value: standing.source === 'playoff-bracket' ? 'Playoffs' : 'Temporada regular' }
+                ]
+            }));
         });
 
-        body.replaceChildren(fragment);
+        if (!rows.length) {
+            const empty = createElement('div', 'empty-state');
+            empty.append(createElement('strong', '', 'Nenhum resultado nesta liga'), createElement('span', '', 'Limpe a busca para ver todos os participantes.'));
+            cardFragment.appendChild(empty);
+        }
+
+        body.replaceChildren(tableFragment);
+        cards.replaceChildren(cardFragment);
         return panel;
     }
 
@@ -815,13 +994,11 @@
         const allFallback = snapshots.every(snapshot => snapshot.usedFallback);
         const anyFallback = snapshots.some(snapshot => snapshot.usedFallback);
         const leader = combined[0];
-
         setStats(elements.seasonStats, [
             { label: 'Temporada', value: year, detail: seriesLabel },
             { label: 'Managers únicos', value: combined.length, detail: `${snapshots.length} ligas combinadas` },
             { label: 'Líder combinado', value: leader?.managerName || '—', detail: leader ? `${leader.points} pontos no ranking` : 'Sem dados disponíveis' }
         ]);
-
         elements.rankingStatus.textContent = allFallback
             ? 'Classificação regular'
             : anyFallback
@@ -829,7 +1006,21 @@
                 : 'Playoffs concluídos';
     }
 
-    async function loadSeason(year, seriesKey, button) {
+    function renderSeasonRanking() {
+        if (!state.currentSeason) return;
+        const fullCombined = state.currentSeason.combined;
+        const searched = core.filterBySearch(fullCombined, state.seasonQuery, ['managerName']);
+        const visible = core.sortSeasonRanking(searched, state.seasonSort);
+        state.currentSeason.visibleCombined = visible;
+
+        renderCombinedStandings(visible, fullCombined.length);
+        elements.leaguePanels.replaceChildren(...state.currentSeason.snapshots.map(snapshot => renderLeaguePanel(snapshot, state.seasonQuery)));
+        elements.seasonResults.textContent = `${visible.length} de ${fullCombined.length} manager${fullCombined.length === 1 ? '' : 's'}`;
+        elements.seasonEmpty.hidden = visible.length > 0;
+        elements.combinedTableWrap.hidden = visible.length === 0;
+    }
+
+    async function loadSeason(year, seriesKey, button, options = {}) {
         const seasonConfig = config.leagueIds[year]?.[seriesKey];
         if (!seasonConfig) {
             showError('Não há configuração de liga cadastrada para esta temporada.');
@@ -838,30 +1029,29 @@
 
         const currentRequest = ++state.requestToken;
         const seriesLabel = config.series[seriesKey] || seriesKey;
-
         setActiveButton(button);
         closeMobileMenu();
         showError();
         showLoading(true);
+        state.currentProfile = null;
 
         elements.pageEyebrow.textContent = `Temporada ${year}`;
         elements.pageTitle.textContent = `AMBO ${seriesLabel}`;
-        elements.pageDescription.textContent = 'Ranking combinado das duas ligas, com classificação final, campanha e pontuação acumulada.';
+        elements.pageDescription.textContent = 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.';
         elements.lastUpdate.textContent = 'Carregando dados validados...';
-        showOnlyView('ranking');
+        showOnlyView('season');
+        updateDocumentTitle();
 
         try {
             const [registry, localSnapshot] = await Promise.all([
                 loadManagerRegistry(),
                 loadLocalSeasonSnapshot(year, seriesKey)
             ]);
-
             if (currentRequest !== state.requestToken) return;
 
             let snapshots;
             let sourceLabel;
             let updatedAt;
-
             if (localSnapshot) {
                 snapshots = localSnapshot.leagues.slice().sort((a, b) => a.index - b.index);
                 sourceLabel = 'Snapshot oficial';
@@ -869,7 +1059,6 @@
             } else {
                 const leagueIds = await resolveLeagueIds(year, seriesKey);
                 if (currentRequest !== state.requestToken) return;
-
                 snapshots = (await Promise.all(
                     leagueIds.map((leagueId, index) => fetchLeagueSnapshot(leagueId, index))
                 )).sort((a, b) => a.index - b.index);
@@ -879,34 +1068,33 @@
 
             snapshots.forEach((snapshot, index) => {
                 const validation = core.validateLeagueSnapshot(snapshot);
-                if (!validation.valid) {
-                    throw new Error(`Liga ${index + 1} inválida: ${validation.errors.join('; ')}`);
-                }
+                if (!validation.valid) throw new Error(`Liga ${index + 1} inválida: ${validation.errors.join('; ')}`);
             });
-
             if (currentRequest !== state.requestToken) return;
 
-            const combined = calculateCombinedStandings(snapshots, registry);
-            renderCombinedStandings(combined);
-            elements.leaguePanels.replaceChildren(...snapshots.map(renderLeaguePanel));
+            const combined = calculateCombinedStandings(snapshots, registry)
+                .map((standing, index) => ({ ...standing, officialRank: index + 1 }));
+            state.currentSeason = {
+                year: Number(year),
+                seriesKey,
+                seriesLabel,
+                snapshots,
+                combined,
+                visibleCombined: combined,
+                sourceLabel,
+                updatedAt
+            };
             renderSeasonStats(year, seriesLabel, snapshots, combined);
-
-            const formattedDate = updatedAt
-                ? new Intl.DateTimeFormat('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }).format(new Date(updatedAt))
-                : null;
-            elements.lastUpdate.textContent = formattedDate
-                ? `${sourceLabel} · ${formattedDate}`
-                : sourceLabel;
+            renderSeasonRanking();
+            const formattedDate = formatDateTime(updatedAt);
+            elements.lastUpdate.textContent = formattedDate ? `${sourceLabel} · ${formattedDate}` : sourceLabel;
+            if (options.updateUrl !== false) writeRoute(currentSeasonRoute(), options.replace ? 'replace' : 'push');
         } catch (error) {
             if (currentRequest !== state.requestToken) return;
             console.error(error);
+            state.currentSeason = null;
             elements.combinedBody.replaceChildren();
+            elements.combinedCards.replaceChildren();
             elements.leaguePanels.replaceChildren();
             elements.seasonStats.replaceChildren();
             elements.rankingStatus.textContent = 'Falha de validação';
@@ -917,18 +1105,224 @@
         }
     }
 
+    function sanitizeFileName(value) {
+        return String(value || 'ambo')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9_-]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .toLowerCase();
+    }
+
+    function getCurrentCsv() {
+        if (state.currentView === 'champions') {
+            return {
+                filename: 'ambo-campeoes.csv',
+                csv: core.rowsToCsv([
+                    { key: 'year', label: 'Ano' },
+                    { key: 'keeper', label: 'AMBO Keeper' },
+                    { key: 'serieA', label: 'AMBO Série A' },
+                    { key: 'serieB', label: 'AMBO Série B' }
+                ], config.champions.slice().sort((a, b) => b.year - a.year))
+            };
+        }
+        if (state.currentView === 'history') {
+            return {
+                filename: `ambo-ranking-historico-${sanitizeFileName(getHistoryScopeLabel())}.csv`,
+                csv: core.rowsToCsv([
+                    { label: 'Posição', value: (_, index) => index + 1 },
+                    { key: 'managerName', label: 'Manager' },
+                    { key: 'totalPoints', label: 'Pontos' },
+                    { key: 'titles', label: 'Títulos' },
+                    { key: 'podiums', label: 'Pódios' },
+                    { key: 'participations', label: 'Participações' },
+                    { key: 'bestFinish', label: 'Melhor posição' },
+                    { label: 'Média', value: row => formatNumber(row.averageFinish, 2) },
+                    { label: 'FPTS', value: row => formatNumber(row.totalFpts) }
+                ], state.currentHistoryRanking.map((row, index) => ({ ...row, __index: index })))
+            };
+        }
+        if (state.currentView === 'profile' && state.currentProfile) {
+            return {
+                filename: `ambo-perfil-${sanitizeFileName(state.currentProfile.managerName)}.csv`,
+                csv: core.rowsToCsv([
+                    { key: 'year', label: 'Ano' },
+                    { key: 'seriesLabel', label: 'Série' },
+                    { key: 'rank', label: 'Posição' },
+                    { key: 'points', label: 'Pontos' },
+                    { key: 'bestLeagueRank', label: 'Melhor liga' },
+                    { label: 'FPTS', value: row => formatNumber(row.fpts) },
+                    { key: 'leagueAppearances', label: 'Ligas' }
+                ], state.currentProfile.history)
+            };
+        }
+        if (state.currentView === 'season' && state.currentSeason) {
+            return {
+                filename: `ambo-${state.currentSeason.year}-${state.currentSeason.seriesKey}.csv`,
+                csv: core.rowsToCsv([
+                    { key: 'officialRank', label: 'Posição oficial' },
+                    { key: 'managerName', label: 'Manager' },
+                    { key: 'points', label: 'Pontos' },
+                    { key: 'bestRank', label: 'Melhor posição' },
+                    { label: 'FPTS', value: row => formatNumber(row.fpts) },
+                    { key: 'appearances', label: 'Ligas' }
+                ], state.currentSeason.visibleCombined)
+            };
+        }
+        return null;
+    }
+
+    function downloadCsv() {
+        const payload = getCurrentCsv();
+        if (!payload) {
+            showFeedback('Não há dados disponíveis para exportar.');
+            return;
+        }
+        const blob = new Blob([`\uFEFF${payload.csv}`], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = payload.filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+        showFeedback('Arquivo CSV gerado.');
+    }
+
+    async function copyText(text) {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+    }
+
+    async function copyCurrentLink() {
+        try {
+            await copyText(window.location.href);
+            showFeedback('Link desta página copiado.');
+        } catch (error) {
+            console.error(error);
+            showFeedback('Não foi possível copiar o link.');
+        }
+    }
+
+    async function shareCurrentPage() {
+        const shareData = {
+            title: document.title,
+            text: elements.pageDescription.textContent,
+            url: window.location.href
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+                return;
+            }
+            await copyText(shareData.url);
+            showFeedback('Compartilhamento indisponível; o link foi copiado.');
+        } catch (error) {
+            if (error?.name !== 'AbortError') {
+                console.error(error);
+                showFeedback('Não foi possível compartilhar agora.');
+            }
+        }
+    }
+
+    async function applyRoute(route, options = {}) {
+        if (route.view === 'history' || route.view === 'profile') {
+            state.historyFilter = route.series || 'all';
+            state.historySort = route.view === 'history' ? (route.sort || 'points') : state.historySort;
+            state.historyQuery = route.view === 'history' ? (route.query || '') : state.historyQuery;
+        }
+        elements.historySeriesFilter.value = state.historyFilter;
+        elements.historySort.value = state.historySort;
+        elements.historySearch.value = state.historyQuery;
+
+        if (route.view === 'history') {
+            await showHistoricalRanking(state.historyButton, { updateUrl: false });
+        } else if (route.view === 'profile') {
+            await loadHistoricalData();
+            await showManagerProfile(route.manager, { updateUrl: false, scroll: false });
+        } else if (route.view === 'season') {
+            state.seasonSort = route.sort || 'points';
+            state.seasonQuery = route.query || '';
+            elements.seasonSort.value = state.seasonSort;
+            elements.seasonSearch.value = state.seasonQuery;
+            const button = state.navButtons.get(`${route.year}:${route.series}`) || null;
+            await loadSeason(route.year, route.series, button, { updateUrl: false });
+        } else {
+            showChampions(state.championsButton, { updateUrl: false });
+        }
+
+        if (options.replace) {
+            const normalizedRoute = route.view === 'season'
+                ? currentSeasonRoute()
+                : route.view === 'history'
+                    ? currentHistoryRoute()
+                    : route.view === 'profile'
+                        ? { view: 'profile', manager: route.manager, series: state.historyFilter }
+                        : { view: 'champions' };
+            writeRoute(normalizedRoute, 'replace');
+        }
+    }
+
     elements.historySeriesFilter.addEventListener('change', event => {
         state.historyFilter = event.target.value;
         renderHistoricalRanking();
+        writeRoute(currentHistoryRoute(), 'replace');
     });
     elements.historySort.addEventListener('change', event => {
         state.historySort = event.target.value;
         renderHistoricalRanking();
+        writeRoute(currentHistoryRoute(), 'replace');
+    });
+    elements.historySearch.addEventListener('input', event => {
+        state.historyQuery = event.target.value;
+        window.clearTimeout(state.historySearchTimer);
+        state.historySearchTimer = window.setTimeout(() => {
+            renderHistoricalRanking();
+            writeRoute(currentHistoryRoute(), 'replace');
+        }, SEARCH_DEBOUNCE_MS);
+    });
+    elements.seasonSort.addEventListener('change', event => {
+        state.seasonSort = event.target.value;
+        renderSeasonRanking();
+        if (state.currentSeason) writeRoute(currentSeasonRoute(), 'replace');
+    });
+    elements.seasonSearch.addEventListener('input', event => {
+        state.seasonQuery = event.target.value;
+        window.clearTimeout(state.seasonSearchTimer);
+        state.seasonSearchTimer = window.setTimeout(() => {
+            renderSeasonRanking();
+            if (state.currentSeason) writeRoute(currentSeasonRoute(), 'replace');
+        }, SEARCH_DEBOUNCE_MS);
     });
     elements.profileBack.addEventListener('click', () => showHistoricalRanking(state.historyButton));
-
+    elements.copyLink.addEventListener('click', copyCurrentLink);
+    elements.sharePage.addEventListener('click', shareCurrentPage);
+    elements.exportCsv.addEventListener('click', downloadCsv);
     elements.mobileMenuButton.addEventListener('click', toggleMobileMenu);
     elements.menuBackdrop.addEventListener('click', closeMobileMenu);
+
+    function handleRouteError(error) {
+        console.error(error);
+        showLoading(false);
+        showError(`Não foi possível abrir este endereço: ${error.message}.`);
+    }
+
+    window.addEventListener('popstate', () => {
+        const route = core.parseRoute(window.location.search, { years: configuredYears });
+        applyRoute(route, { replace: false }).catch(handleRouteError);
+    });
     window.addEventListener('keydown', event => {
         if (event.key === 'Escape') closeMobileMenu();
     });
@@ -937,4 +1331,6 @@
     });
 
     renderNavigation();
+    const initialRoute = core.parseRoute(window.location.search, { years: configuredYears });
+    applyRoute(initialRoute, { replace: true }).catch(handleRouteError);
 })();

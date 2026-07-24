@@ -1,6 +1,6 @@
 # AMBO • Central Sleeper
 
-Painel estático para consultar campeões, rankings anuais e o desempenho histórico das ligas AMBO.
+Painel estático, compartilhável e responsivo para consultar campeões, rankings anuais e o desempenho histórico das ligas AMBO.
 
 ## Estrutura
 
@@ -112,6 +112,47 @@ A interface lê `data/snapshots/manifest.json` e carrega apenas os arquivos real
 ```bash
 npm run sync:history
 ```
+
+
+## Etapa 3 — experiência e compartilhamento
+
+### Links permanentes
+
+Cada tela grava seu estado na URL, incluindo:
+
+- temporada e série abertas;
+- ranking histórico e seu recorte;
+- perfil individual;
+- busca e ordenação ativas.
+
+Exemplos:
+
+```text
+?view=season&year=2025&series=serieA
+?view=history&series=serieB&sort=titles
+?view=profile&manager=rafastein
+```
+
+Os botões **Copiar link** e **Compartilhar** usam exatamente esse endereço, e os botões voltar e avançar do navegador restauram a tela anterior.
+
+### Busca e ordenação
+
+O ranking histórico permite buscar managers e ordenar por pontos, títulos, pódios ou média. O ranking da temporada permite buscar e ordenar por pontos, FPTS, melhor posição ou nome. A posição oficial continua visível mesmo quando outra ordenação é escolhida.
+
+### Exportação CSV
+
+O botão **Exportar CSV** gera o conteúdo correspondente à tela atual:
+
+- hall de campeões;
+- ranking histórico filtrado;
+- trajetória de um perfil;
+- ranking combinado da temporada filtrado.
+
+O arquivo usa ponto e vírgula e inclui BOM UTF-8 para abrir corretamente em versões brasileiras do Excel.
+
+### Experiência mobile
+
+Em telas pequenas, as tabelas principais viram cards nativos, sem rolagem horizontal. Os cards preservam posição, avatar, pontuação e métricas essenciais.
 
 ## Atualização pelo GitHub Actions
 

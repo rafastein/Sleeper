@@ -1,5 +1,19 @@
 # Changelog
 
+## Etapa 3 — experiência e compartilhamento
+
+- URLs permanentes para campeões, histórico, perfis e temporadas;
+- restauração de estado pelos botões voltar e avançar do navegador;
+- botões para copiar link e compartilhar a tela atual;
+- exportação CSV contextual com compatibilidade para Excel;
+- busca por manager no histórico e nas temporadas;
+- ordenação do ranking anual por pontos, FPTS, melhor posição ou nome;
+- filtros gravados na URL;
+- cards mobile para campeões, ranking histórico, perfis, combinado e ligas;
+- contador de resultados filtrados;
+- seis testes novos para rotas, busca, ordenação e CSV;
+- correção preventiva da renderização do ranking combinado.
+
 ## Etapa 2 — central histórica
 
 - novo **Ranking histórico** no menu principal;
