@@ -1,8 +1,8 @@
 {
   "name": "ambo-sleeper",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "private": true,
-  "description": "Central histórica, instalável e otimizada das ligas AMBO com dados do Sleeper.",
+  "description": "Central histórica das ligas AMBO com ranking oficial por títulos, snapshots e dados do Sleeper.",
   "scripts": {
     "test": "node --test",
     "validate:data": "node scripts/validate-snapshots.js",

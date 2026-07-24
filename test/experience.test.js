@@ -66,3 +66,11 @@ test('CSV permite colunas calculadas com o índice da linha', () => {
 
     assert.equal(csv, 'Posição;Manager\r\n1;A\r\n2;B');
 });
+
+test('ranking histórico usa títulos como ordenação padrão na URL', () => {
+    const route = core.parseRoute('?view=history', { years: [2024, 2025] });
+    const search = core.serializeRoute({ view: 'history', sort: 'titles' });
+
+    assert.equal(route.sort, 'titles');
+    assert.equal(search, '?view=history');
+});

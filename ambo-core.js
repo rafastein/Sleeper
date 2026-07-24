@@ -345,32 +345,91 @@
         );
     }
 
-    function sortHistoricalRanking(ranking, sortBy = 'points') {
+    function buildOfficialTitleAwards(champions = [], registry = { managers: [] }, seriesKey = 'all') {
+        const identityIndex = createIdentityIndex(registry);
+        const awards = new Map();
+        const seriesLabels = { serieA: 'Série A', serieB: 'Série B' };
+
+        (champions || []).forEach(row => {
+            const year = Number(row?.year);
+            if (!Number.isInteger(year)) return;
+
+            ['serieA', 'serieB'].forEach(key => {
+                if (seriesKey !== 'all' && key !== seriesKey) return;
+                const rawName = row?.[key];
+                if (!rawName) return;
+
+                const normalizedName = normalizeAlias(rawName);
+                if (!normalizedName) return;
+                const registered = identityIndex.byAlias.get(normalizedName);
+                const canonicalId = registered?.canonicalId || `alias:${normalizedName}`;
+
+                awards.set(`${year}:${key}`, {
+                    year,
+                    seriesKey: key,
+                    seriesLabel: seriesLabels[key] || key,
+                    canonicalId,
+                    managerName: registered?.displayName || String(rawName),
+                    source: 'official'
+                });
+            });
+        });
+
+        return [...awards.values()];
+    }
+
+    function sortHistoricalRanking(ranking, sortBy = 'titles') {
         const rows = [...(ranking || [])];
         const byName = (a, b) => a.managerName.localeCompare(b.managerName, 'pt-BR');
-        const pointsComparator = (a, b) =>
-            b.totalPoints - a.totalPoints
-            || b.titles - a.titles
-            || b.podiums - a.podiums
-            || a.averageFinish - b.averageFinish
-            || b.totalFpts - a.totalFpts
+        const titleComparator = (a, b) =>
+            Number(b.titles || 0) - Number(a.titles || 0)
+            || Number(b.secondPlaces || 0) - Number(a.secondPlaces || 0)
+            || Number(b.thirdPlaces || 0) - Number(a.thirdPlaces || 0)
+            || Number(b.totalPoints || 0) - Number(a.totalPoints || 0)
+            || Number(a.averageFinish || Infinity) - Number(b.averageFinish || Infinity)
+            || Number(b.totalFpts || 0) - Number(a.totalFpts || 0)
             || byName(a, b);
+        const pointsComparator = (a, b) =>
+            Number(b.totalPoints || 0) - Number(a.totalPoints || 0)
+            || titleComparator(a, b);
 
         const comparators = {
             points: pointsComparator,
-            titles: (a, b) => b.titles - a.titles || b.podiums - a.podiums || pointsComparator(a, b),
-            podiums: (a, b) => b.podiums - a.podiums || b.titles - a.titles || pointsComparator(a, b),
-            average: (a, b) => a.averageFinish - b.averageFinish || b.participations - a.participations || pointsComparator(a, b)
+            titles: titleComparator,
+            podiums: (a, b) => Number(b.podiums || 0) - Number(a.podiums || 0) || titleComparator(a, b),
+            average: (a, b) => Number(a.averageFinish || Infinity) - Number(b.averageFinish || Infinity) || Number(b.participations || 0) - Number(a.participations || 0) || titleComparator(a, b)
         };
 
-        return rows.sort(comparators[sortBy] || pointsComparator);
+        return rows.sort(comparators[sortBy] || titleComparator);
     }
 
     function aggregateHistoricalRanking(entries, options = {}) {
         const seriesKey = options.seriesKey || 'all';
         const includeProvisional = options.includeProvisional === true;
-        const sortBy = options.sortBy || 'points';
+        const sortBy = options.sortBy || 'titles';
+        const registry = options.registry || { managers: [] };
+        const officialChampions = Array.isArray(options.officialChampions) ? options.officialChampions : [];
         const aggregate = new Map();
+        const snapshotTitleAwards = new Map();
+
+        const createManager = (canonicalId, managerName, avatar = null) => ({
+            canonicalId,
+            managerName: managerName || canonicalId,
+            avatar: avatar || null,
+            totalPoints: 0,
+            titles: 0,
+            secondPlaces: 0,
+            thirdPlaces: 0,
+            podiums: 0,
+            participations: 0,
+            leagueAppearances: 0,
+            bestFinish: Number.POSITIVE_INFINITY,
+            finishTotal: 0,
+            totalFpts: 0,
+            firstYear: Number.POSITIVE_INFINITY,
+            lastYear: Number.NEGATIVE_INFINITY,
+            history: []
+        });
 
         (entries || []).forEach(entry => {
             if (seriesKey !== 'all' && entry.seriesKey !== seriesKey) return;
@@ -379,46 +438,97 @@
             const canonicalId = String(entry.canonicalId || '');
             if (!canonicalId) return;
 
-            const current = aggregate.get(canonicalId) || {
-                canonicalId,
-                managerName: entry.managerName || canonicalId,
-                avatar: entry.avatar || null,
-                totalPoints: 0,
-                titles: 0,
-                podiums: 0,
-                participations: 0,
-                leagueAppearances: 0,
-                bestFinish: Number.POSITIVE_INFINITY,
-                finishTotal: 0,
-                totalFpts: 0,
-                firstYear: Number.POSITIVE_INFINITY,
-                lastYear: Number.NEGATIVE_INFINITY,
-                history: []
-            };
+            const current = aggregate.get(canonicalId)
+                || createManager(canonicalId, entry.managerName, entry.avatar);
 
             if (entry.year >= current.lastYear) {
                 current.managerName = entry.managerName || current.managerName;
                 current.avatar = entry.avatar || current.avatar;
             }
 
+            const rank = Number(entry.rank);
             current.totalPoints += Number(entry.points || 0);
-            current.titles += Number(entry.rank) === 1 ? 1 : 0;
-            current.podiums += Number(entry.rank) <= 3 ? 1 : 0;
+            current.secondPlaces += rank === 2 ? 1 : 0;
+            current.thirdPlaces += rank === 3 ? 1 : 0;
             current.participations += 1;
             current.leagueAppearances += Number(entry.leagueAppearances || 0);
-            current.bestFinish = Math.min(current.bestFinish, Number(entry.rank));
-            current.finishTotal += Number(entry.rank || 0);
+            current.bestFinish = Math.min(current.bestFinish, rank);
+            current.finishTotal += rank || 0;
             current.totalFpts += Number(entry.fpts || 0);
             current.firstYear = Math.min(current.firstYear, Number(entry.year));
             current.lastYear = Math.max(current.lastYear, Number(entry.year));
             current.history.push({ ...entry });
             aggregate.set(canonicalId, current);
+
+            if (rank === 1) {
+                snapshotTitleAwards.set(`${entry.year}:${entry.seriesKey}`, {
+                    year: Number(entry.year),
+                    seriesKey: entry.seriesKey,
+                    seriesLabel: entry.seriesLabel,
+                    canonicalId,
+                    managerName: entry.managerName || canonicalId,
+                    source: 'snapshot'
+                });
+            }
+        });
+
+        const titleAwards = new Map(snapshotTitleAwards);
+        buildOfficialTitleAwards(officialChampions, registry, seriesKey)
+            .forEach(award => titleAwards.set(`${award.year}:${award.seriesKey}`, award));
+
+        titleAwards.forEach(award => {
+            let canonicalId = String(award.canonicalId || '');
+            const normalizedAwardName = normalizeAlias(award.managerName);
+            const matchingManager = [...aggregate.values()].find(manager =>
+                manager.canonicalId === canonicalId
+                || normalizeAlias(manager.managerName) === normalizedAwardName
+            );
+
+            if (matchingManager) canonicalId = matchingManager.canonicalId;
+            if (!canonicalId) return;
+
+            const current = aggregate.get(canonicalId)
+                || createManager(canonicalId, award.managerName, null);
+
+            current.titles += 1;
+            current.bestFinish = Math.min(current.bestFinish, 1);
+            current.firstYear = Math.min(current.firstYear, Number(award.year));
+            current.lastYear = Math.max(current.lastYear, Number(award.year));
+
+            const hasSnapshotEntry = current.history.some(entry =>
+                Number(entry.year) === Number(award.year)
+                && entry.seriesKey === award.seriesKey
+            );
+
+            if (!hasSnapshotEntry) {
+                current.history.push({
+                    canonicalId,
+                    managerName: current.managerName,
+                    avatar: current.avatar,
+                    year: Number(award.year),
+                    seriesKey: award.seriesKey,
+                    seriesLabel: award.seriesLabel,
+                    rank: 1,
+                    points: null,
+                    bestLeagueRank: null,
+                    fpts: null,
+                    leagueAppearances: 0,
+                    provisional: false,
+                    officialTitleOnly: true
+                });
+            }
+
+            aggregate.set(canonicalId, current);
         });
 
         const ranking = [...aggregate.values()].map(manager => ({
             ...manager,
-            averageFinish: manager.participations ? manager.finishTotal / manager.participations : 0,
+            podiums: manager.titles + manager.secondPlaces + manager.thirdPlaces,
+            averageFinish: manager.participations ? manager.finishTotal / manager.participations : Number.POSITIVE_INFINITY,
             averagePoints: manager.participations ? manager.totalPoints / manager.participations : 0,
+            bestFinish: Number.isFinite(manager.bestFinish) ? manager.bestFinish : 0,
+            firstYear: Number.isFinite(manager.firstYear) ? manager.firstYear : 0,
+            lastYear: Number.isFinite(manager.lastYear) ? manager.lastYear : 0,
             history: manager.history.sort((a, b) => b.year - a.year || a.seriesKey.localeCompare(b.seriesKey))
         }));
 
@@ -492,7 +602,7 @@
         const year = Number.isInteger(yearValue) && (!configuredYears.size || configuredYears.has(yearValue))
             ? yearValue
             : null;
-        const historySort = allowedHistorySorts.has(params.get('sort')) ? params.get('sort') : 'points';
+        const historySort = allowedHistorySorts.has(params.get('sort')) ? params.get('sort') : 'titles';
         const seasonSort = allowedSeasonSorts.has(params.get('sort')) ? params.get('sort') : 'points';
 
         if (view === 'season' && (!year || series === 'all')) {
@@ -519,7 +629,7 @@
 
         if (view === 'history') {
             if (route.series && route.series !== 'all') params.set('series', route.series);
-            if (route.sort && route.sort !== 'points') params.set('sort', route.sort);
+            if (route.sort && route.sort !== 'titles') params.set('sort', route.sort);
             if (route.query) params.set('q', route.query);
         } else if (view === 'profile') {
             if (route.manager) params.set('manager', route.manager);
@@ -550,6 +660,7 @@
         resolveCanonicalManager,
         calculateCombinedStandings,
         buildHistoricalEntries,
+        buildOfficialTitleAwards,
         sortHistoricalRanking,
         aggregateHistoricalRanking,
         getHistoricalProfile,

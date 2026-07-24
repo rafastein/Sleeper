@@ -130,8 +130,8 @@
                         <label class="field-label" for="history-sort">
                             Ordenar por
                             <select id="history-sort">
+                                <option value="titles" selected>Títulos (desempate: 2º e 3º)</option>
                                 <option value="points">Pontos históricos</option>
-                                <option value="titles">Títulos</option>
                                 <option value="podiums">Pódios</option>
                                 <option value="average">Melhor média</option>
                             </select>
@@ -151,9 +151,10 @@
                                     <th scope="col" class="col-rank">Pos.</th>
                                     <th scope="col" class="col-avatar"><span class="sr-only">Avatar</span></th>
                                     <th scope="col">Manager</th>
-                                    <th scope="col">Pontos</th>
                                     <th scope="col">Títulos</th>
-                                    <th scope="col">Pódios</th>
+                                    <th scope="col">Vices</th>
+                                    <th scope="col">3º lugares</th>
+                                    <th scope="col">Pontos</th>
                                     <th scope="col">Participações</th>
                                     <th scope="col">Melhor</th>
                                     <th scope="col">Média</th>
@@ -163,7 +164,7 @@
                         </table>
                     </div>
                     <div id="history-cards" class="mobile-cards" aria-label="Ranking histórico"></div>
-                    <p class="panel-note">Títulos e pódios são calculados pelo ranking combinado anual de cada série. Snapshots provisórios não entram nas estatísticas históricas.</p>
+                    <p class="panel-note">Os títulos usam o Hall oficial da AMBO e, quando ainda não há registro manual, o campeão calculado pelo snapshot. Vice-campeonatos e terceiros lugares são apurados pelos snapshots oficiais. Snapshots provisórios não entram nas estatísticas históricas.</p>
                 </article>
             </section>
 

@@ -22,6 +22,7 @@
         requestToken: 0,
         resolvedLeagueIds: new Map(),
         managerRegistryPromise: null,
+        managerRegistry: null,
         discoveryUsersPromise: null,
         navButtons: new Map(),
         historyDataPromise: null,
@@ -29,7 +30,7 @@
         historyPayloads: [],
         historyManifest: null,
         historyFilter: 'all',
-        historySort: 'points',
+        historySort: 'titles',
         historyQuery: '',
         currentHistoryRanking: [],
         currentProfileId: null,
@@ -603,6 +604,7 @@
 
             const payloads = payloadResults.filter(Boolean);
             const entries = core.buildHistoricalEntries(payloads, registry);
+            state.managerRegistry = registry;
             state.historyEntries = entries;
             state.historyPayloads = payloads;
             state.historyManifest = manifest || { schemaVersion: 1, generatedAt: null, snapshots: [] };
@@ -617,16 +619,25 @@
         }
     }
 
+    function getHistoricalOptions(sortBy = state.historySort) {
+        return {
+            seriesKey: state.historyFilter,
+            sortBy,
+            officialChampions: config.champions,
+            registry: state.managerRegistry || { managers: [] }
+        };
+    }
+
     function renderHistoricalRanking() {
-        const fullRanking = core.aggregateHistoricalRanking(state.historyEntries, {
-            seriesKey: state.historyFilter,
-            sortBy: state.historySort
-        });
+        const fullRanking = core.aggregateHistoricalRanking(
+            state.historyEntries,
+            getHistoricalOptions(state.historySort)
+        );
         const ranking = core.filterBySearch(fullRanking, state.historyQuery, ['managerName']);
-        const pointsRanking = core.aggregateHistoricalRanking(state.historyEntries, {
-            seriesKey: state.historyFilter,
-            sortBy: 'points'
-        });
+        const titleRanking = core.aggregateHistoricalRanking(
+            state.historyEntries,
+            getHistoricalOptions('titles')
+        );
         const officialEntries = state.historyEntries.filter(entry =>
             !entry.provisional && (state.historyFilter === 'all' || entry.seriesKey === state.historyFilter)
         );
@@ -634,20 +645,22 @@
         const provisionalRecuts = new Set(state.historyEntries
             .filter(entry => entry.provisional && (state.historyFilter === 'all' || entry.seriesKey === state.historyFilter))
             .map(entry => `${entry.year}:${entry.seriesKey}`));
-        const leader = pointsRanking[0];
+        const leader = titleRanking[0];
         const expectedRecuts = configuredYears.length * (state.historyFilter === 'all' ? Object.keys(config.series).length : 1);
+        const coveredYears = titleRanking.flatMap(manager => [manager.firstYear, manager.lastYear]).filter(Boolean);
 
         state.currentHistoryRanking = ranking;
         setStats(elements.historyStats, [
             { label: 'Managers ranqueados', value: fullRanking.length, detail: state.historyQuery ? `${ranking.length} visível(is) na busca` : getHistoryScopeLabel() },
             { label: 'Recortes oficiais', value: recuts.size, detail: `${expectedRecuts} possíveis na configuração` },
-            { label: 'Líder histórico', value: leader?.managerName || '—', detail: leader ? `${leader.totalPoints} pontos acumulados` : 'Sem dados oficiais' },
-            { label: 'Período coberto', value: officialEntries.length ? `${Math.min(...officialEntries.map(item => item.year))}–${Math.max(...officialEntries.map(item => item.year))}` : '—', detail: provisionalRecuts.size ? `${provisionalRecuts.size} recorte(s) provisório(s) omitido(s)` : 'Somente snapshots validados' }
+            { label: 'Maior campeão', value: leader?.managerName || '—', detail: leader ? `${leader.titles} título${leader.titles === 1 ? '' : 's'} · ${leader.secondPlaces} vice${leader.secondPlaces === 1 ? '' : 's'} · ${leader.thirdPlaces} terceiro${leader.thirdPlaces === 1 ? '' : 's'}` : 'Sem dados oficiais' },
+            { label: 'Período coberto', value: coveredYears.length ? `${Math.min(...coveredYears)}–${Math.max(...coveredYears)}` : '—', detail: provisionalRecuts.size ? `${provisionalRecuts.size} recorte(s) provisório(s) omitido(s)` : 'Títulos pelo Hall · demais métricas por snapshots' }
         ]);
 
-        elements.historyStatus.textContent = recuts.size
-            ? `${recuts.size} recorte${recuts.size === 1 ? '' : 's'} oficial${recuts.size === 1 ? '' : 'is'}`
-            : 'Sem snapshots oficiais';
+        const totalTitles = titleRanking.reduce((sum, manager) => sum + manager.titles, 0);
+        elements.historyStatus.textContent = totalTitles
+            ? `${totalTitles} título${totalTitles === 1 ? '' : 's'} oficial${totalTitles === 1 ? '' : 'is'}`
+            : 'Sem títulos oficiais';
         elements.historyResults.textContent = `${ranking.length} de ${fullRanking.length} manager${fullRanking.length === 1 ? '' : 's'}`;
         elements.historyEmpty.hidden = ranking.length > 0;
         elements.historyTableWrap.hidden = ranking.length === 0;
@@ -674,12 +687,13 @@
                 createRankCell(rank),
                 avatarCell,
                 managerCell,
-                createElement('td', 'points-value', manager.totalPoints),
-                createElement('td', '', manager.titles),
-                createElement('td', '', manager.podiums),
+                createElement('td', 'points-value', manager.titles),
+                createElement('td', '', manager.secondPlaces),
+                createElement('td', '', manager.thirdPlaces),
+                createElement('td', '', manager.totalPoints),
                 createElement('td', '', manager.participations),
                 createElement('td', '', formatPlacement(manager.bestFinish)),
-                createElement('td', '', formatPlacement(manager.averageFinish, 2))
+                createElement('td', '', Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—')
             );
             tableFragment.appendChild(row);
 
@@ -689,13 +703,13 @@
                 avatar: manager.avatar,
                 name: manager.managerName,
                 meta: `${manager.firstYear}–${manager.lastYear} · ${manager.leagueAppearances} ligas`,
-                score: `${manager.totalPoints} pts`,
+                score: `${manager.titles} título${manager.titles === 1 ? '' : 's'}`,
                 onNameClick: () => showManagerProfile(manager.canonicalId),
                 metrics: [
-                    { label: 'Títulos', value: manager.titles },
-                    { label: 'Pódios', value: manager.podiums },
-                    { label: 'Participações', value: manager.participations },
-                    { label: 'Média', value: formatPlacement(manager.averageFinish, 2) }
+                    { label: 'Vices', value: manager.secondPlaces },
+                    { label: '3º lugares', value: manager.thirdPlaces },
+                    { label: 'Pontos', value: manager.totalPoints },
+                    { label: 'Média', value: Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—' }
                 ]
             }));
         });
@@ -715,7 +729,7 @@
 
         elements.pageEyebrow.textContent = 'Central histórica';
         elements.pageTitle.textContent = 'Ranking histórico';
-        elements.pageDescription.textContent = 'Pontos, títulos, pódios e médias acumulados a partir dos snapshots oficiais.';
+        elements.pageDescription.textContent = 'Ranking por títulos, com desempate por vice-campeonatos e terceiros lugares.';
         elements.lastUpdate.textContent = 'Carregando histórico validado...';
         updateDocumentTitle();
 
@@ -743,9 +757,7 @@
 
     async function showManagerProfile(canonicalId, options = {}) {
         if (!state.historyEntries.length) await loadHistoricalData();
-        const profile = core.getHistoricalProfile(state.historyEntries, canonicalId, {
-            seriesKey: state.historyFilter
-        });
+        const profile = core.getHistoricalProfile(state.historyEntries, canonicalId, getHistoricalOptions('titles'));
 
         if (!profile) {
             showError('Não há dados históricos oficiais suficientes para abrir este perfil.');
@@ -774,41 +786,46 @@
 
         const badges = [];
         if (profile.titles) badges.push(createElement('span', 'profile-badge profile-badge--gold', `${profile.titles} título${profile.titles === 1 ? '' : 's'}`));
-        if (profile.podiums) badges.push(createElement('span', 'profile-badge', `${profile.podiums} pódio${profile.podiums === 1 ? '' : 's'}`));
+        if (profile.secondPlaces) badges.push(createElement('span', 'profile-badge', `${profile.secondPlaces} vice${profile.secondPlaces === 1 ? '' : 's'}`));
+        if (profile.thirdPlaces) badges.push(createElement('span', 'profile-badge', `${profile.thirdPlaces} terceiro${profile.thirdPlaces === 1 ? '' : 's'}`));
         if (!badges.length) badges.push(createElement('span', 'profile-badge', 'Histórico oficial'));
         elements.profileBadges.replaceChildren(...badges);
 
         setStats(elements.profileStats, [
+            { label: 'Títulos', value: profile.titles, detail: 'Hall oficial e snapshots recentes' },
+            { label: 'Vice-campeonatos', value: profile.secondPlaces, detail: '2º no ranking combinado anual' },
+            { label: '3º lugares', value: profile.thirdPlaces, detail: '3º no ranking combinado anual' },
             { label: 'Pontos históricos', value: profile.totalPoints, detail: `${formatNumber(profile.averagePoints, 2)} por participação` },
-            { label: 'Títulos', value: profile.titles, detail: '1º no ranking combinado anual' },
-            { label: 'Pódios', value: profile.podiums, detail: 'Resultados entre os três primeiros' },
-            { label: 'Melhor resultado', value: formatPlacement(profile.bestFinish), detail: getHistoryScopeLabel() },
-            { label: 'Média de colocação', value: formatPlacement(profile.averageFinish, 2), detail: `${profile.participations} recortes oficiais` },
+            { label: 'Média de colocação', value: Number.isFinite(profile.averageFinish) ? formatPlacement(profile.averageFinish, 2) : '—', detail: `${profile.participations} recortes com snapshot` },
             { label: 'FPTS acumulado', value: formatNumber(profile.totalFpts), detail: `${profile.leagueAppearances} participações em ligas` }
         ]);
 
         const tableFragment = document.createDocumentFragment();
         const cardFragment = document.createDocumentFragment();
         profile.history.forEach(entry => {
-            const openSeason = () => {
+            const openSeason = entry.officialTitleOnly ? null : () => {
                 const navButton = state.navButtons.get(`${entry.year}:${entry.seriesKey}`) || null;
                 loadSeason(entry.year, entry.seriesKey, navButton);
             };
             const row = document.createElement('tr');
             const yearCell = document.createElement('td');
-            const seasonButton = createElement('button', 'season-link', entry.year);
-            seasonButton.type = 'button';
-            seasonButton.title = `Abrir ${entry.seriesLabel} de ${entry.year}`;
-            seasonButton.addEventListener('click', openSeason);
-            yearCell.appendChild(seasonButton);
+            if (openSeason) {
+                const seasonButton = createElement('button', 'season-link', entry.year);
+                seasonButton.type = 'button';
+                seasonButton.title = `Abrir ${entry.seriesLabel} de ${entry.year}`;
+                seasonButton.addEventListener('click', openSeason);
+                yearCell.appendChild(seasonButton);
+            } else {
+                yearCell.appendChild(createElement('span', 'entity-name', entry.year));
+            }
             row.append(
                 yearCell,
                 createElement('td', '', entry.seriesLabel),
                 createElement('td', '', formatPlacement(entry.rank)),
-                createElement('td', 'points-value', entry.points),
-                createElement('td', '', formatPlacement(entry.bestLeagueRank)),
-                createElement('td', '', formatNumber(entry.fpts)),
-                createElement('td', '', entry.leagueAppearances)
+                createElement('td', 'points-value', entry.officialTitleOnly ? '—' : entry.points),
+                createElement('td', '', entry.officialTitleOnly ? '—' : formatPlacement(entry.bestLeagueRank)),
+                createElement('td', '', entry.officialTitleOnly ? '—' : formatNumber(entry.fpts)),
+                createElement('td', '', entry.officialTitleOnly ? '—' : entry.leagueAppearances)
             );
             tableFragment.appendChild(row);
 
@@ -817,13 +834,13 @@
                 total: Math.max(profile.history.length, 8),
                 avatar: null,
                 name: `${entry.year} · ${entry.seriesLabel}`,
-                meta: `${entry.leagueAppearances} liga${entry.leagueAppearances === 1 ? '' : 's'} disputada${entry.leagueAppearances === 1 ? '' : 's'}`,
-                score: `${entry.points} pts`,
+                meta: entry.officialTitleOnly ? 'Registro oficial de campeão' : `${entry.leagueAppearances} liga${entry.leagueAppearances === 1 ? '' : 's'} disputada${entry.leagueAppearances === 1 ? '' : 's'}`,
+                score: entry.officialTitleOnly ? 'Campeão' : `${entry.points} pts`,
                 onNameClick: openSeason,
                 metrics: [
                     { label: 'Colocação', value: formatPlacement(entry.rank) },
-                    { label: 'Melhor liga', value: formatPlacement(entry.bestLeagueRank) },
-                    { label: 'FPTS', value: formatNumber(entry.fpts) },
+                    { label: 'Melhor liga', value: entry.officialTitleOnly ? '—' : formatPlacement(entry.bestLeagueRank) },
+                    { label: 'FPTS', value: entry.officialTitleOnly ? '—' : formatNumber(entry.fpts) },
                     { label: 'Série', value: entry.seriesLabel }
                 ]
             }));
@@ -1180,9 +1197,10 @@
                 csv: core.rowsToCsv([
                     { label: 'Posição', value: (_, index) => index + 1 },
                     { key: 'managerName', label: 'Manager' },
-                    { key: 'totalPoints', label: 'Pontos' },
                     { key: 'titles', label: 'Títulos' },
-                    { key: 'podiums', label: 'Pódios' },
+                    { key: 'secondPlaces', label: 'Vice-campeonatos' },
+                    { key: 'thirdPlaces', label: '3º lugares' },
+                    { key: 'totalPoints', label: 'Pontos' },
                     { key: 'participations', label: 'Participações' },
                     { key: 'bestFinish', label: 'Melhor posição' },
                     { label: 'Média', value: row => formatNumber(row.averageFinish, 2) },
@@ -1288,7 +1306,7 @@
     async function applyRoute(route, options = {}) {
         if (route.view === 'history' || route.view === 'profile') {
             state.historyFilter = route.series || 'all';
-            state.historySort = route.view === 'history' ? (route.sort || 'points') : state.historySort;
+            state.historySort = route.view === 'history' ? (route.sort || 'titles') : state.historySort;
             state.historyQuery = route.view === 'history' ? (route.query || '') : state.historyQuery;
         }
         elements.historySeriesFilter.value = state.historyFilter;

@@ -1,5 +1,17 @@
 # Changelog
 
+## 5.1.0 — Ranking histórico por títulos
+
+- ranking histórico ordenado por títulos por padrão;
+- desempate por vice-campeonatos e, em seguida, terceiros lugares;
+- títulos consolidados pelo Hall oficial da AMBO, com fallback para snapshots recentes;
+- correção do título de 2019 do SCPATRIOTS, antes ausente porque os snapshots começam em 2020;
+- prevenção contra contagem duplicada quando Hall e snapshot cobrem o mesmo ano e série;
+- colunas específicas para vices e terceiros lugares;
+- perfis e exportação CSV atualizados;
+- cache do PWA incrementado para publicar a correção imediatamente;
+- três testes novos, totalizando 28.
+
 ## Etapa 3 — experiência e compartilhamento
 
 - URLs permanentes para campeões, histórico, perfis e temporadas;

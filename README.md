@@ -67,7 +67,7 @@ npm run sync -- --year 2025 --series serieA
 
 ### Ranking de todos os tempos
 
-O menu **Ranking histórico** consolida todos os snapshots oficiais disponíveis. É possível filtrar por:
+O menu **Ranking histórico** consolida o Hall oficial de campeões com os snapshots validados disponíveis. É possível filtrar por:
 
 - Séries A e B combinadas;
 - somente Série A;
@@ -76,8 +76,9 @@ O menu **Ranking histórico** consolida todos os snapshots oficiais disponíveis
 A tabela pode ser ordenada por:
 
 - pontos históricos;
-- títulos;
-- pódios;
+- títulos oficiais;
+- vice-campeonatos;
+- terceiros lugares;
 - melhor média de colocação.
 
 ### Regra das estatísticas históricas
@@ -98,7 +99,7 @@ Snapshots marcados como provisórios não entram no ranking histórico oficial.
 
 Clique no nome de qualquer manager no ranking histórico para abrir o perfil. O perfil apresenta:
 
-- pontos, títulos e pódios;
+- títulos, vice-campeonatos, terceiros lugares e pontos;
 - melhor resultado e média;
 - FPTS acumulado;
 - trajetória por ano e série.
@@ -137,7 +138,7 @@ Os botões **Copiar link** e **Compartilhar** usam exatamente esse endereço, e 
 
 ### Busca e ordenação
 
-O ranking histórico permite buscar managers e ordenar por pontos, títulos, pódios ou média. O ranking da temporada permite buscar e ordenar por pontos, FPTS, melhor posição ou nome. A posição oficial continua visível mesmo quando outra ordenação é escolhida.
+O ranking histórico abre ordenado por títulos. Os empates são resolvidos por vice-campeonatos, terceiros lugares e, depois, pontos históricos. Também é possível escolher outras ordenações. O ranking da temporada permite buscar e ordenar por pontos, FPTS, melhor posição ou nome. A posição oficial continua visível mesmo quando outra ordenação é escolhida.
 
 ### Exportação CSV
 
