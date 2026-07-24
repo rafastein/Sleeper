@@ -543,6 +543,10 @@ th:last-child {
     gap: 18px;
 }
 
+.league-grid--single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .league-panel table {
     min-width: 610px;
 }

@@ -1,5 +1,21 @@
 # Changelog
 
+## 5.3.2 — Keeper sem ranking combinado
+
+- Remove o painel de ranking combinado das temporadas Keeper;
+- exibe a única liga Keeper em largura total como classificação oficial;
+- adapta os cards de resumo para participantes e campeão/líder atual;
+- ajusta a descrição da página e a exportação CSV da Keeper;
+- mantém o ranking combinado exclusivamente para Série A e Série B;
+- atualiza o cache do PWA para aplicar a mudança imediatamente.
+
+## 5.3.1 — Ajuste visual do ranking histórico
+
+- Remove a coluna **Pontos** da tabela do ranking histórico.
+- Remove a métrica de pontos dos cards históricos no celular.
+- Mantém os pontos internamente para cálculos, perfis, exportação e desempates secundários.
+- Atualiza a versão do cache do PWA para aplicar o ajuste imediatamente.
+
 ## 5.3.0 — Liga Keeper por temporada
 
 - Keeper adicionada à navegação de 2020 a 2025;

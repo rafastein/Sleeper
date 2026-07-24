@@ -77,3 +77,14 @@ test('ranking histórico não exibe coluna de pontos', () => {
     assert.ok(renderMatch, 'renderização histórica não encontrada');
     assert.doesNotMatch(renderMatch[0], /manager\.totalPoints/);
 });
+
+
+test('Keeper exibe somente a classificação da liga, sem ranking combinado', () => {
+    const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    assert.match(html, /id="combined-panel"/);
+
+    const script = fs.readFileSync(path.join(ROOT, 'script.js'), 'utf8');
+    assert.match(script, /elements\.combinedPanel\.hidden = isKeeper/);
+    assert.match(script, /singleLeague: isKeeper/);
+    assert.match(script, /Classificação final da liga Keeper/);
+});

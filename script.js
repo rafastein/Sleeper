@@ -89,6 +89,7 @@
         profileHistoryBody: document.querySelector('#profile-history-table tbody'),
         profileCards: document.getElementById('profile-cards'),
         seasonStats: document.getElementById('season-stats'),
+        combinedPanel: document.getElementById('combined-panel'),
         combinedBody: document.querySelector('#combined-table tbody'),
         combinedCards: document.getElementById('combined-cards'),
         combinedTableWrap: document.getElementById('combined-table-wrap'),
@@ -698,7 +699,6 @@
                 createElement('td', 'points-value', manager.titles),
                 createElement('td', '', manager.secondPlaces),
                 createElement('td', '', manager.thirdPlaces),
-                createElement('td', '', manager.totalPoints),
                 createElement('td', '', manager.participations),
                 createElement('td', '', formatPlacement(manager.bestFinish)),
                 createElement('td', '', Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—')
@@ -716,7 +716,6 @@
                 metrics: [
                     { label: 'Vices', value: manager.secondPlaces },
                     { label: '3º lugares', value: manager.thirdPlaces },
-                    { label: 'Pontos', value: manager.totalPoints },
                     { label: 'Média', value: Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—' }
                 ]
             }));
@@ -1017,10 +1016,11 @@
         return core.filterBySearch(rows, query, ['managerName', 'teamName']);
     }
 
-    function renderLeaguePanel(snapshot, query = '') {
+    function renderLeaguePanel(snapshot, query = '', options = {}) {
         const panel = elements.leaguePanelTemplate.content.firstElementChild.cloneNode(true);
-        panel.querySelector('.league-number').textContent = `Liga ${snapshot.index + 1}`;
-        panel.querySelector('.league-name').textContent = snapshot.league.name || `Liga ${snapshot.index + 1}`;
+        const singleLeague = Boolean(options.singleLeague);
+        panel.querySelector('.league-number').textContent = singleLeague ? 'Classificação oficial' : `Liga ${snapshot.index + 1}`;
+        panel.querySelector('.league-name').textContent = snapshot.league.name || (singleLeague ? 'AMBO Keeper' : `Liga ${snapshot.index + 1}`);
         panel.querySelector('.league-season').textContent = snapshot.usedFallback ? 'Classificação parcial' : `Temporada ${snapshot.league.season}`;
 
         const body = panel.querySelector('tbody');
@@ -1072,15 +1072,26 @@
         return panel;
     }
 
-    function renderSeasonStats(year, seriesLabel, snapshots, combined) {
+    function renderSeasonStats(year, seriesLabel, snapshots, combined, isKeeper = false) {
         const allFallback = snapshots.every(snapshot => snapshot.usedFallback);
         const anyFallback = snapshots.some(snapshot => snapshot.usedFallback);
         const leader = combined[0];
-        setStats(elements.seasonStats, [
-            { label: 'Temporada', value: year, detail: seriesLabel },
-            { label: 'Managers únicos', value: combined.length, detail: `${snapshots.length} ligas combinadas` },
-            { label: 'Líder combinado', value: leader?.managerName || '—', detail: leader ? `${leader.points} pontos no ranking` : 'Sem dados disponíveis' }
-        ]);
+        const stats = isKeeper
+            ? [
+                { label: 'Temporada', value: year, detail: seriesLabel },
+                { label: 'Participantes', value: combined.length, detail: 'Uma liga' },
+                {
+                    label: allFallback ? 'Líder atual' : 'Campeão',
+                    value: leader?.managerName || '—',
+                    detail: leader ? `${formatPlacement(leader.bestRank)} lugar · ${formatNumber(leader.fpts)} FPTS` : 'Sem dados disponíveis'
+                }
+            ]
+            : [
+                { label: 'Temporada', value: year, detail: seriesLabel },
+                { label: 'Managers únicos', value: combined.length, detail: `${snapshots.length} ligas combinadas` },
+                { label: 'Líder combinado', value: leader?.managerName || '—', detail: leader ? `${leader.points} pontos no ranking` : 'Sem dados disponíveis' }
+            ];
+        setStats(elements.seasonStats, stats);
         elements.rankingStatus.textContent = allFallback
             ? 'Classificação regular'
             : anyFallback
@@ -1090,13 +1101,30 @@
 
     function renderSeasonRanking() {
         if (!state.currentSeason) return;
+        const isKeeper = state.currentSeason.seriesKey === 'keeper';
         const fullCombined = state.currentSeason.combined;
         const searched = core.filterBySearch(fullCombined, state.seasonQuery, ['managerName']);
         const visible = core.sortSeasonRanking(searched, state.seasonSort);
         state.currentSeason.visibleCombined = visible;
 
+        elements.combinedPanel.hidden = isKeeper;
+        elements.leaguePanels.classList.toggle('league-grid--single', isKeeper);
+        elements.leaguePanels.replaceChildren(...state.currentSeason.snapshots.map(snapshot => renderLeaguePanel(
+            snapshot,
+            isKeeper ? '' : state.seasonQuery,
+            { singleLeague: isKeeper }
+        )));
+
+        if (isKeeper) {
+            elements.combinedBody.replaceChildren();
+            elements.combinedCards.replaceChildren();
+            elements.seasonResults.textContent = '';
+            elements.seasonEmpty.hidden = true;
+            elements.combinedTableWrap.hidden = true;
+            return;
+        }
+
         renderCombinedStandings(visible, fullCombined.length);
-        elements.leaguePanels.replaceChildren(...state.currentSeason.snapshots.map(snapshot => renderLeaguePanel(snapshot, state.seasonQuery)));
         elements.seasonResults.textContent = `${visible.length} de ${fullCombined.length} manager${fullCombined.length === 1 ? '' : 's'}`;
         elements.seasonEmpty.hidden = visible.length > 0;
         elements.combinedTableWrap.hidden = visible.length === 0;
@@ -1117,9 +1145,14 @@
         showLoading(true);
         state.currentProfile = null;
 
+        const isKeeper = seriesKey === 'keeper';
         elements.pageEyebrow.textContent = `Temporada ${year}`;
         elements.pageTitle.textContent = `AMBO ${seriesLabel}`;
-        elements.pageDescription.textContent = 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.';
+        elements.pageDescription.textContent = isKeeper
+            ? 'Classificação final da liga Keeper, com campanha, pontuação e FPTS de cada participante.'
+            : 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.';
+        elements.combinedPanel.hidden = isKeeper;
+        elements.leaguePanels.classList.toggle('league-grid--single', isKeeper);
         elements.lastUpdate.textContent = 'Carregando dados validados...';
         showOnlyView('season');
         updateDocumentTitle();
@@ -1166,7 +1199,7 @@
                 sourceLabel,
                 updatedAt
             };
-            renderSeasonStats(year, seriesLabel, snapshots, combined);
+            renderSeasonStats(year, seriesLabel, snapshots, combined, isKeeper);
             renderSeasonRanking();
             const formattedDate = formatDateTime(updatedAt);
             elements.lastUpdate.textContent = formattedDate ? `${sourceLabel} · ${formattedDate}` : sourceLabel;
@@ -1240,6 +1273,21 @@
             };
         }
         if (state.currentView === 'season' && state.currentSeason) {
+            if (state.currentSeason.seriesKey === 'keeper') {
+                const snapshot = state.currentSeason.snapshots[0];
+                const rows = snapshot ? getLeagueRows(snapshot) : [];
+                return {
+                    filename: `ambo-${state.currentSeason.year}-keeper.csv`,
+                    csv: core.rowsToCsv([
+                        { label: 'Posição', value: row => row.standing.rank },
+                        { key: 'teamName', label: 'Equipe' },
+                        { key: 'managerName', label: 'Manager' },
+                        { key: 'campaign', label: 'Campanha' },
+                        { label: 'Pontos', value: row => row.standing.points },
+                        { label: 'FPTS', value: row => formatNumber(row.fpts) }
+                    ], rows)
+                };
+            }
             return {
                 filename: `ambo-${state.currentSeason.year}-${state.currentSeason.seriesKey}.csv`,
                 csv: core.rowsToCsv([
