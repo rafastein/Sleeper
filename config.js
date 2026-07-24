@@ -1,18 +1,19 @@
 /**
- * Dados editáveis do projeto AMBO.
- * Para cadastrar uma nova temporada, adicione o ano em leagueIds.
- * A série pode receber os IDs diretamente ou descobrir as ligas renovadas pela API,
- * informando um username e os IDs das ligas da temporada anterior.
+ * Configuração central do projeto AMBO.
+ * Este arquivo funciona no navegador e também nos scripts Node usados para
+ * sincronizar e validar snapshots.
  */
-window.AMBO_CONFIG = Object.freeze({
+const AMBO_CONFIG = Object.freeze({
     leagueIds: {
         2025: {
             serieA: {
+                discoveryKey: 'serieASeed',
                 username: 'Jptavares',
                 previousLeagueIds: ['1051278540760530944', '1051278597819854848'],
                 expectedLeagues: 2
             },
             serieB: {
+                discoveryKey: 'serieBSeed',
                 username: 'rafastein',
                 previousLeagueIds: ['1126717143111917568', '1126717395566989312'],
                 expectedLeagues: 2
@@ -45,6 +46,14 @@ window.AMBO_CONFIG = Object.freeze({
         serieB: 'Série B'
     },
 
+    data: {
+        managerRegistryPath: 'data/managers.json',
+        discoveryUsersPath: 'data/discovery-users.json',
+        snapshotsBasePath: 'data/snapshots',
+        preferSnapshots: true,
+        snapshotYears: [2020, 2021, 2022, 2023, 2024, 2025]
+    },
+
     champions: [
         { year: 2024, keeper: 'Jptavares', serieA: 'dedebenjor', serieB: 'Jptavares' },
         { year: 2023, keeper: 'GuiZilse', serieA: 'L_Bezerra', serieB: 'Jotaa' },
@@ -56,3 +65,11 @@ window.AMBO_CONFIG = Object.freeze({
         { year: 2017, keeper: null, serieA: 'DanHen', serieB: null }
     ]
 });
+
+if (typeof window !== 'undefined') {
+    window.AMBO_CONFIG = AMBO_CONFIG;
+}
+
+if (typeof module === 'object' && module.exports) {
+    module.exports = AMBO_CONFIG;
+}

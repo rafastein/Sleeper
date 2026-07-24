@@ -1,0 +1,325 @@
+(function (root, factory) {
+    const api = factory();
+
+    if (typeof module === 'object' && module.exports) {
+        module.exports = api;
+    }
+
+    if (root) {
+        root.AMBO_CORE = api;
+    }
+}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+    'use strict';
+
+    function normalizeAlias(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '')
+            .trim();
+    }
+
+    function getRosterPoints(roster, key = 'fpts') {
+        const settings = roster?.settings || {};
+        const integer = Number(settings[key] || 0);
+        const decimal = Number(settings[`${key}_decimal`] || 0) / 100;
+        return integer + decimal;
+    }
+
+    function compareRegularSeasonRosters(a, b) {
+        const settingsA = a?.settings || {};
+        const settingsB = b?.settings || {};
+
+        if ((settingsB.wins || 0) !== (settingsA.wins || 0)) {
+            return (settingsB.wins || 0) - (settingsA.wins || 0);
+        }
+
+        if ((settingsB.ties || 0) !== (settingsA.ties || 0)) {
+            return (settingsB.ties || 0) - (settingsA.ties || 0);
+        }
+
+        const pointsDifference = getRosterPoints(b) - getRosterPoints(a);
+        if (pointsDifference !== 0) return pointsDifference;
+
+        const againstDifference = getRosterPoints(a, 'fpts_against') - getRosterPoints(b, 'fpts_against');
+        if (againstDifference !== 0) return againstDifference;
+
+        return Number(a?.roster_id || 0) - Number(b?.roster_id || 0);
+    }
+
+    function getBracketRosterIds(bracket) {
+        const rosterIds = new Set();
+
+        (bracket || []).forEach(match => {
+            ['t1', 't2', 'w', 'l'].forEach(key => {
+                const rosterId = Number(match?.[key]);
+                if (Number.isInteger(rosterId) && rosterId > 0) rosterIds.add(rosterId);
+            });
+        });
+
+        return rosterIds;
+    }
+
+    function applyPlacementMatches(rankByRoster, bracket, rankOffset = 0) {
+        (bracket || [])
+            .filter(match => Number.isInteger(match?.p))
+            .sort((a, b) => a.p - b.p)
+            .forEach(match => {
+                const winnerId = Number(match.w);
+                const loserId = Number(match.l);
+                const baseRank = Number(match.p) + rankOffset;
+
+                if (Number.isInteger(winnerId) && winnerId > 0) {
+                    rankByRoster.set(winnerId, baseRank);
+                }
+
+                if (Number.isInteger(loserId) && loserId > 0) {
+                    rankByRoster.set(loserId, baseRank + 1);
+                }
+            });
+    }
+
+    function calculateStandings(winnersBracket, losersBracket, rosters, league) {
+        if (!Array.isArray(rosters) || rosters.length === 0) {
+            return { standings: [], usedFallback: true };
+        }
+
+        const rankByRoster = new Map();
+        const configuredPlayoffTeams = Number(league?.settings?.playoff_teams);
+        const inferredPlayoffTeams = getBracketRosterIds(winnersBracket).size;
+        const playoffTeamCount = Number.isInteger(configuredPlayoffTeams) && configuredPlayoffTeams > 0
+            ? Math.min(configuredPlayoffTeams, rosters.length)
+            : inferredPlayoffTeams;
+
+        applyPlacementMatches(rankByRoster, winnersBracket, 0);
+
+        const losersPlacementRanks = (losersBracket || [])
+            .filter(match => Number.isInteger(match?.p))
+            .map(match => Number(match.p));
+
+        const losersRankOffset = losersPlacementRanks.length > 0
+            && playoffTeamCount > 0
+            && Math.min(...losersPlacementRanks) <= playoffTeamCount
+            ? playoffTeamCount
+            : 0;
+
+        applyPlacementMatches(rankByRoster, losersBracket, losersRankOffset);
+
+        const occupiedRanks = new Set(rankByRoster.values());
+        const availableRanks = Array.from({ length: rosters.length }, (_, index) => index + 1)
+            .filter(rank => !occupiedRanks.has(rank));
+
+        const unrankedRosters = rosters
+            .filter(roster => !rankByRoster.has(roster.roster_id))
+            .sort(compareRegularSeasonRosters);
+
+        unrankedRosters.forEach((roster, index) => {
+            rankByRoster.set(roster.roster_id, availableRanks[index]);
+        });
+
+        const fallbackRosterIds = new Set(unrankedRosters.map(roster => roster.roster_id));
+        const standings = rosters
+            .map(roster => {
+                const rank = rankByRoster.get(roster.roster_id);
+                return {
+                    rank,
+                    rosterId: roster.roster_id,
+                    points: rosters.length + 1 - rank,
+                    source: fallbackRosterIds.has(roster.roster_id)
+                        ? 'regular-season-fallback'
+                        : 'playoff-bracket'
+                };
+            })
+            .sort((a, b) => a.rank - b.rank);
+
+        return {
+            standings,
+            usedFallback: unrankedRosters.length > 0
+        };
+    }
+
+    function validateStandings(standings, rosterCount) {
+        const errors = [];
+        const rows = Array.isArray(standings) ? standings : [];
+        const expectedCount = Number(rosterCount || rows.length);
+        const expectedRanks = Array.from({ length: expectedCount }, (_, index) => index + 1);
+        const actualRanks = rows.map(row => Number(row.rank)).sort((a, b) => a - b);
+        const rosterIds = rows.map(row => String(row.rosterId));
+
+        if (rows.length !== expectedCount) {
+            errors.push(`quantidade de posições ${rows.length} diferente da quantidade de rosters ${expectedCount}`);
+        }
+
+        if (new Set(rosterIds).size !== rosterIds.length) {
+            errors.push('há roster repetido na classificação');
+        }
+
+        if (new Set(actualRanks).size !== actualRanks.length) {
+            errors.push('há posição repetida na classificação');
+        }
+
+        if (actualRanks.length !== expectedRanks.length || actualRanks.some((rank, index) => rank !== expectedRanks[index])) {
+            errors.push(`as posições devem formar a sequência de 1 a ${expectedCount}`);
+        }
+
+        rows.forEach(row => {
+            const expectedPoints = expectedCount + 1 - Number(row.rank);
+            if (Number(row.points) !== expectedPoints) {
+                errors.push(`roster ${row.rosterId} deveria receber ${expectedPoints} pontos, mas recebeu ${row.points}`);
+            }
+        });
+
+        const expectedPointTotal = expectedCount * (expectedCount + 1) / 2;
+        const actualPointTotal = rows.reduce((sum, row) => sum + Number(row.points || 0), 0);
+        if (actualPointTotal !== expectedPointTotal) {
+            errors.push(`soma de pontos ${actualPointTotal} diferente do total esperado ${expectedPointTotal}`);
+        }
+
+        return {
+            valid: errors.length === 0,
+            errors,
+            rosterCount: expectedCount,
+            expectedPointTotal,
+            actualPointTotal
+        };
+    }
+
+    function validateLeagueSnapshot(snapshot) {
+        const errors = [];
+
+        if (!snapshot || typeof snapshot !== 'object') {
+            return { valid: false, errors: ['snapshot ausente ou inválido'] };
+        }
+
+        if (!Array.isArray(snapshot.rosters)) errors.push('rosters ausentes');
+        if (!Array.isArray(snapshot.users)) errors.push('users ausentes');
+        if (!Array.isArray(snapshot.standings)) errors.push('standings ausentes');
+
+        if (errors.length === 0) {
+            const result = validateStandings(snapshot.standings, snapshot.rosters.length);
+            errors.push(...result.errors);
+        }
+
+        return { valid: errors.length === 0, errors };
+    }
+
+    function getUserForRoster(roster, users) {
+        return (users || []).find(user => String(user.user_id) === String(roster?.owner_id)) || null;
+    }
+
+    function getManagerName(user, roster) {
+        return user?.display_name || user?.username || roster?.metadata?.owner_name || 'Manager não identificado';
+    }
+
+    function getTeamName(user, roster) {
+        return user?.metadata?.team_name || roster?.metadata?.team_name || getManagerName(user, roster);
+    }
+
+    function createIdentityIndex(registry) {
+        const byUserId = new Map();
+        const byAlias = new Map();
+
+        (registry?.managers || []).forEach(manager => {
+            const normalizedManager = {
+                canonicalId: String(manager.canonicalId),
+                displayName: manager.displayName || manager.canonicalId,
+                sleeperUserIds: Array.isArray(manager.sleeperUserIds) ? manager.sleeperUserIds.map(String) : [],
+                aliases: Array.isArray(manager.aliases) ? manager.aliases.filter(Boolean) : []
+            };
+
+            normalizedManager.sleeperUserIds.forEach(userId => byUserId.set(userId, normalizedManager));
+            [normalizedManager.displayName, ...normalizedManager.aliases]
+                .map(normalizeAlias)
+                .filter(Boolean)
+                .forEach(alias => byAlias.set(alias, normalizedManager));
+        });
+
+        return { byUserId, byAlias };
+    }
+
+    function resolveCanonicalManager(user, roster, identityIndex) {
+        const userIds = [user?.user_id, roster?.owner_id].filter(Boolean).map(String);
+        for (const userId of userIds) {
+            const manager = identityIndex?.byUserId?.get(userId);
+            if (manager) return manager;
+        }
+
+        const aliases = [
+            user?.username,
+            user?.display_name,
+            user?.metadata?.team_name,
+            roster?.metadata?.owner_name,
+            roster?.metadata?.team_name
+        ].map(normalizeAlias).filter(Boolean);
+
+        for (const alias of aliases) {
+            const manager = identityIndex?.byAlias?.get(alias);
+            if (manager) return manager;
+        }
+
+        const managerName = getManagerName(user, roster);
+        const ownerId = userIds[0];
+        return {
+            canonicalId: ownerId ? `sleeper:${ownerId}` : `alias:${normalizeAlias(managerName) || roster?.roster_id || 'unknown'}`,
+            displayName: managerName,
+            sleeperUserIds: ownerId ? [ownerId] : [],
+            aliases: [managerName]
+        };
+    }
+
+    function calculateCombinedStandings(leagueSnapshots, registry = { managers: [] }) {
+        const combined = new Map();
+        const identityIndex = createIdentityIndex(registry);
+
+        (leagueSnapshots || []).forEach(snapshot => {
+            snapshot.standings.forEach(standing => {
+                const roster = snapshot.rosters.find(item => item.roster_id === standing.rosterId);
+                if (!roster) return;
+
+                const user = getUserForRoster(roster, snapshot.users);
+                const identity = resolveCanonicalManager(user, roster, identityIndex);
+                const current = combined.get(identity.canonicalId) || {
+                    ownerKey: identity.canonicalId,
+                    avatar: user?.avatar || null,
+                    managerName: identity.displayName || getManagerName(user, roster),
+                    points: 0,
+                    bestRank: Number.POSITIVE_INFINITY,
+                    fpts: 0,
+                    appearances: 0
+                };
+
+                current.avatar ||= user?.avatar || null;
+                current.points += standing.points;
+                current.bestRank = Math.min(current.bestRank, standing.rank);
+                current.fpts += getRosterPoints(roster);
+                current.appearances += 1;
+                combined.set(identity.canonicalId, current);
+            });
+        });
+
+        return [...combined.values()].sort((a, b) => {
+            if (b.points !== a.points) return b.points - a.points;
+            if (a.bestRank !== b.bestRank) return a.bestRank - b.bestRank;
+            if (b.fpts !== a.fpts) return b.fpts - a.fpts;
+            return a.managerName.localeCompare(b.managerName, 'pt-BR');
+        });
+    }
+
+    return Object.freeze({
+        normalizeAlias,
+        getRosterPoints,
+        compareRegularSeasonRosters,
+        getBracketRosterIds,
+        applyPlacementMatches,
+        calculateStandings,
+        validateStandings,
+        validateLeagueSnapshot,
+        getUserForRoster,
+        getManagerName,
+        getTeamName,
+        createIdentityIndex,
+        resolveCanonicalManager,
+        calculateCombinedStandings
+    });
+}));

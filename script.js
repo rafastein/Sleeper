@@ -5,11 +5,18 @@
     const AVATAR_BASE_URL = 'https://sleepercdn.com/avatars/thumbs';
     const REQUEST_TIMEOUT_MS = 15000;
     const config = window.AMBO_CONFIG;
+    const core = window.AMBO_CORE;
+
+    if (!config || !core) {
+        throw new Error('Configuração ou núcleo de cálculo não carregado.');
+    }
 
     const state = {
         activeButton: null,
         requestToken: 0,
-        resolvedLeagueIds: new Map()
+        resolvedLeagueIds: new Map(),
+        managerRegistryPromise: null,
+        discoveryUsersPromise: null
     };
 
     const elements = {
@@ -59,22 +66,19 @@
     }
 
     function getRosterPoints(roster, key = 'fpts') {
-        const settings = roster?.settings || {};
-        const integer = Number(settings[key] || 0);
-        const decimal = Number(settings[`${key}_decimal`] || 0) / 100;
-        return integer + decimal;
+        return core.getRosterPoints(roster, key);
     }
 
     function getUserForRoster(roster, users) {
-        return users.find(user => user.user_id === roster?.owner_id) || null;
+        return core.getUserForRoster(roster, users);
     }
 
     function getManagerName(user, roster) {
-        return user?.display_name || user?.username || roster?.metadata?.owner_name || 'Manager não identificado';
+        return core.getManagerName(user, roster);
     }
 
     function getTeamName(user, roster) {
-        return user?.metadata?.team_name || roster?.metadata?.team_name || getManagerName(user, roster);
+        return core.getTeamName(user, roster);
     }
 
     function getInitials(name) {
@@ -276,6 +280,65 @@
         }
     }
 
+    async function fetchOptionalJson(url) {
+        try {
+            const response = await fetch(url, { cache: 'no-cache' });
+            if (response.status === 404) return null;
+            if (!response.ok) throw new Error(`requisição retornou ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.warn(`Arquivo local indisponível em ${url}:`, error);
+            return null;
+        }
+    }
+
+    function loadManagerRegistry() {
+        if (!state.managerRegistryPromise) {
+            state.managerRegistryPromise = fetchOptionalJson(config.data?.managerRegistryPath || 'data/managers.json')
+                .then(registry => registry || { schemaVersion: 1, managers: [] });
+        }
+        return state.managerRegistryPromise;
+    }
+
+    function loadDiscoveryUsers() {
+        if (!state.discoveryUsersPromise) {
+            state.discoveryUsersPromise = fetchOptionalJson(config.data?.discoveryUsersPath || 'data/discovery-users.json')
+                .then(data => data?.users || {});
+        }
+        return state.discoveryUsersPromise;
+    }
+
+    async function loadLocalSeasonSnapshot(year, seriesKey) {
+        const dataConfig = config.data || {};
+        const enabled = dataConfig.preferSnapshots !== false;
+        const years = Array.isArray(dataConfig.snapshotYears) ? dataConfig.snapshotYears.map(Number) : [];
+        if (!enabled || (years.length && !years.includes(Number(year)))) return null;
+
+        const basePath = String(dataConfig.snapshotsBasePath || 'data/snapshots').replace(/\/$/, '');
+        const payload = await fetchOptionalJson(`${basePath}/${year}/${seriesKey}.json`);
+        if (!payload) return null;
+
+        if (payload.schemaVersion !== 1 || !Array.isArray(payload.leagues)) {
+            console.warn(`Snapshot ${year}/${seriesKey} ignorado: formato inválido.`);
+            return null;
+        }
+
+        const validationErrors = [];
+        payload.leagues.forEach((leagueSnapshot, index) => {
+            const result = core.validateLeagueSnapshot(leagueSnapshot);
+            if (!result.valid) {
+                validationErrors.push(`Liga ${index + 1}: ${result.errors.join('; ')}`);
+            }
+        });
+
+        if (validationErrors.length) {
+            console.error(`Snapshot ${year}/${seriesKey} inválido:`, validationErrors);
+            return null;
+        }
+
+        return payload;
+    }
+
     async function resolveLeagueIds(year, seriesKey) {
         const seasonConfig = config.leagueIds[year]?.[seriesKey];
 
@@ -292,8 +355,9 @@
             ? seasonConfig.previousLeagueIds.map(String)
             : [];
         const expectedLeagues = Number(seasonConfig.expectedLeagues || previousLeagueIds.length || 2);
+        const discoveryKey = String(seasonConfig.discoveryKey || core.normalizeAlias(username));
 
-        if (!username || !previousLeagueIds.length) {
+        if (!previousLeagueIds.length) {
             throw new Error('a descoberta automática está incompleta no config.js');
         }
 
@@ -303,17 +367,21 @@
         }
 
         const discoveryRequest = (async () => {
-            const user = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(username)}`);
-            if (!user?.user_id) {
-                throw new Error(`usuário ${username} não encontrado no Sleeper`);
+            const persistedUsers = await loadDiscoveryUsers();
+            let userId = String(seasonConfig.userId || persistedUsers[discoveryKey]?.userId || '').trim();
+
+            if (!userId) {
+                if (!username) {
+                    throw new Error(`user_id persistente ausente para ${seriesKey}`);
+                }
+                const user = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(username)}`);
+                userId = String(user?.user_id || '');
+                if (!userId) throw new Error(`usuário ${username} não encontrado no Sleeper`);
             }
 
-            const leagues = await fetchJson(
-                `${API_BASE_URL}/user/${encodeURIComponent(user.user_id)}/leagues/nfl/${year}`
-            );
-
+            const leagues = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(userId)}/leagues/nfl/${year}`);
             if (!Array.isArray(leagues)) {
-                throw new Error(`a API não retornou as ligas de ${username} em ${year}`);
+                throw new Error(`a API não retornou as ligas do usuário ${userId} em ${year}`);
             }
 
             const previousIds = new Set(previousLeagueIds);
@@ -326,9 +394,7 @@
             )];
 
             if (matchedLeagueIds.length !== expectedLeagues) {
-                throw new Error(
-                    `foram encontradas ${matchedLeagueIds.length} de ${expectedLeagues} ligas renovadas para ${username} em ${year}`
-                );
+                throw new Error(`foram encontradas ${matchedLeagueIds.length} de ${expectedLeagues} ligas renovadas em ${year}`);
             }
 
             return matchedLeagueIds;
@@ -362,7 +428,7 @@
             fetchOptionalBracket(leagueId, 'losers_bracket')
         ]);
 
-        const calculated = calculateStandings(winnersBracket, losersBracket, rosters, league);
+        const calculated = core.calculateStandings(winnersBracket, losersBracket, rosters, league);
 
         return {
             index,
@@ -370,159 +436,15 @@
             league,
             rosters,
             users,
+            winnersBracket,
+            losersBracket,
             standings: calculated.standings,
             usedFallback: calculated.usedFallback
         };
     }
 
-    function compareRegularSeasonRosters(a, b) {
-        const settingsA = a.settings || {};
-        const settingsB = b.settings || {};
-
-        if ((settingsB.wins || 0) !== (settingsA.wins || 0)) return (settingsB.wins || 0) - (settingsA.wins || 0);
-        if ((settingsB.ties || 0) !== (settingsA.ties || 0)) return (settingsB.ties || 0) - (settingsA.ties || 0);
-
-        const pointsDifference = getRosterPoints(b) - getRosterPoints(a);
-        if (pointsDifference !== 0) return pointsDifference;
-
-        const againstDifference = getRosterPoints(a, 'fpts_against') - getRosterPoints(b, 'fpts_against');
-        if (againstDifference !== 0) return againstDifference;
-
-        return (a.roster_id || 0) - (b.roster_id || 0);
-    }
-
-    function getBracketRosterIds(bracket) {
-        const rosterIds = new Set();
-
-        (bracket || []).forEach(match => {
-            ['t1', 't2', 'w', 'l'].forEach(key => {
-                const rosterId = Number(match?.[key]);
-                if (Number.isInteger(rosterId) && rosterId > 0) rosterIds.add(rosterId);
-            });
-        });
-
-        return rosterIds;
-    }
-
-    function applyPlacementMatches(rankByRoster, bracket, rankOffset = 0) {
-        (bracket || [])
-            .filter(match => Number.isInteger(match?.p))
-            .sort((a, b) => a.p - b.p)
-            .forEach(match => {
-                const winnerId = Number(match.w);
-                const loserId = Number(match.l);
-                const baseRank = Number(match.p) + rankOffset;
-
-                if (Number.isInteger(winnerId) && winnerId > 0) {
-                    rankByRoster.set(winnerId, baseRank);
-                }
-
-                if (Number.isInteger(loserId) && loserId > 0) {
-                    rankByRoster.set(loserId, baseRank + 1);
-                }
-            });
-    }
-
-    /**
-     * O campo `p` informa a colocação disputada dentro de cada bracket.
-     * No winners bracket, p: 1 representa 1º/2º, p: 3 representa 3º/4º etc.
-     * No losers bracket, o Sleeper reinicia essa numeração em 1; por isso é
-     * necessário somar a quantidade de times dos playoffs para obter 7º–12º.
-     */
-    function calculateStandings(winnersBracket, losersBracket, rosters, league) {
-        const rankByRoster = new Map();
-        const configuredPlayoffTeams = Number(league?.settings?.playoff_teams);
-        const inferredPlayoffTeams = getBracketRosterIds(winnersBracket).size;
-        const playoffTeamCount = Number.isInteger(configuredPlayoffTeams) && configuredPlayoffTeams > 0
-            ? Math.min(configuredPlayoffTeams, rosters.length)
-            : inferredPlayoffTeams;
-
-        applyPlacementMatches(rankByRoster, winnersBracket, 0);
-
-        const losersPlacementRanks = (losersBracket || [])
-            .filter(match => Number.isInteger(match?.p))
-            .map(match => Number(match.p));
-
-        // Algumas respostas podem trazer posições absolutas no losers bracket.
-        // Só aplicamos o deslocamento quando a numeração reinicia em 1.
-        const losersRankOffset = losersPlacementRanks.length > 0
-            && playoffTeamCount > 0
-            && Math.min(...losersPlacementRanks) <= playoffTeamCount
-            ? playoffTeamCount
-            : 0;
-
-        applyPlacementMatches(rankByRoster, losersBracket, losersRankOffset);
-
-        const occupiedRanks = new Set(rankByRoster.values());
-        const availableRanks = Array.from({ length: rosters.length }, (_, index) => index + 1)
-            .filter(rank => !occupiedRanks.has(rank));
-
-        const unrankedRosters = rosters
-            .filter(roster => !rankByRoster.has(roster.roster_id))
-            .sort(compareRegularSeasonRosters);
-
-        unrankedRosters.forEach((roster, index) => {
-            rankByRoster.set(roster.roster_id, availableRanks[index]);
-        });
-
-        const fallbackRosterIds = new Set(unrankedRosters.map(roster => roster.roster_id));
-        const standings = rosters
-            .map(roster => {
-                const rank = rankByRoster.get(roster.roster_id);
-                return {
-                    rank,
-                    rosterId: roster.roster_id,
-                    points: rosters.length + 1 - rank,
-                    source: fallbackRosterIds.has(roster.roster_id)
-                        ? 'regular-season-fallback'
-                        : 'playoff-bracket'
-                };
-            })
-            .sort((a, b) => a.rank - b.rank);
-
-        return {
-            standings,
-            usedFallback: unrankedRosters.length > 0
-        };
-    }
-
-    function calculateCombinedStandings(leagueSnapshots) {
-        const combined = new Map();
-
-        leagueSnapshots.forEach(snapshot => {
-            snapshot.standings.forEach(standing => {
-                const roster = snapshot.rosters.find(item => item.roster_id === standing.rosterId);
-                if (!roster) return;
-
-                const user = getUserForRoster(roster, snapshot.users);
-                const ownerKey = roster.owner_id || `sem-owner:${snapshot.leagueId}:${roster.roster_id}`;
-                const managerName = getManagerName(user, roster);
-                const current = combined.get(ownerKey) || {
-                    ownerKey,
-                    avatar: user?.avatar || null,
-                    managerName,
-                    points: 0,
-                    bestRank: Number.POSITIVE_INFINITY,
-                    fpts: 0,
-                    appearances: 0
-                };
-
-                current.avatar ||= user?.avatar || null;
-                current.managerName = current.managerName === 'Manager não identificado' ? managerName : current.managerName;
-                current.points += standing.points;
-                current.bestRank = Math.min(current.bestRank, standing.rank);
-                current.fpts += getRosterPoints(roster);
-                current.appearances += 1;
-                combined.set(ownerKey, current);
-            });
-        });
-
-        return [...combined.values()].sort((a, b) => {
-            if (b.points !== a.points) return b.points - a.points;
-            if (a.bestRank !== b.bestRank) return a.bestRank - b.bestRank;
-            if (b.fpts !== a.fpts) return b.fpts - a.fpts;
-            return a.managerName.localeCompare(b.managerName, 'pt-BR');
-        });
+    function calculateCombinedStandings(leagueSnapshots, registry) {
+        return core.calculateCombinedStandings(leagueSnapshots, registry);
     }
 
     function renderCombinedStandings(standings) {
@@ -628,42 +550,72 @@
         elements.pageEyebrow.textContent = `Temporada ${year}`;
         elements.pageTitle.textContent = `AMBO ${seriesLabel}`;
         elements.pageDescription.textContent = 'Ranking combinado das duas ligas, com classificação final, campanha e pontuação acumulada.';
-        elements.lastUpdate.textContent = 'Atualizando dados...';
+        elements.lastUpdate.textContent = 'Carregando dados validados...';
         elements.championsView.hidden = true;
         elements.rankingView.hidden = false;
 
         try {
-            const leagueIds = await resolveLeagueIds(year, seriesKey);
-            if (currentRequest !== state.requestToken) return;
-
-            const snapshots = (await Promise.all(
-                leagueIds.map((leagueId, index) => fetchLeagueSnapshot(leagueId, index))
-            )).sort((a, b) => a.index - b.index);
+            const [registry, localSnapshot] = await Promise.all([
+                loadManagerRegistry(),
+                loadLocalSeasonSnapshot(year, seriesKey)
+            ]);
 
             if (currentRequest !== state.requestToken) return;
 
-            const combined = calculateCombinedStandings(snapshots);
+            let snapshots;
+            let sourceLabel;
+            let updatedAt;
+
+            if (localSnapshot) {
+                snapshots = localSnapshot.leagues.slice().sort((a, b) => a.index - b.index);
+                sourceLabel = 'Snapshot oficial';
+                updatedAt = localSnapshot.generatedAt;
+            } else {
+                const leagueIds = await resolveLeagueIds(year, seriesKey);
+                if (currentRequest !== state.requestToken) return;
+
+                snapshots = (await Promise.all(
+                    leagueIds.map((leagueId, index) => fetchLeagueSnapshot(leagueId, index))
+                )).sort((a, b) => a.index - b.index);
+                sourceLabel = 'Sleeper API';
+                updatedAt = new Date().toISOString();
+            }
+
+            snapshots.forEach((snapshot, index) => {
+                const validation = core.validateLeagueSnapshot(snapshot);
+                if (!validation.valid) {
+                    throw new Error(`Liga ${index + 1} inválida: ${validation.errors.join('; ')}`);
+                }
+            });
+
+            if (currentRequest !== state.requestToken) return;
+
+            const combined = calculateCombinedStandings(snapshots, registry);
             renderCombinedStandings(combined);
             elements.leaguePanels.replaceChildren(...snapshots.map(renderLeaguePanel));
             renderSeasonStats(year, seriesLabel, snapshots, combined);
 
-            const now = new Intl.DateTimeFormat('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }).format(new Date());
-            elements.lastUpdate.textContent = `Atualizado em ${now}`;
+            const formattedDate = updatedAt
+                ? new Intl.DateTimeFormat('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }).format(new Date(updatedAt))
+                : null;
+            elements.lastUpdate.textContent = formattedDate
+                ? `${sourceLabel} · ${formattedDate}`
+                : sourceLabel;
         } catch (error) {
             if (currentRequest !== state.requestToken) return;
             console.error(error);
             elements.combinedBody.replaceChildren();
             elements.leaguePanels.replaceChildren();
             elements.seasonStats.replaceChildren();
-            elements.rankingStatus.textContent = 'Falha ao carregar';
+            elements.rankingStatus.textContent = 'Falha de validação';
             elements.lastUpdate.textContent = 'Dados indisponíveis';
-            showError(`Não foi possível carregar as ligas: ${error.message}. Confira a conexão e a configuração da temporada.`);
+            showError(`Não foi possível carregar as ligas: ${error.message}.`);
         } finally {
             if (currentRequest === state.requestToken) showLoading(false);
         }
