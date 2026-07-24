@@ -1,31 +1,40 @@
 # Changelog
 
+## Etapa 2 — central histórica
+
+- novo **Ranking histórico** no menu principal;
+- consolidação automática dos snapshots disponíveis;
+- filtros para Série A, Série B ou ambas;
+- ordenação por pontos, títulos, pódios e média;
+- títulos e pódios calculados pelo ranking combinado anual;
+- snapshots provisórios excluídos das estatísticas oficiais;
+- perfis individuais dos managers;
+- trajetória anual clicável por ano e série;
+- pontos, títulos, pódios, participações, melhor resultado, média e FPTS acumulado;
+- indicadores de cobertura dos snapshots;
+- cinco testes novos para a camada histórica;
+- comando `npm run sync:history`.
+
 ## Etapa 1 — confiabilidade dos dados
 
-- regras de classificação extraídas para `ambo-core.js`;
+- regras extraídas para `ambo-core.js`;
 - testes automáticos com o test runner nativo do Node.js;
 - validação de posições, rosters, pontos e soma total;
-- proteção específica contra duplicação do 1º ao 6º lugar no losers bracket;
+- proteção contra duplicação do 1º ao 6º lugar no losers bracket;
 - snapshots locais para temporadas encerradas;
-- fallback automático para a API quando o snapshot ainda não existe;
-- sincronizador de snapshots em `scripts/sync-data.js`;
-- validação independente em `scripts/validate-snapshots.js`;
-- cadastro canônico de managers em `data/managers.json`;
-- persistência de `user_id` em `data/discovery-users.json`;
-- GitHub Action para validar cada push;
-- GitHub Action manual para baixar, validar e commitar snapshots;
-- indicação da origem e da data dos dados na interface.
+- fallback para a API quando o snapshot ainda não existe;
+- sincronizador e validador de snapshots;
+- cadastro canônico de managers;
+- persistência de `user_id`;
+- GitHub Actions para validação e sincronização.
 
-## 2026-07-24
+## Modernização inicial
 
-- adicionada a temporada 2025 ao menu;
-- descoberta automática das ligas renovadas pela API do Sleeper;
-- Série A localizada a partir do usuário `Jptavares`;
-- Série B localizada a partir do usuário `rafastein`;
-- correção do deslocamento do losers bracket;
-- classificação final calculada pelo campo `p`;
-- suporte a qualquer quantidade de participantes;
+- temporada 2025;
+- descoberta automática das ligas renovadas;
+- Série A localizada por `Jptavares`;
+- Série B localizada por `rafastein`;
 - FPTS com casas decimais;
 - identidade visual renovada;
 - menu mobile acessível;
-- dados editáveis separados em `config.js`.
+- configuração central em `config.js`.

@@ -306,6 +306,130 @@
         });
     }
 
+
+
+    function buildHistoricalEntries(snapshotPayloads, registry = { managers: [] }) {
+        const entries = [];
+
+        (snapshotPayloads || []).forEach(payload => {
+            if (!payload || !Array.isArray(payload.leagues)) return;
+
+            const year = Number(payload.year);
+            const seriesKey = String(payload.seriesKey || '');
+            const seriesLabel = payload.seriesLabel || seriesKey;
+            const provisional = payload.leagues.some(league => Boolean(league.usedFallback));
+            const combined = calculateCombinedStandings(payload.leagues, registry);
+
+            combined.forEach((standing, index) => {
+                entries.push({
+                    canonicalId: standing.ownerKey,
+                    managerName: standing.managerName,
+                    avatar: standing.avatar || null,
+                    year,
+                    seriesKey,
+                    seriesLabel,
+                    rank: index + 1,
+                    points: Number(standing.points || 0),
+                    bestLeagueRank: Number(standing.bestRank || 0),
+                    fpts: Number(standing.fpts || 0),
+                    leagueAppearances: Number(standing.appearances || 0),
+                    provisional
+                });
+            });
+        });
+
+        return entries.sort((a, b) =>
+            b.year - a.year
+            || a.seriesKey.localeCompare(b.seriesKey)
+            || a.rank - b.rank
+        );
+    }
+
+    function sortHistoricalRanking(ranking, sortBy = 'points') {
+        const rows = [...(ranking || [])];
+        const byName = (a, b) => a.managerName.localeCompare(b.managerName, 'pt-BR');
+        const pointsComparator = (a, b) =>
+            b.totalPoints - a.totalPoints
+            || b.titles - a.titles
+            || b.podiums - a.podiums
+            || a.averageFinish - b.averageFinish
+            || b.totalFpts - a.totalFpts
+            || byName(a, b);
+
+        const comparators = {
+            points: pointsComparator,
+            titles: (a, b) => b.titles - a.titles || b.podiums - a.podiums || pointsComparator(a, b),
+            podiums: (a, b) => b.podiums - a.podiums || b.titles - a.titles || pointsComparator(a, b),
+            average: (a, b) => a.averageFinish - b.averageFinish || b.participations - a.participations || pointsComparator(a, b)
+        };
+
+        return rows.sort(comparators[sortBy] || pointsComparator);
+    }
+
+    function aggregateHistoricalRanking(entries, options = {}) {
+        const seriesKey = options.seriesKey || 'all';
+        const includeProvisional = options.includeProvisional === true;
+        const sortBy = options.sortBy || 'points';
+        const aggregate = new Map();
+
+        (entries || []).forEach(entry => {
+            if (seriesKey !== 'all' && entry.seriesKey !== seriesKey) return;
+            if (!includeProvisional && entry.provisional) return;
+
+            const canonicalId = String(entry.canonicalId || '');
+            if (!canonicalId) return;
+
+            const current = aggregate.get(canonicalId) || {
+                canonicalId,
+                managerName: entry.managerName || canonicalId,
+                avatar: entry.avatar || null,
+                totalPoints: 0,
+                titles: 0,
+                podiums: 0,
+                participations: 0,
+                leagueAppearances: 0,
+                bestFinish: Number.POSITIVE_INFINITY,
+                finishTotal: 0,
+                totalFpts: 0,
+                firstYear: Number.POSITIVE_INFINITY,
+                lastYear: Number.NEGATIVE_INFINITY,
+                history: []
+            };
+
+            if (entry.year >= current.lastYear) {
+                current.managerName = entry.managerName || current.managerName;
+                current.avatar = entry.avatar || current.avatar;
+            }
+
+            current.totalPoints += Number(entry.points || 0);
+            current.titles += Number(entry.rank) === 1 ? 1 : 0;
+            current.podiums += Number(entry.rank) <= 3 ? 1 : 0;
+            current.participations += 1;
+            current.leagueAppearances += Number(entry.leagueAppearances || 0);
+            current.bestFinish = Math.min(current.bestFinish, Number(entry.rank));
+            current.finishTotal += Number(entry.rank || 0);
+            current.totalFpts += Number(entry.fpts || 0);
+            current.firstYear = Math.min(current.firstYear, Number(entry.year));
+            current.lastYear = Math.max(current.lastYear, Number(entry.year));
+            current.history.push({ ...entry });
+            aggregate.set(canonicalId, current);
+        });
+
+        const ranking = [...aggregate.values()].map(manager => ({
+            ...manager,
+            averageFinish: manager.participations ? manager.finishTotal / manager.participations : 0,
+            averagePoints: manager.participations ? manager.totalPoints / manager.participations : 0,
+            history: manager.history.sort((a, b) => b.year - a.year || a.seriesKey.localeCompare(b.seriesKey))
+        }));
+
+        return sortHistoricalRanking(ranking, sortBy);
+    }
+
+    function getHistoricalProfile(entries, canonicalId, options = {}) {
+        return aggregateHistoricalRanking(entries, options)
+            .find(manager => manager.canonicalId === String(canonicalId)) || null;
+    }
+
     return Object.freeze({
         normalizeAlias,
         getRosterPoints,
@@ -320,6 +444,10 @@
         getTeamName,
         createIdentityIndex,
         resolveCanonicalManager,
-        calculateCombinedStandings
+        calculateCombinedStandings,
+        buildHistoricalEntries,
+        sortHistoricalRanking,
+        aggregateHistoricalRanking,
+        getHistoricalProfile
     });
 }));

@@ -758,3 +758,218 @@ th:last-child {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Etapa 2: ranking histórico e perfis */
+.stats-grid--four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stats-grid--six {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.panel__header--wrap {
+    flex-wrap: wrap;
+}
+
+.history-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(5, 15, 28, 0.2);
+}
+
+.field-label {
+    display: grid;
+    min-width: 210px;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.67rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.field-label select {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 34px 8px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: var(--surface-strong);
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: normal;
+    text-transform: none;
+    cursor: pointer;
+}
+
+.field-label select:focus-visible,
+.manager-link:focus-visible,
+.season-link:focus-visible,
+.back-button:focus-visible {
+    outline: 3px solid rgba(85, 214, 190, 0.35);
+    outline-offset: 2px;
+}
+
+.history-table {
+    min-width: 920px;
+}
+
+.manager-link,
+.season-link {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.manager-link:hover,
+.season-link:hover {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.season-link {
+    color: var(--primary);
+}
+
+.panel-note {
+    margin: 0;
+    padding: 13px 20px 16px;
+    border-top: 1px solid var(--border);
+    color: #70849b;
+    font-size: 0.68rem;
+}
+
+.empty-state {
+    display: grid;
+    min-height: 210px;
+    place-content: center;
+    gap: 6px;
+    padding: 28px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.empty-state strong {
+    color: var(--text);
+}
+
+.empty-state span {
+    max-width: 470px;
+    font-size: 0.76rem;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    margin: 0 0 14px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    border-color: rgba(85, 214, 190, 0.25);
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.profile-summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    padding: 20px;
+}
+
+.profile-summary__avatar .avatar,
+.profile-summary__avatar .avatar-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    font-size: 1.1rem;
+}
+
+.profile-summary__meta {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 0.77rem;
+}
+
+.profile-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.profile-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 6px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--silver);
+    font-size: 0.67rem;
+    font-weight: 800;
+}
+
+.profile-badge--gold {
+    border-color: rgba(248, 201, 92, 0.28);
+    background: rgba(248, 201, 92, 0.09);
+    color: var(--gold);
+}
+
+.profile-history-table {
+    min-width: 720px;
+}
+
+@media (max-width: 1120px) {
+    .stats-grid--four {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid--four,
+    .stats-grid--six {
+        grid-template-columns: 1fr;
+    }
+
+    .history-toolbar {
+        display: grid;
+        padding: 14px 16px;
+    }
+
+    .field-label {
+        min-width: 0;
+    }
+
+    .profile-summary {
+        grid-template-columns: auto minmax(0, 1fr);
+        padding: 16px;
+    }
+
+    .profile-badges {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}

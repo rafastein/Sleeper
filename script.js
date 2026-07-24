@@ -16,13 +16,24 @@
         requestToken: 0,
         resolvedLeagueIds: new Map(),
         managerRegistryPromise: null,
-        discoveryUsersPromise: null
+        discoveryUsersPromise: null,
+        navButtons: new Map(),
+        historyDataPromise: null,
+        historyEntries: [],
+        historyPayloads: [],
+        historyManifest: null,
+        historyFilter: 'all',
+        historySort: 'points',
+        historyButton: null,
+        currentProfileId: null
     };
 
     const elements = {
         navigation: document.getElementById('navigation'),
         championsView: document.getElementById('champions-view'),
         rankingView: document.getElementById('ranking-view'),
+        historyView: document.getElementById('history-view'),
+        profileView: document.getElementById('profile-view'),
         pageEyebrow: document.getElementById('page-eyebrow'),
         pageTitle: document.getElementById('page-title'),
         pageDescription: document.getElementById('page-description'),
@@ -32,6 +43,21 @@
         championStats: document.getElementById('champion-stats'),
         championsBody: document.querySelector('#champions-table tbody'),
         championsRange: document.getElementById('champions-range'),
+        historyStats: document.getElementById('history-stats'),
+        historyBody: document.querySelector('#history-table tbody'),
+        historyStatus: document.getElementById('history-status'),
+        historySeriesFilter: document.getElementById('history-series-filter'),
+        historySort: document.getElementById('history-sort'),
+        historyEmpty: document.getElementById('history-empty'),
+        historyTableWrap: document.getElementById('history-table-wrap'),
+        profileBack: document.getElementById('profile-back'),
+        profileAvatar: document.getElementById('profile-avatar'),
+        profileName: document.getElementById('profile-name'),
+        profileMeta: document.getElementById('profile-meta'),
+        profileBadges: document.getElementById('profile-badges'),
+        profileStats: document.getElementById('profile-stats'),
+        profileScope: document.getElementById('profile-scope'),
+        profileHistoryBody: document.querySelector('#profile-history-table tbody'),
         seasonStats: document.getElementById('season-stats'),
         combinedBody: document.querySelector('#combined-table tbody'),
         rankingStatus: document.getElementById('ranking-status'),
@@ -143,6 +169,25 @@
         container.replaceChildren(...stats.map(stat => createStatCard(stat.label, stat.value, stat.detail)));
     }
 
+    function showOnlyView(viewName) {
+        const views = {
+            champions: elements.championsView,
+            history: elements.historyView,
+            profile: elements.profileView,
+            ranking: elements.rankingView
+        };
+
+        Object.entries(views).forEach(([name, view]) => {
+            view.hidden = name !== viewName;
+        });
+    }
+
+    function formatPlacement(value, digits = 0) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) return '—';
+        return `${formatNumber(number, digits)}º`;
+    }
+
     function setActiveButton(button) {
         if (state.activeButton) state.activeButton.classList.remove('is-active');
         state.activeButton = button;
@@ -179,6 +224,17 @@
         championsButton.addEventListener('click', () => showChampions(championsButton));
         fragment.appendChild(championsButton);
 
+        const historyButton = createElement('button', 'nav-button');
+        historyButton.type = 'button';
+        historyButton.dataset.view = 'history';
+        historyButton.append(
+            createElement('span', 'nav-button__icon', '∞'),
+            createElement('span', '', 'Ranking histórico')
+        );
+        historyButton.addEventListener('click', () => showHistoricalRanking(historyButton));
+        state.historyButton = historyButton;
+        fragment.appendChild(historyButton);
+
         const years = Object.keys(config.leagueIds).map(Number).sort((a, b) => b - a);
         years.forEach(year => {
             fragment.appendChild(createElement('p', 'nav-year', year));
@@ -195,6 +251,7 @@
                     createElement('span', '', seriesLabel)
                 );
                 button.addEventListener('click', () => loadSeason(year, seriesKey, button));
+                state.navButtons.set(`${year}:${seriesKey}`, button);
                 fragment.appendChild(button);
             });
         });
@@ -255,8 +312,7 @@
         elements.pageTitle.textContent = 'Hall de campeões';
         elements.pageDescription.textContent = 'A história das ligas AMBO reunida em um só lugar.';
         elements.lastUpdate.textContent = `Base cadastrada até ${Math.max(...config.champions.map(item => item.year))}`;
-        elements.championsView.hidden = false;
-        elements.rankingView.hidden = true;
+        showOnlyView('champions');
         renderChampions();
     }
 
@@ -337,6 +393,247 @@
         }
 
         return payload;
+    }
+
+
+    function formatDateTime(value) {
+        if (!value) return null;
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return null;
+        return new Intl.DateTimeFormat('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(date);
+    }
+
+    function getHistoryScopeLabel(seriesKey = state.historyFilter) {
+        if (seriesKey === 'serieA') return 'Série A';
+        if (seriesKey === 'serieB') return 'Série B';
+        return 'Séries A + B';
+    }
+
+    async function loadHistoricalData() {
+        if (state.historyDataPromise) return state.historyDataPromise;
+
+        state.historyDataPromise = (async () => {
+            const basePath = String(config.data?.snapshotsBasePath || 'data/snapshots').replace(/\/$/, '');
+            const [registry, manifest] = await Promise.all([
+                loadManagerRegistry(),
+                fetchOptionalJson(`${basePath}/manifest.json`)
+            ]);
+
+            const manifestEntries = Array.isArray(manifest?.snapshots) ? manifest.snapshots : [];
+            const payloadResults = await Promise.all(manifestEntries.map(async entry => {
+                const year = Number(entry.year);
+                const seriesKey = String(entry.seriesKey || '');
+                if (!year || !seriesKey) return null;
+
+                const payload = await fetchOptionalJson(`${basePath}/${year}/${seriesKey}.json`);
+                if (!payload || payload.schemaVersion !== 1 || !Array.isArray(payload.leagues)) return null;
+
+                const invalidLeague = payload.leagues.find(league => !core.validateLeagueSnapshot(league).valid);
+                if (invalidLeague) {
+                    console.warn(`Snapshot histórico ${year}/${seriesKey} ignorado por falha de validação.`);
+                    return null;
+                }
+
+                return payload;
+            }));
+
+            const payloads = payloadResults.filter(Boolean);
+            const entries = core.buildHistoricalEntries(payloads, registry);
+            state.historyEntries = entries;
+            state.historyPayloads = payloads;
+            state.historyManifest = manifest || { schemaVersion: 1, generatedAt: null, snapshots: [] };
+
+            return {
+                registry,
+                manifest: state.historyManifest,
+                payloads,
+                entries
+            };
+        })();
+
+        try {
+            return await state.historyDataPromise;
+        } catch (error) {
+            state.historyDataPromise = null;
+            throw error;
+        }
+    }
+
+    function renderHistoricalRanking() {
+        const ranking = core.aggregateHistoricalRanking(state.historyEntries, {
+            seriesKey: state.historyFilter,
+            sortBy: state.historySort
+        });
+        const pointsRanking = core.aggregateHistoricalRanking(state.historyEntries, {
+            seriesKey: state.historyFilter,
+            sortBy: 'points'
+        });
+        const officialEntries = state.historyEntries.filter(entry =>
+            !entry.provisional
+            && (state.historyFilter === 'all' || entry.seriesKey === state.historyFilter)
+        );
+        const recuts = new Set(officialEntries.map(entry => `${entry.year}:${entry.seriesKey}`));
+        const provisionalRecuts = new Set(state.historyEntries
+            .filter(entry => entry.provisional && (state.historyFilter === 'all' || entry.seriesKey === state.historyFilter))
+            .map(entry => `${entry.year}:${entry.seriesKey}`));
+        const leader = pointsRanking[0];
+        const expectedYears = Object.keys(config.leagueIds).length;
+        const expectedRecuts = expectedYears * (state.historyFilter === 'all' ? Object.keys(config.series).length : 1);
+
+        setStats(elements.historyStats, [
+            { label: 'Managers ranqueados', value: ranking.length, detail: getHistoryScopeLabel() },
+            { label: 'Recortes oficiais', value: recuts.size, detail: `${expectedRecuts} possíveis na configuração` },
+            { label: 'Líder histórico', value: leader?.managerName || '—', detail: leader ? `${leader.totalPoints} pontos acumulados` : 'Sem dados oficiais' },
+            { label: 'Período coberto', value: officialEntries.length ? `${Math.min(...officialEntries.map(item => item.year))}–${Math.max(...officialEntries.map(item => item.year))}` : '—', detail: provisionalRecuts.size ? `${provisionalRecuts.size} recorte(s) provisório(s) omitido(s)` : 'Somente snapshots validados' }
+        ]);
+
+        elements.historyStatus.textContent = recuts.size
+            ? `${recuts.size} recorte${recuts.size === 1 ? '' : 's'} oficial${recuts.size === 1 ? '' : 'is'}`
+            : 'Sem snapshots oficiais';
+        elements.historyEmpty.hidden = ranking.length > 0;
+        elements.historyTableWrap.hidden = ranking.length === 0;
+
+        const fragment = document.createDocumentFragment();
+        ranking.forEach((manager, index) => {
+            const rank = index + 1;
+            const row = document.createElement('tr');
+            applyRankClass(row, rank, ranking.length);
+
+            const avatarCell = createElement('td', 'col-avatar');
+            avatarCell.appendChild(createAvatar(manager.avatar, manager.managerName));
+
+            const managerCell = document.createElement('td');
+            const managerButton = createElement('button', 'manager-link', manager.managerName);
+            managerButton.type = 'button';
+            managerButton.addEventListener('click', () => showManagerProfile(manager.canonicalId));
+            managerCell.append(
+                managerButton,
+                createElement('span', 'entity-meta', `${manager.firstYear}–${manager.lastYear} · ${manager.leagueAppearances} liga${manager.leagueAppearances === 1 ? '' : 's'}`)
+            );
+
+            row.append(
+                createRankCell(rank),
+                avatarCell,
+                managerCell,
+                createElement('td', 'points-value', manager.totalPoints),
+                createElement('td', '', manager.titles),
+                createElement('td', '', manager.podiums),
+                createElement('td', '', manager.participations),
+                createElement('td', '', formatPlacement(manager.bestFinish)),
+                createElement('td', '', formatPlacement(manager.averageFinish, 2))
+            );
+            fragment.appendChild(row);
+        });
+        elements.historyBody.replaceChildren(fragment);
+    }
+
+    async function showHistoricalRanking(button = state.historyButton) {
+        const currentRequest = ++state.requestToken;
+        setActiveButton(button);
+        closeMobileMenu();
+        showError();
+        showLoading(true);
+        showOnlyView('history');
+
+        elements.pageEyebrow.textContent = 'Arquivo histórico';
+        elements.pageTitle.textContent = 'Ranking de todos os tempos';
+        elements.pageDescription.textContent = 'Pontos, títulos, pódios e médias calculados a partir dos snapshots oficiais das Séries A e B.';
+        elements.lastUpdate.textContent = 'Carregando histórico validado...';
+
+        try {
+            const data = await loadHistoricalData();
+            if (currentRequest !== state.requestToken) return;
+            renderHistoricalRanking();
+            const updatedAt = formatDateTime(data.manifest?.generatedAt);
+            elements.lastUpdate.textContent = updatedAt
+                ? `Snapshots atualizados em ${updatedAt}`
+                : `${data.payloads.length} snapshots disponíveis`;
+        } catch (error) {
+            if (currentRequest !== state.requestToken) return;
+            console.error(error);
+            elements.historyBody.replaceChildren();
+            elements.historyStats.replaceChildren();
+            elements.historyStatus.textContent = 'Histórico indisponível';
+            elements.historyEmpty.hidden = false;
+            elements.historyTableWrap.hidden = true;
+            elements.lastUpdate.textContent = 'Dados indisponíveis';
+            showError(`Não foi possível montar o ranking histórico: ${error.message}.`);
+        } finally {
+            if (currentRequest === state.requestToken) showLoading(false);
+        }
+    }
+
+    function showManagerProfile(canonicalId) {
+        const profile = core.getHistoricalProfile(state.historyEntries, canonicalId, {
+            seriesKey: state.historyFilter
+        });
+
+        if (!profile) {
+            showError('Não há dados históricos oficiais suficientes para abrir este perfil.');
+            return;
+        }
+
+        state.currentProfileId = canonicalId;
+        showError();
+        showOnlyView('profile');
+        closeMobileMenu();
+
+        elements.pageEyebrow.textContent = 'Perfil histórico';
+        elements.pageTitle.textContent = profile.managerName;
+        elements.pageDescription.textContent = `Desempenho acumulado no recorte ${getHistoryScopeLabel().toLowerCase()}.`;
+        elements.lastUpdate.textContent = `${profile.firstYear}–${profile.lastYear}`;
+        elements.profileAvatar.replaceChildren(createAvatar(profile.avatar, profile.managerName));
+        elements.profileName.textContent = profile.managerName;
+        elements.profileMeta.textContent = `${profile.participations} participação${profile.participations === 1 ? '' : 'ões'} em rankings combinados · ${profile.leagueAppearances} liga${profile.leagueAppearances === 1 ? '' : 's'} disputada${profile.leagueAppearances === 1 ? '' : 's'}`;
+        elements.profileScope.textContent = getHistoryScopeLabel();
+
+        const badges = [];
+        if (profile.titles) badges.push(createElement('span', 'profile-badge profile-badge--gold', `${profile.titles} título${profile.titles === 1 ? '' : 's'}`));
+        if (profile.podiums) badges.push(createElement('span', 'profile-badge', `${profile.podiums} pódio${profile.podiums === 1 ? '' : 's'}`));
+        if (!badges.length) badges.push(createElement('span', 'profile-badge', 'Histórico oficial'));
+        elements.profileBadges.replaceChildren(...badges);
+
+        setStats(elements.profileStats, [
+            { label: 'Pontos históricos', value: profile.totalPoints, detail: `${formatNumber(profile.averagePoints, 2)} por participação` },
+            { label: 'Títulos', value: profile.titles, detail: '1º no ranking combinado anual' },
+            { label: 'Pódios', value: profile.podiums, detail: 'Resultados entre os três primeiros' },
+            { label: 'Melhor resultado', value: formatPlacement(profile.bestFinish), detail: getHistoryScopeLabel() },
+            { label: 'Média de colocação', value: formatPlacement(profile.averageFinish, 2), detail: `${profile.participations} recortes oficiais` },
+            { label: 'FPTS acumulado', value: formatNumber(profile.totalFpts), detail: `${profile.leagueAppearances} participações em ligas` }
+        ]);
+
+        const fragment = document.createDocumentFragment();
+        profile.history.forEach(entry => {
+            const row = document.createElement('tr');
+            const yearCell = document.createElement('td');
+            const seasonButton = createElement('button', 'season-link', entry.year);
+            seasonButton.type = 'button';
+            seasonButton.title = `Abrir ${entry.seriesLabel} de ${entry.year}`;
+            seasonButton.addEventListener('click', () => {
+                const navButton = state.navButtons.get(`${entry.year}:${entry.seriesKey}`) || null;
+                loadSeason(entry.year, entry.seriesKey, navButton);
+            });
+            yearCell.appendChild(seasonButton);
+
+            row.append(
+                yearCell,
+                createElement('td', '', entry.seriesLabel),
+                createElement('td', '', formatPlacement(entry.rank)),
+                createElement('td', 'points-value', entry.points),
+                createElement('td', '', formatPlacement(entry.bestLeagueRank)),
+                createElement('td', '', formatNumber(entry.fpts)),
+                createElement('td', '', entry.leagueAppearances)
+            );
+            fragment.appendChild(row);
+        });
+        elements.profileHistoryBody.replaceChildren(fragment);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function resolveLeagueIds(year, seriesKey) {
@@ -551,8 +848,7 @@
         elements.pageTitle.textContent = `AMBO ${seriesLabel}`;
         elements.pageDescription.textContent = 'Ranking combinado das duas ligas, com classificação final, campanha e pontuação acumulada.';
         elements.lastUpdate.textContent = 'Carregando dados validados...';
-        elements.championsView.hidden = true;
-        elements.rankingView.hidden = false;
+        showOnlyView('ranking');
 
         try {
             const [registry, localSnapshot] = await Promise.all([
@@ -620,6 +916,16 @@
             if (currentRequest === state.requestToken) showLoading(false);
         }
     }
+
+    elements.historySeriesFilter.addEventListener('change', event => {
+        state.historyFilter = event.target.value;
+        renderHistoricalRanking();
+    });
+    elements.historySort.addEventListener('change', event => {
+        state.historySort = event.target.value;
+        renderHistoricalRanking();
+    });
+    elements.profileBack.addEventListener('click', () => showHistoricalRanking(state.historyButton));
 
     elements.mobileMenuButton.addEventListener('click', toggleMobileMenu);
     elements.menuBackdrop.addEventListener('click', closeMobileMenu);

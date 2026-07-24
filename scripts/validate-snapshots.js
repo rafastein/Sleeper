@@ -38,11 +38,45 @@ function validateRegistry() {
     return errors;
 }
 
+
+
+function validateManifest(snapshotRoot, files) {
+    const manifestPath = path.join(snapshotRoot, 'manifest.json');
+    const errors = [];
+    if (!fs.existsSync(manifestPath)) return ['data/snapshots/manifest.json ausente'];
+
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    if (manifest.schemaVersion !== 1 || !Array.isArray(manifest.snapshots)) {
+        return ['data/snapshots/manifest.json possui formato inválido'];
+    }
+
+    const keys = new Set();
+    for (const entry of manifest.snapshots) {
+        const key = `${Number(entry.year)}:${entry.seriesKey}`;
+        if (keys.has(key)) errors.push(`manifest com recorte repetido: ${key}`);
+        keys.add(key);
+
+        const expectedPath = path.join(snapshotRoot, String(entry.year), `${entry.seriesKey}.json`);
+        if (!fs.existsSync(expectedPath)) errors.push(`manifest aponta para arquivo ausente: ${path.relative(ROOT, expectedPath)}`);
+    }
+
+    for (const file of files) {
+        const payload = JSON.parse(fs.readFileSync(file, 'utf8'));
+        const key = `${Number(payload.year)}:${payload.seriesKey}`;
+        if (!keys.has(key)) errors.push(`snapshot não listado no manifest: ${path.relative(ROOT, file)}`);
+    }
+
+    return errors;
+}
+
 function main() {
     const snapshotRoot = path.join(ROOT, config.data.snapshotsBasePath);
     const files = collectJsonFiles(snapshotRoot)
         .filter(file => path.basename(file) !== 'manifest.json');
-    const errors = validateRegistry();
+    const errors = [
+        ...validateRegistry(),
+        ...validateManifest(snapshotRoot, files)
+    ];
     let leaguesValidated = 0;
 
     for (const file of files) {

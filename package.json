@@ -1,6 +1,6 @@
 {
   "name": "ambo-sleeper",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "description": "Central histórica das ligas AMBO com dados do Sleeper.",
   "scripts": {
@@ -8,7 +8,8 @@
     "validate:data": "node scripts/validate-snapshots.js",
     "check": "npm test && npm run validate:data",
     "sync": "node scripts/sync-data.js",
-    "sync:2025": "node scripts/sync-data.js --year 2025"
+    "sync:2025": "node scripts/sync-data.js --year 2025",
+    "sync:history": "node scripts/sync-data.js"
   },
   "engines": {
     "node": ">=18"

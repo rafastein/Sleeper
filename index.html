@@ -80,6 +80,107 @@
                 </article>
             </section>
 
+            <section id="history-view" class="view" aria-labelledby="page-title" hidden>
+                <div id="history-stats" class="stats-grid stats-grid--four"></div>
+
+                <article class="panel panel--featured">
+                    <div class="panel__header panel__header--wrap">
+                        <div>
+                            <p class="panel__eyebrow">Desempenho acumulado</p>
+                            <h2>Ranking de todos os tempos</h2>
+                        </div>
+                        <span id="history-status" class="pill"></span>
+                    </div>
+
+                    <div class="history-toolbar" aria-label="Filtros do ranking histórico">
+                        <label class="field-label" for="history-series-filter">
+                            Série
+                            <select id="history-series-filter">
+                                <option value="all">Série A + Série B</option>
+                                <option value="serieA">Somente Série A</option>
+                                <option value="serieB">Somente Série B</option>
+                            </select>
+                        </label>
+                        <label class="field-label" for="history-sort">
+                            Ordenar por
+                            <select id="history-sort">
+                                <option value="points">Pontos históricos</option>
+                                <option value="titles">Títulos</option>
+                                <option value="podiums">Pódios</option>
+                                <option value="average">Melhor média</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div id="history-empty" class="empty-state" hidden>
+                        <strong>Nenhum snapshot histórico disponível</strong>
+                        <span>Execute a sincronização de todas as temporadas para gerar o ranking.</span>
+                    </div>
+
+                    <div id="history-table-wrap" class="table-scroll">
+                        <table id="history-table" class="history-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="col-rank">Pos.</th>
+                                    <th scope="col" class="col-avatar"><span class="sr-only">Avatar</span></th>
+                                    <th scope="col">Manager</th>
+                                    <th scope="col">Pontos</th>
+                                    <th scope="col">Títulos</th>
+                                    <th scope="col">Pódios</th>
+                                    <th scope="col">Participações</th>
+                                    <th scope="col">Melhor</th>
+                                    <th scope="col">Média</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <p class="panel-note">Títulos e pódios são calculados pelo ranking combinado anual de cada série. Snapshots provisórios não entram nas estatísticas históricas.</p>
+                </article>
+            </section>
+
+            <section id="profile-view" class="view" aria-labelledby="page-title" hidden>
+                <button id="profile-back" class="back-button" type="button">← Voltar ao ranking histórico</button>
+
+                <article class="profile-summary panel panel--featured">
+                    <div id="profile-avatar" class="profile-summary__avatar"></div>
+                    <div>
+                        <p class="panel__eyebrow">Perfil histórico</p>
+                        <h2 id="profile-name">Manager</h2>
+                        <p id="profile-meta" class="profile-summary__meta"></p>
+                    </div>
+                    <div id="profile-badges" class="profile-badges"></div>
+                </article>
+
+                <div id="profile-stats" class="stats-grid stats-grid--six"></div>
+
+                <article class="panel panel--featured">
+                    <div class="panel__header">
+                        <div>
+                            <p class="panel__eyebrow">Temporada por temporada</p>
+                            <h2>Trajetória anual</h2>
+                        </div>
+                        <span id="profile-scope" class="pill"></span>
+                    </div>
+                    <div class="table-scroll">
+                        <table id="profile-history-table" class="profile-history-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Ano</th>
+                                    <th scope="col">Série</th>
+                                    <th scope="col">Pos.</th>
+                                    <th scope="col">Pontos</th>
+                                    <th scope="col">Melhor liga</th>
+                                    <th scope="col">FPTS</th>
+                                    <th scope="col">Ligas</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
             <section id="ranking-view" class="view" aria-labelledby="page-title" hidden>
                 <div id="season-stats" class="stats-grid"></div>
 

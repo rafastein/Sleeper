@@ -1,73 +1,49 @@
 # AMBO • Central Sleeper
 
-Painel estático para consultar o histórico de campeões e os rankings das ligas AMBO usando a API pública do Sleeper.
+Painel estático para consultar campeões, rankings anuais e o desempenho histórico das ligas AMBO.
 
 ## Estrutura
 
 - `index.html`: interface;
 - `styles.css`: identidade visual e responsividade;
 - `config.js`: anos, ligas, séries e campeões;
-- `ambo-core.js`: regras puras de classificação, validação e identidade;
-- `script.js`: carregamento dos dados e renderização;
+- `ambo-core.js`: classificação, identidade, histórico e validações;
+- `script.js`: carregamento e renderização;
 - `data/`: cadastro canônico, `user_id`s persistentes e snapshots;
-- `scripts/`: sincronização e validação dos dados;
+- `scripts/`: sincronização e validação;
 - `test/`: testes automáticos;
-- `.github/workflows/`: validação contínua e atualização automática dos snapshots.
+- `.github/workflows/`: controles de qualidade e atualização dos snapshots.
 
 ## Como executar
 
-Use um servidor local em vez de abrir o HTML diretamente:
+Use um servidor local:
 
 ```bash
 python -m http.server 8000
 ```
 
-Depois acesse `http://localhost:8000`.
+Depois acesse `http://localhost:8000`. A extensão **Live Server** do VS Code também funciona.
 
-Também é possível usar a extensão **Live Server** do VS Code.
-
-## Etapa 1: camada de confiabilidade
-
-### 1. Testes automáticos
-
-O projeto usa o test runner nativo do Node.js, sem dependências externas.
-
-```bash
-npm test
-```
-
-Os testes verificam, entre outros pontos:
-
-- posições únicas e contínuas;
-- distribuição de 12 a 1 ponto em ligas de 12 participantes;
-- total obrigatório de 78 pontos por liga;
-- deslocamento correto do losers bracket;
-- fallback para temporada incompleta;
-- FPTS com casas decimais;
-- consolidação de contas antigas e novas do mesmo manager.
-
-Para executar todos os controles:
+## Verificação técnica
 
 ```bash
 npm run check
 ```
 
-### 2. Snapshots das temporadas encerradas
+Esse comando executa os testes e valida os snapshots locais.
 
-O site procura primeiro um arquivo local validado:
+## Etapa 1 — confiabilidade
 
-```text
-data/snapshots/2025/serieA.json
-data/snapshots/2025/serieB.json
-```
+O projeto possui:
 
-Se o snapshot ainda não existir, o site consulta a API do Sleeper normalmente.
-
-Para gerar todos os snapshots configurados:
-
-```bash
-npm run sync
-```
+- posições únicas e contínuas;
+- distribuição dinâmica de pontos;
+- total obrigatório de 78 pontos em ligas com 12 participantes;
+- correção do deslocamento do losers bracket;
+- snapshots locais validados;
+- cadastro canônico dos managers;
+- persistência de `user_id`;
+- sincronização automática pelo GitHub Actions.
 
 Para gerar somente 2025:
 
@@ -75,36 +51,81 @@ Para gerar somente 2025:
 npm run sync:2025
 ```
 
-Ou uma única série:
+Para gerar todo o histórico configurado:
+
+```bash
+npm run sync:history
+```
+
+Também é possível selecionar o recorte:
 
 ```bash
 npm run sync -- --year 2025 --series serieA
 ```
 
-O sincronizador interrompe o processo quando encontra:
+## Etapa 2 — central histórica
 
-- posição repetida;
-- roster duplicado;
-- sequência diferente de 1 até o total de participantes;
-- pontuação incompatível com a posição;
-- soma total incorreta;
-- classificação provisória em uma temporada encerrada.
+### Ranking de todos os tempos
 
-### 3. Atualização pelo GitHub Actions
+O menu **Ranking histórico** consolida todos os snapshots oficiais disponíveis. É possível filtrar por:
 
-Após enviar os arquivos ao GitHub:
+- Séries A e B combinadas;
+- somente Série A;
+- somente Série B.
 
-1. abra a aba **Actions**;
+A tabela pode ser ordenada por:
+
+- pontos históricos;
+- títulos;
+- pódios;
+- melhor média de colocação.
+
+### Regra das estatísticas históricas
+
+Cada snapshot de ano e série gera um ranking combinado das duas ligas daquele recorte.
+
+- **Pontos históricos:** soma dos pontos combinados em todos os recortes;
+- **Título:** 1º lugar no ranking combinado anual da série;
+- **Pódio:** posição entre 1º e 3º no ranking combinado anual;
+- **Participação:** presença em um recorte de ano + série;
+- **Melhor resultado:** menor colocação final alcançada;
+- **Média:** média das colocações finais;
+- **FPTS acumulado:** soma dos FPTS das ligas disputadas.
+
+Snapshots marcados como provisórios não entram no ranking histórico oficial.
+
+### Perfis individuais
+
+Clique no nome de qualquer manager no ranking histórico para abrir o perfil. O perfil apresenta:
+
+- pontos, títulos e pódios;
+- melhor resultado e média;
+- FPTS acumulado;
+- trajetória por ano e série.
+
+O ano de cada linha é clicável e abre diretamente a classificação correspondente.
+
+### Cobertura do histórico
+
+A interface lê `data/snapshots/manifest.json` e carrega apenas os arquivos realmente disponíveis. Para preencher 2020–2025, execute a Action **Atualizar snapshots** com o campo de ano vazio ou rode:
+
+```bash
+npm run sync:history
+```
+
+## Atualização pelo GitHub Actions
+
+1. abra **Actions** no GitHub;
 2. selecione **Atualizar snapshots**;
 3. clique em **Run workflow**;
-4. informe `2025` para atualizar somente esse ano ou deixe vazio para todos;
-5. aguarde o commit automático dos arquivos em `data/`.
+4. deixe o ano vazio para sincronizar todas as temporadas;
+5. aguarde o commit automático em `data/`.
 
-O novo commit dispara uma nova publicação no Vercel.
+O push criado pela Action dispara a nova publicação no Vercel quando o projeto está conectado à branch `main`.
 
-### 4. Cadastro canônico dos managers
+## Cadastro canônico dos managers
 
-O arquivo `data/managers.json` representa cada pessoa por um `canonicalId` estável.
+O arquivo `data/managers.json` representa cada pessoa por um `canonicalId` estável:
 
 ```json
 {
@@ -115,23 +136,13 @@ O arquivo `data/managers.json` representa cada pessoa por um `canonicalId` está
 }
 ```
 
-O comando de sincronização adiciona automaticamente os `user_id`s e aliases encontrados. Quando duas contas pertencem à mesma pessoa, mova os dois IDs para o mesmo registro canônico e apague o registro duplicado.
-
-### 5. `user_id` persistente
-
-As contas usadas para descobrir ligas renovadas ficam em:
-
-```text
-data/discovery-users.json
-```
-
-Na primeira sincronização, o script resolve `Jptavares` e `rafastein` pelo username e salva seus IDs permanentes. Nas próximas execuções, a busca usa diretamente o `user_id`.
+Quando duas contas pertencem à mesma pessoa, mantenha os IDs no mesmo registro canônico.
 
 ## Como adicionar uma temporada
 
 Edite `config.js`.
 
-### IDs informados diretamente
+### IDs diretos
 
 ```js
 2026: {
@@ -140,7 +151,7 @@ Edite `config.js`.
 }
 ```
 
-### Descoberta automática de ligas renovadas
+### Descoberta de ligas renovadas
 
 ```js
 2026: {
@@ -153,19 +164,15 @@ Edite `config.js`.
 }
 ```
 
-Inclua o novo ano em `data.snapshotYears` quando a temporada terminar e rode a sincronização.
+Inclua o ano em `data.snapshotYears` quando quiser armazenar snapshots dele.
 
-## Regra do ranking
+## Regra da classificação anual
 
-A classificação final usa o campo `p` dos brackets do Sleeper. Em cada jogo de colocação, o vencedor recebe a posição `p` e o perdedor recebe `p + 1`.
+A classificação usa o campo `p` dos brackets. O vencedor recebe a posição `p` e o perdedor recebe `p + 1`.
 
-No losers bracket, quando a numeração reinicia em 1, o sistema soma a quantidade de times dos playoffs para transformar as posições em 7º a 12º.
-
-Quando o bracket está incompleto, as posições restantes são preenchidas provisoriamente pela temporada regular, usando:
+Quando o losers bracket reinicia em 1, o sistema soma a quantidade de times dos playoffs para produzir as posições seguintes. Se o bracket estiver incompleto, as vagas restantes são preenchidas provisoriamente por:
 
 1. vitórias;
 2. empates;
 3. FPTS;
 4. menor FPTS sofrido.
-
-Em uma liga com `N` participantes, o 1º recebe `N` pontos, o 2º recebe `N - 1` e assim por diante.
