@@ -8,7 +8,8 @@
 
     const state = {
         activeButton: null,
-        requestToken: 0
+        requestToken: 0,
+        resolvedLeagueIds: new Map()
     };
 
     const elements = {
@@ -275,6 +276,74 @@
         }
     }
 
+    async function resolveLeagueIds(year, seriesKey) {
+        const seasonConfig = config.leagueIds[year]?.[seriesKey];
+
+        if (Array.isArray(seasonConfig)) {
+            return seasonConfig.map(String);
+        }
+
+        if (!seasonConfig || typeof seasonConfig !== 'object') {
+            throw new Error('não há configuração de liga para esta temporada');
+        }
+
+        const username = String(seasonConfig.username || '').trim();
+        const previousLeagueIds = Array.isArray(seasonConfig.previousLeagueIds)
+            ? seasonConfig.previousLeagueIds.map(String)
+            : [];
+        const expectedLeagues = Number(seasonConfig.expectedLeagues || previousLeagueIds.length || 2);
+
+        if (!username || !previousLeagueIds.length) {
+            throw new Error('a descoberta automática está incompleta no config.js');
+        }
+
+        const cacheKey = `${year}:${seriesKey}`;
+        if (state.resolvedLeagueIds.has(cacheKey)) {
+            return state.resolvedLeagueIds.get(cacheKey);
+        }
+
+        const discoveryRequest = (async () => {
+            const user = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(username)}`);
+            if (!user?.user_id) {
+                throw new Error(`usuário ${username} não encontrado no Sleeper`);
+            }
+
+            const leagues = await fetchJson(
+                `${API_BASE_URL}/user/${encodeURIComponent(user.user_id)}/leagues/nfl/${year}`
+            );
+
+            if (!Array.isArray(leagues)) {
+                throw new Error(`a API não retornou as ligas de ${username} em ${year}`);
+            }
+
+            const previousIds = new Set(previousLeagueIds);
+            const matchedLeagueIds = [...new Set(
+                leagues
+                    .filter(league => previousIds.has(String(league?.previous_league_id || '')))
+                    .sort((a, b) => String(a?.name || '').localeCompare(String(b?.name || ''), 'pt-BR'))
+                    .map(league => String(league?.league_id || ''))
+                    .filter(Boolean)
+            )];
+
+            if (matchedLeagueIds.length !== expectedLeagues) {
+                throw new Error(
+                    `foram encontradas ${matchedLeagueIds.length} de ${expectedLeagues} ligas renovadas para ${username} em ${year}`
+                );
+            }
+
+            return matchedLeagueIds;
+        })();
+
+        state.resolvedLeagueIds.set(cacheKey, discoveryRequest);
+
+        try {
+            return await discoveryRequest;
+        } catch (error) {
+            state.resolvedLeagueIds.delete(cacheKey);
+            throw error;
+        }
+    }
+
     async function fetchOptionalBracket(leagueId, bracketName) {
         try {
             return await fetchJson(`${API_BASE_URL}/league/${leagueId}/${bracketName}`);
@@ -491,9 +560,9 @@
     }
 
     async function loadSeason(year, seriesKey, button) {
-        const leagueIds = config.leagueIds[year]?.[seriesKey];
-        if (!Array.isArray(leagueIds) || !leagueIds.length) {
-            showError('Não há IDs de liga cadastrados para esta temporada.');
+        const seasonConfig = config.leagueIds[year]?.[seriesKey];
+        if (!seasonConfig) {
+            showError('Não há configuração de liga cadastrada para esta temporada.');
             return;
         }
 
@@ -513,6 +582,9 @@
         elements.rankingView.hidden = false;
 
         try {
+            const leagueIds = await resolveLeagueIds(year, seriesKey);
+            if (currentRequest !== state.requestToken) return;
+
             const snapshots = (await Promise.all(
                 leagueIds.map((leagueId, index) => fetchLeagueSnapshot(leagueId, index))
             )).sort((a, b) => a.index - b.index);
@@ -540,7 +612,7 @@
             elements.seasonStats.replaceChildren();
             elements.rankingStatus.textContent = 'Falha ao carregar';
             elements.lastUpdate.textContent = 'Dados indisponíveis';
-            showError(`Não foi possível carregar as ligas: ${error.message}. Confira a conexão e os IDs cadastrados.`);
+            showError(`Não foi possível carregar as ligas: ${error.message}. Confira a conexão e a configuração da temporada.`);
         } finally {
             if (currentRequest === state.requestToken) showLoading(false);
         }

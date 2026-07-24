@@ -21,14 +21,35 @@ Depois acesse `http://localhost:8000`.
 
 ## Como adicionar uma temporada
 
-Edite apenas `config.js`:
+Edite apenas `config.js`. Há duas formas.
+
+### IDs informados diretamente
 
 ```js
-2025: {
+2026: {
     serieA: ['ID_DA_LIGA_1', 'ID_DA_LIGA_2'],
     serieB: ['ID_DA_LIGA_1', 'ID_DA_LIGA_2']
 }
 ```
+
+### Descoberta automática de ligas renovadas
+
+```js
+2026: {
+    serieA: {
+        username: 'USUARIO_DA_SERIE_A',
+        previousLeagueIds: ['ID_A_1_DE_2025', 'ID_A_2_DE_2025'],
+        expectedLeagues: 2
+    },
+    serieB: {
+        username: 'USUARIO_DA_SERIE_B',
+        previousLeagueIds: ['ID_B_1_DE_2025', 'ID_B_2_DE_2025'],
+        expectedLeagues: 2
+    }
+}
+```
+
+O painel consulta as ligas do usuário no ano indicado e cruza o campo `previous_league_id` com os IDs da temporada anterior. Em 2025, a Série A usa `Jptavares` e a Série B usa `rafastein` para localizar automaticamente as duas ligas de cada série.
 
 Inclua também os campeões no array `champions` quando os resultados forem oficiais.
 

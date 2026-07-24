@@ -1,3 +1,11 @@
+## 2026-07-24
+
+- adicionada a temporada 2025 ao menu;
+- descoberta automática das ligas renovadas pela API do Sleeper;
+- Série A localizada a partir do usuário `Jptavares`;
+- Série B localizada a partir do usuário `rafastein`;
+- cache e mensagens de erro para a resolução automática dos IDs.
+
 # Alterações desta versão
 
 ## Lógica

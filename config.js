@@ -1,10 +1,23 @@
 /**
  * Dados editáveis do projeto AMBO.
- * Para cadastrar uma nova temporada, adicione o ano em LEAGUE_IDS.
- * Cada série precisa conter os dois IDs das ligas que formam o ranking combinado.
+ * Para cadastrar uma nova temporada, adicione o ano em leagueIds.
+ * A série pode receber os IDs diretamente ou descobrir as ligas renovadas pela API,
+ * informando um username e os IDs das ligas da temporada anterior.
  */
 window.AMBO_CONFIG = Object.freeze({
     leagueIds: {
+        2025: {
+            serieA: {
+                username: 'Jptavares',
+                previousLeagueIds: ['1051278540760530944', '1051278597819854848'],
+                expectedLeagues: 2
+            },
+            serieB: {
+                username: 'rafastein',
+                previousLeagueIds: ['1126717143111917568', '1126717395566989312'],
+                expectedLeagues: 2
+            }
+        },
         2024: {
             serieA: ['1051278540760530944', '1051278597819854848'],
             serieB: ['1126717143111917568', '1126717395566989312']
