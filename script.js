@@ -341,6 +341,13 @@
         };
     }
 
+    function getSeriesIcon(seriesKey, seriesLabel) {
+        if (seriesKey === 'keeper') return 'K';
+        if (seriesKey === 'serieA') return 'A';
+        if (seriesKey === 'serieB') return 'B';
+        return String(seriesLabel || seriesKey || '?').slice(0, 1).toUpperCase();
+    }
+
     function renderNavigation() {
         const fragment = document.createDocumentFragment();
 
@@ -377,7 +384,7 @@
                 button.dataset.year = String(year);
                 button.dataset.series = seriesKey;
                 button.append(
-                    createElement('span', 'nav-button__icon', seriesLabel.replace('Série ', '')),
+                    createElement('span', 'nav-button__icon', getSeriesIcon(seriesKey, seriesLabel)),
                     createElement('span', '', seriesLabel)
                 );
                 button.addEventListener('click', () => loadSeason(year, seriesKey, button));
@@ -575,9 +582,10 @@
     }
 
     function getHistoryScopeLabel(seriesKey = state.historyFilter) {
+        if (seriesKey === 'keeper') return 'Keeper';
         if (seriesKey === 'serieA') return 'Série A';
         if (seriesKey === 'serieB') return 'Série B';
-        return 'Séries A + B';
+        return 'Keeper + Séries A + B';
     }
 
     async function loadHistoricalData() {
@@ -690,7 +698,6 @@
                 createElement('td', 'points-value', manager.titles),
                 createElement('td', '', manager.secondPlaces),
                 createElement('td', '', manager.thirdPlaces),
-                createElement('td', '', manager.totalPoints),
                 createElement('td', '', manager.participations),
                 createElement('td', '', formatPlacement(manager.bestFinish)),
                 createElement('td', '', Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—')
@@ -708,7 +715,6 @@
                 metrics: [
                     { label: 'Vices', value: manager.secondPlaces },
                     { label: '3º lugares', value: manager.thirdPlaces },
-                    { label: 'Pontos', value: manager.totalPoints },
                     { label: 'Média', value: Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—' }
                 ]
             }));
@@ -862,16 +868,29 @@
         const previousLeagueIds = Array.isArray(seasonConfig.previousLeagueIds)
             ? seasonConfig.previousLeagueIds.map(String)
             : [];
-        const expectedLeagues = Number(seasonConfig.expectedLeagues || previousLeagueIds.length || 2);
+        const nameIncludes = Array.isArray(seasonConfig.nameIncludes)
+            ? seasonConfig.nameIncludes.map(String).filter(Boolean)
+            : [];
+        const expectedLeagues = Number(seasonConfig.expectedLeagues || previousLeagueIds.length || 1);
         const discoveryKey = String(seasonConfig.discoveryKey || core.normalizeAlias(username));
-        if (!previousLeagueIds.length) throw new Error('a descoberta automática está incompleta no config.js');
+        if (!previousLeagueIds.length && !nameIncludes.length) {
+            throw new Error('a descoberta automática está incompleta no config.js');
+        }
 
         const cacheKey = `${year}:${seriesKey}`;
         if (state.resolvedLeagueIds.has(cacheKey)) return state.resolvedLeagueIds.get(cacheKey);
 
         const discoveryRequest = (async () => {
             const persistedUsers = await loadDiscoveryUsers();
-            let userId = String(seasonConfig.userId || persistedUsers[discoveryKey]?.userId || '').trim();
+            const persistedByUsername = Object.values(persistedUsers || {}).find(item =>
+                core.normalizeAlias(item?.username) === core.normalizeAlias(username)
+            );
+            let userId = String(
+                seasonConfig.userId
+                || persistedUsers[discoveryKey]?.userId
+                || persistedByUsername?.userId
+                || ''
+            ).trim();
             if (!userId) {
                 if (!username) throw new Error(`user_id persistente ausente para ${seriesKey}`);
                 const user = await fetchJson(`${DIRECT_API_BASE_URL}/user/${encodeURIComponent(username)}`);
@@ -881,16 +900,12 @@
 
             const leagues = await fetchJson(`${DIRECT_API_BASE_URL}/user/${encodeURIComponent(userId)}/leagues/nfl/${year}`);
             if (!Array.isArray(leagues)) throw new Error(`a API não retornou as ligas do usuário ${userId} em ${year}`);
-            const previousIds = new Set(previousLeagueIds);
-            const matchedLeagueIds = [...new Set(
-                leagues
-                    .filter(league => previousIds.has(String(league?.previous_league_id || '')))
-                    .sort((a, b) => String(a?.name || '').localeCompare(String(b?.name || ''), 'pt-BR'))
-                    .map(league => String(league?.league_id || ''))
-                    .filter(Boolean)
-            )];
+            const matchedLeagueIds = core.filterLeagueIdsForDiscovery(leagues, seasonConfig);
             if (matchedLeagueIds.length !== expectedLeagues) {
-                throw new Error(`foram encontradas ${matchedLeagueIds.length} de ${expectedLeagues} ligas renovadas em ${year}`);
+                const candidates = leagues
+                    .map(league => `${league?.name || 'Sem nome'} (${league?.league_id || '?'})`)
+                    .join(', ');
+                throw new Error(`foram encontradas ${matchedLeagueIds.length} de ${expectedLeagues} ligas em ${year}. Candidatas: ${candidates || 'nenhuma'}`);
             }
             return matchedLeagueIds;
         })();

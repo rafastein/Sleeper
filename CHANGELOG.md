@@ -1,5 +1,24 @@
 # Changelog
 
+## 5.3.1 — Ajuste visual do ranking histórico
+
+- Remove a coluna **Pontos** da tabela do ranking histórico.
+- Remove a métrica de pontos dos cards históricos no celular.
+- Mantém os pontos internamente para cálculos, perfis, exportação e desempates secundários.
+- Atualiza a versão do cache do PWA para aplicar o ajuste imediatamente.
+
+## 5.3.0 — Liga Keeper por temporada
+
+- Keeper adicionada à navegação de 2020 a 2025;
+- snapshots Keeper descobertos pelo `user_id` persistente de `rafastein`;
+- fallback de descoberta pelo username apenas quando o ID ainda não está salvo;
+- filtro Keeper incluído no ranking histórico e nos perfis;
+- títulos oficiais da Keeper passam a integrar o ranking histórico;
+- rotas compartilháveis aceitam `series=keeper`;
+- sincronização manual aceita `--series keeper`;
+- descoberta por nome de liga centralizada e coberta por testes;
+- cache PWA incrementado para a versão 5.3.
+
 ## 5.1.0 — Ranking histórico por títulos
 
 - ranking histórico ordenado por títulos por padrão;
