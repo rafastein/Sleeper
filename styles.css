@@ -1251,3 +1251,25 @@ th:last-child {
         border-top: 1px solid var(--border);
     }
 }
+
+
+/* Etapa 4: PWA, estado de rede e acabamento de produção */
+.status-dot.is-offline {
+    background: #f59e0b;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.75);
+}
+
+.status-dot.is-online {
+    background: var(--primary);
+    box-shadow: 0 0 12px var(--primary);
+}
+
+.action-button[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 640px) {
+    .page-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

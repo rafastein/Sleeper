@@ -54,6 +54,23 @@ const AMBO_CONFIG = Object.freeze({
         snapshotYears: [2020, 2021, 2022, 2023, 2024, 2025]
     },
 
+    api: {
+        directBaseUrl: 'https://api.sleeper.app/v1',
+        proxyEndpoint: '/api/sleeper',
+        preferProxy: true,
+        timeoutMs: 15000
+    },
+
+    pwa: {
+        enabled: true,
+        serviceWorkerPath: '/sw.js'
+    },
+
+    monitoring: {
+        vercelAnalytics: true,
+        speedInsights: true
+    },
+
     champions: [
         { year: 2024, keeper: 'Jptavares', serieA: 'dedebenjor', serieB: 'Jptavares' },
         { year: 2023, keeper: 'GuiZilse', serieA: 'L_Bezerra', serieB: 'Jotaa' },

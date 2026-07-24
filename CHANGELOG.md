@@ -52,3 +52,14 @@
 - identidade visual renovada;
 - menu mobile acessível;
 - configuração central em `config.js`.
+
+
+## 5.0.0 — Etapa 4
+
+- proxy Vercel com cache e fallback;
+- PWA instalável e modo offline;
+- Web Analytics e Speed Insights;
+- sincronização semanal automática;
+- cabeçalhos de segurança e cache;
+- endpoint de saúde;
+- seis testes de infraestrutura.

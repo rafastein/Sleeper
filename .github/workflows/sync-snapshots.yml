@@ -12,15 +12,23 @@ on:
         required: false
         type: string
         default: ""
+  schedule:
+    - cron: "17 9 * * 1"
 
 permissions:
   contents: write
+
+concurrency:
+  group: ambo-snapshot-sync
+  cancel-in-progress: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -29,8 +37,13 @@ jobs:
         shell: bash
         run: |
           ARGS=""
-          if [ -n "${{ inputs.year }}" ]; then ARGS="$ARGS --year ${{ inputs.year }}"; fi
-          if [ -n "${{ inputs.series }}" ]; then ARGS="$ARGS --series ${{ inputs.series }}"; fi
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            LATEST_YEAR=$(node -e "const c=require('./config'); console.log(Math.max(...Object.keys(c.leagueIds).map(Number)))")
+            ARGS="--year $LATEST_YEAR --allow-fallback"
+          else
+            if [ -n "${{ inputs.year }}" ]; then ARGS="$ARGS --year ${{ inputs.year }}"; fi
+            if [ -n "${{ inputs.series }}" ]; then ARGS="$ARGS --series ${{ inputs.series }}"; fi
+          fi
           echo "value=$ARGS" >> "$GITHUB_OUTPUT"
       - name: Baixar e validar dados do Sleeper
         run: node scripts/sync-data.js ${{ steps.args.outputs.value }}
@@ -38,7 +51,7 @@ jobs:
       - name: Commitar snapshots atualizados
         shell: bash
         run: |
-          if git diff --quiet; then
+          if [ -z "$(git status --porcelain)" ]; then
             echo "Nenhuma alteração encontrada."
             exit 0
           fi
@@ -46,4 +59,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/
           git commit -m "Atualiza snapshots do Sleeper"
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main

@@ -1,45 +1,32 @@
-# Atualização segura para a Etapa 3
+# Atualização segura para a Etapa 4
 
-## Antes de copiar os arquivos
+Este pacote não contém a pasta `data/`, portanto preserva snapshots e `user_id`s.
 
-No terminal do VS Code, dentro do repositório:
+## Instalação
 
 ```bash
 git pull
 ```
 
-Isso baixa eventuais commits criados pela Action de snapshots.
-
-## Pacote de atualização segura
-
-O ZIP de atualização não contém a pasta `data/`. Portanto, ele preserva:
-
-- `data/managers.json`;
-- `data/discovery-users.json`;
-- `data/snapshots/manifest.json`;
-- todos os snapshots já gerados.
-
-Copie os arquivos para a raiz do projeto e permita a substituição dos arquivos com o mesmo nome. Depois execute:
+Copie os arquivos deste ZIP para a raiz do repositório, permitindo substituir os existentes. Depois:
 
 ```bash
 npm run check
 git add .
-git commit -m "Adiciona URLs compartilháveis, filtros e exportação"
+git commit -m "Adiciona infraestrutura, cache e PWA"
 git push
 ```
 
-A Vercel publicará a nova versão automaticamente após o push na branch `main`.
+A Vercel fará o novo deployment automaticamente.
 
-## Conferência rápida
+## Depois do deploy
 
-Depois do deploy:
+1. Abra **Vercel → projeto Sleeper → Analytics** e habilite Web Analytics.
+2. Abra **Speed Insights** e habilite o recurso.
+3. Teste `/api/health`.
+4. Abra o site no celular e confira a opção **Instalar app** quando o navegador disponibilizá-la.
+5. Em GitHub → Actions, confira se `Atualizar snapshots` exibe também a agenda semanal.
 
-1. abra uma temporada e copie o link;
-2. cole o link em uma nova aba e confirme que a mesma temporada abre;
-3. teste a busca e a ordenação;
-4. exporte um CSV;
-5. confira os cards em uma tela de celular.
+## Observação
 
-## Pacote completo
-
-Use o ZIP completo somente para reinstalar toda a estrutura. Se já houver snapshots reais, faça backup da pasta `data/` antes de substituir o projeto completo.
+No Live Server, o site usa a API pública diretamente. No deployment da Vercel, tenta primeiro o proxy com cache e recorre à API direta se o proxy estiver indisponível.

@@ -1,12 +1,13 @@
 (() => {
     'use strict';
 
-    const API_BASE_URL = 'https://api.sleeper.app/v1';
-    const AVATAR_BASE_URL = 'https://sleepercdn.com/avatars/thumbs';
-    const REQUEST_TIMEOUT_MS = 15000;
-    const SEARCH_DEBOUNCE_MS = 180;
     const config = window.AMBO_CONFIG;
     const core = window.AMBO_CORE;
+    const DIRECT_API_BASE_URL = config?.api?.directBaseUrl || 'https://api.sleeper.app/v1';
+    const PROXY_ENDPOINT = config?.api?.proxyEndpoint || '/api/sleeper';
+    const AVATAR_BASE_URL = 'https://sleepercdn.com/avatars/thumbs';
+    const REQUEST_TIMEOUT_MS = Number(config?.api?.timeoutMs || 15000);
+    const SEARCH_DEBOUNCE_MS = 180;
 
     if (!config || !core) {
         throw new Error('Configuração ou núcleo de cálculo não carregado.');
@@ -39,7 +40,9 @@
         currentView: 'champions',
         feedbackTimer: null,
         historySearchTimer: null,
-        seasonSearchTimer: null
+        seasonSearchTimer: null,
+        deferredInstallPrompt: null,
+        serviceWorkerRegistration: null
     };
 
     const elements = {
@@ -58,6 +61,9 @@
         copyLink: document.getElementById('copy-link'),
         sharePage: document.getElementById('share-page'),
         exportCsv: document.getElementById('export-csv'),
+        installApp: document.getElementById('install-app'),
+        networkStatus: document.getElementById('network-status'),
+        networkDot: document.getElementById('network-dot'),
         championStats: document.getElementById('champion-stats'),
         championsBody: document.querySelector('#champions-table tbody'),
         championsRange: document.getElementById('champions-range'),
@@ -458,20 +464,62 @@
         if (options.updateUrl !== false) writeRoute({ view: 'champions' }, options.replace ? 'replace' : 'push');
     }
 
-    async function fetchJson(url) {
+    function isLocalDevelopment() {
+        return window.location.protocol === 'file:'
+            || ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+    }
+
+    function getSleeperPath(url) {
+        if (!String(url).startsWith(DIRECT_API_BASE_URL)) return null;
+        const path = String(url).slice(DIRECT_API_BASE_URL.length);
+        return path.startsWith('/') ? path : `/${path}`;
+    }
+
+    function getFetchCandidates(url) {
+        const sleeperPath = getSleeperPath(url);
+        const useProxy = Boolean(config.api?.preferProxy !== false && sleeperPath && !isLocalDevelopment());
+        if (!useProxy) return [url];
+        return [`${PROXY_ENDPOINT}?path=${encodeURIComponent(sleeperPath)}`, url];
+    }
+
+    async function fetchWithTimeout(url) {
         const controller = new AbortController();
         const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
         try {
-            const response = await fetch(url, { signal: controller.signal });
-            if (!response.ok) throw new Error(`requisição retornou ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            if (error.name === 'AbortError') throw new Error('tempo de resposta excedido');
-            throw error;
+            return await fetch(url, {
+                signal: controller.signal,
+                headers: { accept: 'application/json' }
+            });
         } finally {
             window.clearTimeout(timeoutId);
         }
+    }
+
+    async function fetchJson(url) {
+        const candidates = getFetchCandidates(url);
+        let lastError = null;
+
+        for (let index = 0; index < candidates.length; index += 1) {
+            const candidate = candidates[index];
+            try {
+                const response = await fetchWithTimeout(candidate);
+                if (!response.ok) {
+                    const error = new Error(`requisição retornou ${response.status}`);
+                    error.status = response.status;
+                    throw error;
+                }
+                return await response.json();
+            } catch (error) {
+                lastError = error?.name === 'AbortError'
+                    ? new Error('tempo de resposta excedido')
+                    : error;
+                const hasFallback = index < candidates.length - 1;
+                if (!hasFallback) break;
+                console.warn('Proxy indisponível; tentando a API do Sleeper diretamente.', lastError);
+            }
+        }
+
+        throw lastError || new Error('não foi possível consultar o Sleeper');
     }
 
     async function fetchOptionalJson(url) {
@@ -809,12 +857,12 @@
             let userId = String(seasonConfig.userId || persistedUsers[discoveryKey]?.userId || '').trim();
             if (!userId) {
                 if (!username) throw new Error(`user_id persistente ausente para ${seriesKey}`);
-                const user = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(username)}`);
+                const user = await fetchJson(`${DIRECT_API_BASE_URL}/user/${encodeURIComponent(username)}`);
                 userId = String(user?.user_id || '');
                 if (!userId) throw new Error(`usuário ${username} não encontrado no Sleeper`);
             }
 
-            const leagues = await fetchJson(`${API_BASE_URL}/user/${encodeURIComponent(userId)}/leagues/nfl/${year}`);
+            const leagues = await fetchJson(`${DIRECT_API_BASE_URL}/user/${encodeURIComponent(userId)}/leagues/nfl/${year}`);
             if (!Array.isArray(leagues)) throw new Error(`a API não retornou as ligas do usuário ${userId} em ${year}`);
             const previousIds = new Set(previousLeagueIds);
             const matchedLeagueIds = [...new Set(
@@ -841,7 +889,7 @@
 
     async function fetchOptionalBracket(leagueId, bracketName) {
         try {
-            return await fetchJson(`${API_BASE_URL}/league/${leagueId}/${bracketName}`);
+            return await fetchJson(`${DIRECT_API_BASE_URL}/league/${leagueId}/${bracketName}`);
         } catch (error) {
             console.warn(`Não foi possível carregar ${bracketName} da liga ${leagueId}:`, error);
             return [];
@@ -850,9 +898,9 @@
 
     async function fetchLeagueSnapshot(leagueId, index) {
         const [league, rosters, users, winnersBracket, losersBracket] = await Promise.all([
-            fetchJson(`${API_BASE_URL}/league/${leagueId}`),
-            fetchJson(`${API_BASE_URL}/league/${leagueId}/rosters`),
-            fetchJson(`${API_BASE_URL}/league/${leagueId}/users`),
+            fetchJson(`${DIRECT_API_BASE_URL}/league/${leagueId}`),
+            fetchJson(`${DIRECT_API_BASE_URL}/league/${leagueId}/rosters`),
+            fetchJson(`${DIRECT_API_BASE_URL}/league/${leagueId}/users`),
             fetchOptionalBracket(leagueId, 'winners_bracket'),
             fetchOptionalBracket(leagueId, 'losers_bracket')
         ]);
@@ -1275,6 +1323,70 @@
         }
     }
 
+    function updateNetworkStatus() {
+        const online = navigator.onLine;
+        if (elements.networkStatus) {
+            elements.networkStatus.textContent = online
+                ? (isLocalDevelopment() ? 'API direta em modo local' : 'Dados com cache Vercel')
+                : 'Modo offline · snapshots em cache';
+        }
+        if (elements.networkDot) {
+            elements.networkDot.classList.toggle('is-online', online);
+            elements.networkDot.classList.toggle('is-offline', !online);
+        }
+    }
+
+    async function installPwa() {
+        const promptEvent = state.deferredInstallPrompt;
+        if (!promptEvent) return;
+        promptEvent.prompt();
+        await promptEvent.userChoice;
+        state.deferredInstallPrompt = null;
+        elements.installApp.hidden = true;
+    }
+
+    async function registerServiceWorker() {
+        if (config.pwa?.enabled === false || !('serviceWorker' in navigator)) return;
+        if (!['http:', 'https:'].includes(window.location.protocol)) return;
+
+        try {
+            const registration = await navigator.serviceWorker.register(
+                config.pwa?.serviceWorkerPath || '/sw.js',
+                { scope: '/' }
+            );
+            state.serviceWorkerRegistration = registration;
+
+            registration.addEventListener('updatefound', () => {
+                const worker = registration.installing;
+                if (!worker) return;
+                worker.addEventListener('statechange', () => {
+                    if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                        showFeedback('Nova versão disponível. Atualize a página para aplicar.');
+                    }
+                });
+            });
+        } catch (error) {
+            console.warn('Não foi possível registrar o modo instalável:', error);
+        }
+    }
+
+    function initializeProductionFeatures() {
+        updateNetworkStatus();
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+        window.addEventListener('beforeinstallprompt', event => {
+            event.preventDefault();
+            state.deferredInstallPrompt = event;
+            elements.installApp.hidden = false;
+        });
+        window.addEventListener('appinstalled', () => {
+            state.deferredInstallPrompt = null;
+            elements.installApp.hidden = true;
+            showFeedback('AMBO instalada neste dispositivo.');
+        });
+        registerServiceWorker();
+    }
+
     elements.historySeriesFilter.addEventListener('change', event => {
         state.historyFilter = event.target.value;
         renderHistoricalRanking();
@@ -1310,6 +1422,7 @@
     elements.copyLink.addEventListener('click', copyCurrentLink);
     elements.sharePage.addEventListener('click', shareCurrentPage);
     elements.exportCsv.addEventListener('click', downloadCsv);
+    elements.installApp.addEventListener('click', installPwa);
     elements.mobileMenuButton.addEventListener('click', toggleMobileMenu);
     elements.menuBackdrop.addEventListener('click', closeMobileMenu);
 
@@ -1330,6 +1443,7 @@
         if (window.innerWidth > 820) closeMobileMenu();
     });
 
+    initializeProductionFeatures();
     renderNavigation();
     const initialRoute = core.parseRoute(window.location.search, { years: configuredYears });
     applyRoute(initialRoute, { replace: true }).catch(handleRouteError);

@@ -217,3 +217,36 @@ Quando o losers bracket reinicia em 1, o sistema soma a quantidade de times dos 
 2. empates;
 3. FPTS;
 4. menor FPTS sofrido.
+
+
+## Etapa 4 — infraestrutura e produção
+
+A versão 5 adiciona:
+
+- proxy Vercel em `api/sleeper.js`, com allowlist e cache no CDN;
+- fallback automático para a API pública do Sleeper;
+- PWA instalável com service worker e modo offline para o shell e snapshots;
+- Web Analytics e Speed Insights da Vercel;
+- sincronização semanal automática do ano mais recente;
+- cabeçalhos de segurança e políticas de cache em `vercel.json`;
+- endpoint de saúde em `/api/health`;
+- testes de infraestrutura.
+
+### Ativar os painéis da Vercel
+
+Após o deploy, abra o projeto na Vercel e habilite **Web Analytics** e **Speed Insights**. Os scripts já estão no `index.html`.
+
+### Sincronização automática
+
+A Action `Atualizar snapshots` continua aceitando execução manual e também roda toda segunda-feira às 09:17 UTC. Na execução programada, sincroniza apenas o ano mais recente configurado e permite snapshot provisório. Recortes provisórios continuam fora do ranking histórico oficial.
+
+### Testar
+
+```bash
+npm run check
+```
+
+### Endpoints
+
+- `/api/health`: confirma versão e disponibilidade do deployment;
+- `/api/sleeper?path=/league/ID`: proxy interno com cache.

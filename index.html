@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#07111f">
+    <meta name="application-name" content="AMBO Central Sleeper">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AMBO">
     <meta name="description" content="Histórico de campeões e rankings das ligas AMBO no Sleeper.">
     <meta property="og:title" content="AMBO • Central Sleeper">
     <meta property="og:description" content="Rankings, campeões e histórico das ligas AMBO.">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="/social-card.png">
+    <meta property="og:image:alt" content="AMBO Central Sleeper — rankings e história das ligas">
     <title>AMBO • Central Sleeper</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -39,8 +48,8 @@
             <nav id="navigation" class="navigation"></nav>
 
             <div class="sidebar__footer">
-                <span class="status-dot" aria-hidden="true"></span>
-                Dados via Sleeper API
+                <span id="network-dot" class="status-dot" aria-hidden="true"></span>
+                <span id="network-status">Dados via Sleeper API</span>
             </div>
         </aside>
 
@@ -54,6 +63,7 @@
                 <div class="topbar__meta">
                     <div id="last-update" class="last-update" aria-live="polite"></div>
                     <div class="page-actions" aria-label="Ações da página">
+                        <button id="install-app" class="action-button" type="button" hidden>Instalar app</button>
                         <button id="copy-link" class="action-button" type="button">Copiar link</button>
                         <button id="share-page" class="action-button" type="button">Compartilhar</button>
                         <button id="export-csv" class="action-button action-button--primary" type="button">Exportar CSV</button>
@@ -288,5 +298,7 @@
             <div class="mobile-cards league-mobile-cards" aria-label="Classificação da liga"></div>
         </article>
     </template>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>
