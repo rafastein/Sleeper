@@ -98,7 +98,16 @@ test('Keeper exibe somente a classificação da liga, sem ranking combinado', ()
 test('assets de código usam rede primeiro para evitar JavaScript antigo', () => {
     const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
     const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
-    assert.match(html, /script\.js\?v=5\.3\.3/);
-    assert.match(html, /styles\.css\?v=5\.3\.3/);
+    assert.match(html, /script\.js\?v=5\.3\.4/);
+    assert.match(html, /styles\.css\?v=5\.3\.4/);
     assert.match(sw, /\.\(\?:css\|js\).*networkFirst/s);
+});
+
+
+test('ranking combinado não exibe legenda de participações abaixo do manager', () => {
+    const script = fs.readFileSync(path.join(ROOT, 'script.js'), 'utf8');
+    const renderMatch = script.match(/function renderCombinedStandings\(standings, totalManagers\)[\s\S]*?function getLeagueRows/);
+    assert.ok(renderMatch, 'renderização do ranking combinado não encontrada');
+    assert.doesNotMatch(renderMatch[0], /participa(?:ção|ções).*na rodada/);
+    assert.match(renderMatch[0], /createEntityCell\(standing\.managerName\)/);
 });

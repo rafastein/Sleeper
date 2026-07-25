@@ -202,12 +202,12 @@
         return image;
     }
 
-    function createEntityCell(primary, secondary) {
+    function createEntityCell(primary, secondary = '') {
         const cell = document.createElement('td');
-        cell.append(
-            createElement('span', 'entity-name', primary),
-            createElement('span', 'entity-meta', secondary)
-        );
+        cell.appendChild(createElement('span', 'entity-name', primary));
+        if (secondary) {
+            cell.appendChild(createElement('span', 'entity-meta', secondary));
+        }
         return cell;
     }
 
@@ -970,7 +970,7 @@
             row.append(
                 createRankCell(officialRank),
                 avatarCell,
-                createEntityCell(standing.managerName, `${standing.appearances} participação${standing.appearances === 1 ? '' : 'ões'} na rodada`),
+                createEntityCell(standing.managerName),
                 createElement('td', 'points-value', standing.points),
                 createElement('td', '', formatPlacement(standing.bestRank)),
                 createElement('td', '', formatNumber(standing.fpts)),
