@@ -201,6 +201,11 @@
             errors.push(...result.errors);
         }
 
+        if (snapshot.playoffs !== undefined) {
+            const playoffValidation = validatePlayoffData(snapshot.playoffs);
+            errors.push(...playoffValidation.errors);
+        }
+
         return { valid: errors.length === 0, errors };
     }
 
@@ -620,9 +625,215 @@
         return [header, ...body].join('\r\n');
     }
 
+    function getEffectiveMatchupPoints(matchup) {
+        if (!matchup || typeof matchup !== 'object') return null;
+        const customPoints = matchup.custom_points;
+        if (customPoints !== null && customPoints !== undefined && Number.isFinite(Number(customPoints))) {
+            return Number(customPoints);
+        }
+        return Number.isFinite(Number(matchup.points)) ? Number(matchup.points) : null;
+    }
+
+    function getPlayoffRoundCount(...brackets) {
+        return brackets
+            .flatMap(bracket => Array.isArray(bracket) ? bracket : [])
+            .reduce((maximum, match) => Math.max(maximum, Number(match?.r) || 0), 0);
+    }
+
+    function getPlayoffWeekNumbers(league, ...brackets) {
+        const roundCount = getPlayoffRoundCount(...brackets);
+        if (!roundCount) return [];
+
+        const configuredStart = Number(league?.settings?.playoff_week_start);
+        const playoffWeekStart = Number.isInteger(configuredStart) && configuredStart > 0
+            ? configuredStart
+            : 15;
+
+        return Array.from({ length: roundCount }, (_, index) => playoffWeekStart + index);
+    }
+
+    function getBracketSourceReference(match, slot) {
+        const direct = match?.[slot];
+        if (direct && typeof direct === 'object') return direct;
+        const from = match?.[`${slot}_from`];
+        return from && typeof from === 'object' ? from : null;
+    }
+
+    function resolveBracketRosterId(match, slot, matchById, seen = new Set()) {
+        const direct = Number(match?.[slot]);
+        if (Number.isInteger(direct) && direct > 0) return direct;
+
+        const reference = getBracketSourceReference(match, slot);
+        if (!reference) return null;
+
+        const outcome = Object.prototype.hasOwnProperty.call(reference, 'w') ? 'w'
+            : Object.prototype.hasOwnProperty.call(reference, 'l') ? 'l'
+                : null;
+        if (!outcome) return null;
+
+        const sourceId = Number(reference[outcome]);
+        if (!Number.isInteger(sourceId) || seen.has(sourceId)) return null;
+        const sourceMatch = matchById.get(sourceId);
+        if (!sourceMatch) return null;
+
+        const resolved = Number(sourceMatch?.[outcome]);
+        if (Number.isInteger(resolved) && resolved > 0) return resolved;
+
+        seen.add(sourceId);
+        return null;
+    }
+
+    function groupMatchupsById(rows) {
+        const groups = new Map();
+        (rows || []).forEach(row => {
+            const matchupId = row?.matchup_id;
+            if (matchupId === null || matchupId === undefined) return;
+            const key = String(matchupId);
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(row);
+        });
+        return [...groups.values()];
+    }
+
+    function findScoreRows(rows, rosterId1, rosterId2) {
+        const firstId = Number(rosterId1);
+        const secondId = Number(rosterId2);
+        const groups = groupMatchupsById(rows);
+
+        if (Number.isInteger(firstId) && Number.isInteger(secondId)) {
+            const group = groups.find(items => {
+                const ids = new Set(items.map(item => Number(item?.roster_id)));
+                return ids.has(firstId) && ids.has(secondId);
+            });
+            if (group) return group;
+        }
+
+        if (Number.isInteger(firstId) || Number.isInteger(secondId)) {
+            const target = Number.isInteger(firstId) ? firstId : secondId;
+            const group = groups.find(items => items.some(item => Number(item?.roster_id) === target));
+            if (group) return group;
+        }
+
+        return [];
+    }
+
+    function getRoundLabel(round, totalRounds) {
+        const roundNumber = Number(round);
+        const remaining = Number(totalRounds) - roundNumber;
+        if (remaining === 0) return 'Final';
+        if (remaining === 1) return 'Semifinais';
+        if (remaining === 2) return 'Quartas de final';
+        if (remaining === 3) return 'Oitavas de final';
+        return `Rodada ${roundNumber}`;
+    }
+
+    function getPlacementLabel(placement) {
+        const value = Number(placement);
+        if (!Number.isInteger(value) || value < 1) return '';
+        if (value === 1) return 'Disputa do título';
+        if (value === 3) return 'Disputa do 3º lugar';
+        return `Disputa do ${value}º lugar`;
+    }
+
+    function buildPlayoffRounds(bracket, league, matchupsByWeek = {}) {
+        const matches = Array.isArray(bracket) ? bracket : [];
+        const matchById = new Map(matches.map(match => [Number(match?.m), match]));
+        const totalRounds = getPlayoffRoundCount(matches);
+        const weekNumbers = getPlayoffWeekNumbers(league, matches);
+        const rounds = [];
+
+        for (let roundNumber = 1; roundNumber <= totalRounds; roundNumber += 1) {
+            const week = weekNumbers[roundNumber - 1] || null;
+            const weekRows = matchupsByWeek?.[week] || matchupsByWeek?.[String(week)] || [];
+            const roundMatches = matches
+                .filter(match => Number(match?.r) === roundNumber)
+                .sort((a, b) => Number(a?.m || 0) - Number(b?.m || 0))
+                .map(match => {
+                    const team1RosterId = resolveBracketRosterId(match, 't1', matchById);
+                    const team2RosterId = resolveBracketRosterId(match, 't2', matchById);
+                    const scoreRows = findScoreRows(weekRows, team1RosterId, team2RosterId);
+                    const scoreByRoster = new Map(scoreRows.map(row => [
+                        Number(row?.roster_id),
+                        {
+                            points: getEffectiveMatchupPoints(row),
+                            originalPoints: Number.isFinite(Number(row?.points)) ? Number(row.points) : null,
+                            customPoints: row?.custom_points === null || row?.custom_points === undefined
+                                ? null
+                                : Number(row.custom_points)
+                        }
+                    ]));
+                    const winnerRosterId = Number.isInteger(Number(match?.w)) && Number(match.w) > 0
+                        ? Number(match.w)
+                        : null;
+                    const loserRosterId = Number.isInteger(Number(match?.l)) && Number(match.l) > 0
+                        ? Number(match.l)
+                        : null;
+
+                    return {
+                        matchId: Number(match?.m),
+                        round: roundNumber,
+                        week,
+                        placement: Number.isInteger(Number(match?.p)) ? Number(match.p) : null,
+                        placementLabel: getPlacementLabel(match?.p),
+                        team1RosterId,
+                        team2RosterId,
+                        winnerRosterId,
+                        loserRosterId,
+                        team1Score: scoreByRoster.get(team1RosterId)?.points ?? null,
+                        team2Score: scoreByRoster.get(team2RosterId)?.points ?? null,
+                        team1ScoreDetails: scoreByRoster.get(team1RosterId) || null,
+                        team2ScoreDetails: scoreByRoster.get(team2RosterId) || null,
+                        isBye: Boolean((team1RosterId && !team2RosterId) || (!team1RosterId && team2RosterId)),
+                        completed: Boolean(winnerRosterId),
+                        raw: match
+                    };
+                });
+
+            rounds.push({
+                round: roundNumber,
+                label: getRoundLabel(roundNumber, totalRounds),
+                week,
+                matches: roundMatches
+            });
+        }
+
+        const championshipMatch = matches.find(match => Number(match?.p) === 1)
+            || matches.slice().sort((a, b) => Number(b?.r || 0) - Number(a?.r || 0))[0]
+            || null;
+        const championRosterId = Number.isInteger(Number(championshipMatch?.w))
+            ? Number(championshipMatch.w)
+            : null;
+        const matchesWithTeams = rounds.flatMap(round => round.matches)
+            .filter(match => match.team1RosterId || match.team2RosterId);
+
+        return {
+            rounds,
+            totalRounds,
+            championRosterId,
+            completed: matchesWithTeams.length > 0 && matchesWithTeams.every(match => match.completed || match.isBye),
+            matchCount: matchesWithTeams.length
+        };
+    }
+
+    function validatePlayoffData(playoffs) {
+        const errors = [];
+        if (!playoffs || typeof playoffs !== 'object') {
+            return { valid: false, errors: ['dados de playoffs inválidos'] };
+        }
+        if (!playoffs.matchupsByWeek || typeof playoffs.matchupsByWeek !== 'object' || Array.isArray(playoffs.matchupsByWeek)) {
+            errors.push('matchupsByWeek dos playoffs ausente ou inválido');
+        } else {
+            Object.entries(playoffs.matchupsByWeek).forEach(([week, rows]) => {
+                if (!/^\d+$/.test(String(week))) errors.push(`semana de playoffs inválida: ${week}`);
+                if (!Array.isArray(rows)) errors.push(`matchups da semana ${week} não são uma lista`);
+            });
+        }
+        return { valid: errors.length === 0, errors };
+    }
+
     function parseRoute(search, options = {}) {
         const params = new URLSearchParams(String(search || '').replace(/^\?/, ''));
-        const allowedViews = new Set(['champions', 'history', 'profile', 'season']);
+        const allowedViews = new Set(['champions', 'history', 'profile', 'season', 'playoffs']);
         const allowedSeries = new Set(['all', 'keeper', 'serieA', 'serieB']);
         const allowedHistorySorts = new Set(['points', 'titles', 'podiums', 'average']);
         const allowedSeasonSorts = new Set(['points', 'fpts', 'bestRank', 'name']);
@@ -637,12 +848,18 @@
         const historySort = allowedHistorySorts.has(params.get('sort')) ? params.get('sort') : 'titles';
         const seasonSort = allowedSeasonSorts.has(params.get('sort')) ? params.get('sort') : 'points';
 
-        if (view === 'season' && (!year || series === 'all')) {
+        if ((view === 'season' || view === 'playoffs') && (!year || series === 'all')) {
             return { view: 'champions' };
         }
         if (view === 'profile' && !params.get('manager')) {
             return { view: 'history', series, sort: historySort, query: params.get('q') || '' };
         }
+
+        const leagueValue = Number(params.get('league'));
+        const league = Number.isInteger(leagueValue) && leagueValue > 0 ? leagueValue : 1;
+        const bracket = params.get('bracket') === 'losers' ? 'losers' : 'winners';
+        const roundValue = Number(params.get('round'));
+        const round = Number.isInteger(roundValue) && roundValue > 0 ? roundValue : 1;
 
         return {
             view,
@@ -650,7 +867,10 @@
             series,
             sort: view === 'season' ? seasonSort : historySort,
             query: params.get('q') || '',
-            manager: params.get('manager') || null
+            manager: params.get('manager') || null,
+            league,
+            bracket,
+            round
         };
     }
 
@@ -671,6 +891,12 @@
             if (route.series) params.set('series', route.series);
             if (route.sort && route.sort !== 'points') params.set('sort', route.sort);
             if (route.query) params.set('q', route.query);
+        } else if (view === 'playoffs') {
+            if (route.year) params.set('year', String(route.year));
+            if (route.series) params.set('series', route.series);
+            if (Number(route.league) > 1) params.set('league', String(route.league));
+            if (route.bracket === 'losers') params.set('bracket', 'losers');
+            if (Number(route.round) > 1) params.set('round', String(route.round));
         }
 
         return `?${params.toString()}`;
@@ -699,6 +925,11 @@
         getHistoricalProfile,
         filterBySearch,
         sortSeasonRanking,
+        getEffectiveMatchupPoints,
+        getPlayoffRoundCount,
+        getPlayoffWeekNumbers,
+        buildPlayoffRounds,
+        validatePlayoffData,
         csvEscape,
         rowsToCsv,
         parseRoute,

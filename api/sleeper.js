@@ -5,7 +5,8 @@ const ALLOWED_PATHS = [
     /^\/user\/[A-Za-z0-9_-]+$/,
     /^\/user\/[A-Za-z0-9_-]+\/leagues\/nfl\/20\d{2}$/,
     /^\/league\/\d+$/,
-    /^\/league\/\d+\/(rosters|users|winners_bracket|losers_bracket)$/
+    /^\/league\/\d+\/(rosters|users|winners_bracket|losers_bracket)$/,
+    /^\/league\/\d+\/matchups\/\d{1,2}$/
 ];
 
 function normalizePath(value) {

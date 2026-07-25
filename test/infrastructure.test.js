@@ -19,7 +19,8 @@ test('proxy aceita somente endpoints usados pelo projeto', () => {
         '/league/1051278540760530944/rosters',
         '/league/1051278540760530944/users',
         '/league/1051278540760530944/winners_bracket',
-        '/league/1051278540760530944/losers_bracket'
+        '/league/1051278540760530944/losers_bracket',
+        '/league/1051278540760530944/matchups/17'
     ];
     valid.forEach(value => assert.equal(proxy.isAllowedPath(value), true, value));
 });
@@ -98,8 +99,8 @@ test('Keeper exibe somente a classificação da liga, sem ranking combinado', ()
 test('assets de código usam rede primeiro para evitar JavaScript antigo', () => {
     const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
     const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
-    assert.match(html, /script\.js\?v=5\.3\.4/);
-    assert.match(html, /styles\.css\?v=5\.3\.4/);
+    assert.match(html, /script\.js\?v=6\.0\.0/);
+    assert.match(html, /styles\.css\?v=6\.0\.0/);
     assert.match(sw, /\.\(\?:css\|js\).*networkFirst/s);
 });
 

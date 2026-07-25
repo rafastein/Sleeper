@@ -1,5 +1,18 @@
 # Changelog
 
+## 6.0.0 — Chaveamento visual dos playoffs
+
+- adiciona uma tela própria de playoffs para Keeper, Série A e Série B;
+- exibe seletor entre Liga 1 e Liga 2 nas séries com duas ligas;
+- permite alternar entre chave principal e chave de consolação;
+- monta o bracket horizontal no desktop e a navegação por rodada no celular;
+- mostra participantes, BYEs, placares, vencedores, campeão e partidas ainda indefinidas;
+- prioriza `custom_points` quando houver correção de pontuação pelo comissário;
+- sincroniza os matchups das semanas de playoffs junto com os snapshots;
+- adiciona URLs compartilháveis, exportação CSV e suporte ao histórico offline;
+- amplia a allowlist do proxy Vercel para os endpoints semanais de matchups;
+- inclui testes de semanas, progressão do bracket, placares, rotas e infraestrutura.
+
 ## 5.3.2 — Keeper sem ranking combinado
 
 - Remove o painel de ranking combinado das temporadas Keeper;

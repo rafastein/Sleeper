@@ -38,6 +38,10 @@
         currentSeason: null,
         seasonSort: 'points',
         seasonQuery: '',
+        playoffLeagueIndex: 0,
+        playoffBracket: 'winners',
+        playoffRound: 1,
+        currentPlayoffData: null,
         currentView: 'champions',
         feedbackTimer: null,
         historySearchTimer: null,
@@ -50,6 +54,7 @@
         navigation: document.getElementById('navigation'),
         championsView: document.getElementById('champions-view'),
         rankingView: document.getElementById('ranking-view'),
+        playoffsView: document.getElementById('playoffs-view'),
         historyView: document.getElementById('history-view'),
         profileView: document.getElementById('profile-view'),
         pageEyebrow: document.getElementById('page-eyebrow'),
@@ -88,7 +93,20 @@
         profileScope: document.getElementById('profile-scope'),
         profileHistoryBody: document.querySelector('#profile-history-table tbody'),
         profileCards: document.getElementById('profile-cards'),
+        seasonTabs: document.getElementById('season-tabs'),
+        seasonStandingsTab: document.getElementById('season-standings-tab'),
+        seasonPlayoffsTab: document.getElementById('season-playoffs-tab'),
         seasonStats: document.getElementById('season-stats'),
+        playoffStats: document.getElementById('playoff-stats'),
+        playoffPanelTitle: document.getElementById('playoff-panel-title'),
+        playoffStatus: document.getElementById('playoff-status'),
+        playoffLeagueControl: document.getElementById('playoff-league-control'),
+        playoffLeagueTabs: document.getElementById('playoff-league-tabs'),
+        playoffBracketTabs: document.getElementById('playoff-bracket-tabs'),
+        playoffEmpty: document.getElementById('playoff-empty'),
+        playoffBracketDesktop: document.getElementById('playoff-bracket-desktop'),
+        playoffRoundTabs: document.getElementById('playoff-round-tabs'),
+        playoffMobileRound: document.getElementById('playoff-mobile-round'),
         combinedPanel: document.getElementById('combined-panel'),
         combinedBody: document.querySelector('#combined-table tbody'),
         combinedCards: document.getElementById('combined-cards'),
@@ -279,12 +297,19 @@
             champions: elements.championsView,
             history: elements.historyView,
             profile: elements.profileView,
-            season: elements.rankingView
+            season: elements.rankingView,
+            playoffs: elements.playoffsView
         };
 
         Object.entries(views).forEach(([name, view]) => {
             view.hidden = name !== viewName;
         });
+        const isSeasonView = viewName === 'season' || viewName === 'playoffs';
+        elements.seasonTabs.hidden = !isSeasonView;
+        elements.seasonStandingsTab.classList.toggle('is-active', viewName === 'season');
+        elements.seasonStandingsTab.toggleAttribute('aria-current', viewName === 'season');
+        elements.seasonPlayoffsTab.classList.toggle('is-active', viewName === 'playoffs');
+        elements.seasonPlayoffsTab.toggleAttribute('aria-current', viewName === 'playoffs');
         state.currentView = viewName;
     }
 
@@ -339,6 +364,18 @@
             series: state.currentSeason?.seriesKey,
             sort: state.seasonSort,
             query: state.seasonQuery
+        };
+    }
+
+
+    function currentPlayoffsRoute() {
+        return {
+            view: 'playoffs',
+            year: state.currentSeason?.year,
+            series: state.currentSeason?.seriesKey,
+            league: state.playoffLeagueIndex + 1,
+            bracket: state.playoffBracket,
+            round: state.playoffRound
         };
     }
 
@@ -939,6 +976,16 @@
             fetchOptionalBracket(leagueId, 'winners_bracket'),
             fetchOptionalBracket(leagueId, 'losers_bracket')
         ]);
+        const playoffWeeks = core.getPlayoffWeekNumbers(league, winnersBracket, losersBracket);
+        const matchupEntries = await Promise.all(playoffWeeks.map(async week => {
+            try {
+                const rows = await fetchJson(`${DIRECT_API_BASE_URL}/league/${leagueId}/matchups/${week}`);
+                return [String(week), Array.isArray(rows) ? rows : []];
+            } catch (error) {
+                console.warn(`Não foi possível carregar os confrontos da semana ${week} da liga ${leagueId}:`, error);
+                return [String(week), []];
+            }
+        }));
         const calculated = core.calculateStandings(winnersBracket, losersBracket, rosters, league);
         return {
             index,
@@ -948,6 +995,11 @@
             users,
             winnersBracket,
             losersBracket,
+            playoffs: {
+                weekStart: playoffWeeks[0] || null,
+                weeks: playoffWeeks,
+                matchupsByWeek: Object.fromEntries(matchupEntries)
+            },
             standings: calculated.standings,
             usedFallback: calculated.usedFallback
         };
@@ -1074,6 +1126,277 @@
         return panel;
     }
 
+    function getRosterPresentation(snapshot, rosterId) {
+        const numericRosterId = Number(rosterId);
+        if (!Number.isInteger(numericRosterId) || numericRosterId < 1) return null;
+        const roster = (snapshot?.rosters || []).find(item => Number(item?.roster_id) === numericRosterId) || null;
+        const user = getUserForRoster(roster, snapshot?.users || []);
+        const managerName = getManagerName(user, roster);
+        return {
+            rosterId: numericRosterId,
+            roster,
+            user,
+            managerName,
+            teamName: getTeamName(user, roster),
+            avatar: user?.avatar || null
+        };
+    }
+
+    function createBracketTeam(snapshot, rosterId, score, winnerRosterId, options = {}) {
+        const container = createElement('div', 'bracket-team');
+        const presentation = getRosterPresentation(snapshot, rosterId);
+        const isWinner = presentation && Number(presentation.rosterId) === Number(winnerRosterId);
+        container.classList.toggle('is-winner', Boolean(isWinner));
+        container.classList.toggle('is-placeholder', !presentation);
+
+        if (!presentation) {
+            const placeholder = options.isBye ? 'BYE' : 'A definir';
+            container.appendChild(createElement('span', 'bracket-team__placeholder', placeholder));
+            return container;
+        }
+
+        container.appendChild(createAvatar(presentation.avatar, presentation.managerName));
+        const identity = createElement('div', 'bracket-team__identity');
+        identity.append(
+            createElement('strong', 'bracket-team__name', presentation.teamName),
+            createElement('span', 'bracket-team__manager', presentation.managerName)
+        );
+        container.appendChild(identity);
+
+        const scoreElement = createElement('strong', 'bracket-team__score', score === null || score === undefined ? '—' : formatNumber(score));
+        if (options.scoreDetails?.customPoints !== null && options.scoreDetails?.customPoints !== undefined) {
+            scoreElement.classList.add('is-adjusted');
+            scoreElement.title = 'Placar ajustado pelo comissário';
+        }
+        container.appendChild(scoreElement);
+
+        if (isWinner) {
+            const winnerBadge = createElement('span', 'bracket-team__winner', 'Venceu');
+            winnerBadge.setAttribute('aria-label', 'Vencedor do confronto');
+            container.appendChild(winnerBadge);
+        }
+        return container;
+    }
+
+    function createBracketMatch(snapshot, match, roundLabel) {
+        const card = createElement('article', 'bracket-match');
+        card.dataset.matchId = String(match.matchId || '');
+        card.classList.toggle('is-completed', match.completed);
+        card.classList.toggle('is-championship', Number(match.placement) === 1);
+
+        const header = createElement('div', 'bracket-match__header');
+        const label = match.placementLabel || `Jogo ${match.matchId}`;
+        header.append(
+            createElement('span', 'bracket-match__label', Number(match.placement) === 1 ? `🏆 ${label}` : label),
+            createElement('span', 'bracket-match__week', match.week ? `Semana ${match.week}` : roundLabel)
+        );
+
+        const team1IsBye = match.isBye && !match.team1RosterId;
+        const team2IsBye = match.isBye && !match.team2RosterId;
+        card.append(
+            header,
+            createBracketTeam(snapshot, match.team1RosterId, match.team1Score, match.winnerRosterId, {
+                isBye: team1IsBye,
+                scoreDetails: match.team1ScoreDetails
+            }),
+            createBracketTeam(snapshot, match.team2RosterId, match.team2Score, match.winnerRosterId, {
+                isBye: team2IsBye,
+                scoreDetails: match.team2ScoreDetails
+            })
+        );
+        return card;
+    }
+
+    function renderPlayoffLeagueTabs() {
+        if (!state.currentSeason) return;
+        const snapshots = state.currentSeason.snapshots;
+        elements.playoffLeagueControl.hidden = snapshots.length <= 1;
+        const fragment = document.createDocumentFragment();
+
+        snapshots.forEach((snapshot, index) => {
+            const button = createElement('button', 'segment-button', snapshots.length === 1
+                ? (snapshot.league?.name || 'Liga')
+                : `Liga ${index + 1}`);
+            button.type = 'button';
+            button.classList.toggle('is-active', index === state.playoffLeagueIndex);
+            button.toggleAttribute('aria-current', index === state.playoffLeagueIndex);
+            button.title = snapshot.league?.name || `Liga ${index + 1}`;
+            button.addEventListener('click', () => {
+                state.playoffLeagueIndex = index;
+                state.playoffBracket = 'winners';
+                state.playoffRound = 1;
+                renderPlayoffs();
+                writeRoute(currentPlayoffsRoute(), 'replace');
+            });
+            fragment.appendChild(button);
+        });
+        elements.playoffLeagueTabs.replaceChildren(fragment);
+    }
+
+    function renderPlayoffBracketTabs(snapshot) {
+        const buttons = [...elements.playoffBracketTabs.querySelectorAll('[data-bracket]')];
+        const hasWinners = Array.isArray(snapshot?.winnersBracket) && snapshot.winnersBracket.length > 0;
+        const hasLosers = Array.isArray(snapshot?.losersBracket) && snapshot.losersBracket.length > 0;
+        if (state.playoffBracket === 'losers' && !hasLosers) state.playoffBracket = 'winners';
+        if (state.playoffBracket === 'winners' && !hasWinners && hasLosers) state.playoffBracket = 'losers';
+
+        buttons.forEach(button => {
+            const key = button.dataset.bracket;
+            const available = key === 'winners' ? hasWinners : hasLosers;
+            button.disabled = !available;
+            button.hidden = !available;
+            button.classList.toggle('is-active', key === state.playoffBracket);
+            button.toggleAttribute('aria-current', key === state.playoffBracket);
+        });
+    }
+
+    function renderDesktopBracket(snapshot, rounds) {
+        const fragment = document.createDocumentFragment();
+        rounds.forEach(round => {
+            const column = createElement('section', 'bracket-round');
+            const heading = createElement('div', 'bracket-round__heading');
+            heading.append(
+                createElement('strong', '', round.label),
+                createElement('span', '', round.week ? `Semana ${round.week}` : '')
+            );
+            const matches = createElement('div', 'bracket-round__matches');
+            round.matches.forEach(match => matches.appendChild(createBracketMatch(snapshot, match, round.label)));
+            column.append(heading, matches);
+            fragment.appendChild(column);
+        });
+        elements.playoffBracketDesktop.style.setProperty('--playoff-rounds', Math.max(rounds.length, 1));
+        elements.playoffBracketDesktop.replaceChildren(fragment);
+    }
+
+    function renderMobilePlayoffRound(snapshot, rounds) {
+        if (!rounds.length) {
+            elements.playoffRoundTabs.replaceChildren();
+            elements.playoffMobileRound.replaceChildren();
+            return;
+        }
+        state.playoffRound = Math.min(Math.max(Number(state.playoffRound) || 1, 1), rounds.length);
+        const tabs = document.createDocumentFragment();
+        rounds.forEach((round, index) => {
+            const button = createElement('button', 'round-tab', round.label);
+            button.type = 'button';
+            button.classList.toggle('is-active', index + 1 === state.playoffRound);
+            button.toggleAttribute('aria-current', index + 1 === state.playoffRound);
+            button.addEventListener('click', () => {
+                state.playoffRound = index + 1;
+                renderMobilePlayoffRound(snapshot, rounds);
+                writeRoute(currentPlayoffsRoute(), 'replace');
+            });
+            tabs.appendChild(button);
+        });
+        elements.playoffRoundTabs.replaceChildren(tabs);
+
+        const round = rounds[state.playoffRound - 1];
+        const heading = createElement('div', 'mobile-round-heading');
+        heading.append(
+            createElement('strong', '', round.label),
+            createElement('span', '', round.week ? `Semana ${round.week}` : '')
+        );
+        const matches = createElement('div', 'mobile-round-matches');
+        round.matches.forEach(match => matches.appendChild(createBracketMatch(snapshot, match, round.label)));
+        elements.playoffMobileRound.replaceChildren(heading, matches);
+    }
+
+    function getPlayoffParticipantCount(built) {
+        const ids = new Set();
+        (built?.rounds || []).forEach(round => round.matches.forEach(match => {
+            if (match.team1RosterId) ids.add(match.team1RosterId);
+            if (match.team2RosterId) ids.add(match.team2RosterId);
+        }));
+        return ids.size;
+    }
+
+    function renderPlayoffStats(snapshot, built) {
+        const champion = getRosterPresentation(snapshot, built.championRosterId);
+        const participantCount = getPlayoffParticipantCount(built);
+        setStats(elements.playoffStats, [
+            {
+                label: 'Liga',
+                value: state.currentSeason.snapshots.length > 1 ? `Liga ${state.playoffLeagueIndex + 1}` : state.currentSeason.seriesLabel,
+                detail: snapshot.league?.name || 'AMBO'
+            },
+            {
+                label: 'Chave',
+                value: state.playoffBracket === 'winners' ? 'Principal' : 'Consolação',
+                detail: `${built.totalRounds} rodada${built.totalRounds === 1 ? '' : 's'} · ${participantCount} participantes`
+            },
+            {
+                label: built.completed ? 'Campeão' : 'Situação',
+                value: champion?.managerName || (built.completed ? '—' : 'Em andamento'),
+                detail: champion?.teamName || (built.matchCount ? 'Resultados ainda não concluídos' : 'Sem confrontos disponíveis')
+            }
+        ]);
+    }
+
+    function renderPlayoffs() {
+        if (!state.currentSeason) return;
+        const snapshots = state.currentSeason.snapshots;
+        state.playoffLeagueIndex = Math.min(Math.max(Number(state.playoffLeagueIndex) || 0, 0), Math.max(snapshots.length - 1, 0));
+        const snapshot = snapshots[state.playoffLeagueIndex];
+        if (!snapshot) return;
+
+        renderPlayoffLeagueTabs();
+        renderPlayoffBracketTabs(snapshot);
+        const bracket = state.playoffBracket === 'losers' ? snapshot.losersBracket : snapshot.winnersBracket;
+        const matchupsByWeek = snapshot.playoffs?.matchupsByWeek || {};
+        const built = core.buildPlayoffRounds(bracket, snapshot.league, matchupsByWeek);
+        state.currentPlayoffData = { snapshot, built, bracketKey: state.playoffBracket };
+
+        const bracketLabel = state.playoffBracket === 'winners' ? 'Chave principal' : 'Consolação';
+        elements.playoffPanelTitle.textContent = `${snapshot.league?.name || `Liga ${state.playoffLeagueIndex + 1}`} · ${bracketLabel}`;
+        elements.playoffStatus.textContent = built.completed ? 'Playoffs concluídos' : built.matchCount ? 'Em andamento' : 'Sem dados';
+        elements.playoffStatus.classList.toggle('pill--warning', !built.completed && built.matchCount > 0);
+        elements.playoffEmpty.hidden = built.rounds.length > 0;
+        elements.playoffBracketDesktop.hidden = built.rounds.length === 0;
+
+        if (built.rounds.length) {
+            renderDesktopBracket(snapshot, built.rounds);
+            renderMobilePlayoffRound(snapshot, built.rounds);
+        } else {
+            elements.playoffBracketDesktop.replaceChildren();
+            elements.playoffRoundTabs.replaceChildren();
+            elements.playoffMobileRound.replaceChildren();
+        }
+        renderPlayoffStats(snapshot, built);
+    }
+
+    function updateSeasonHeader(mode) {
+        if (!state.currentSeason) return;
+        const isKeeper = state.currentSeason.seriesKey === 'keeper';
+        elements.pageEyebrow.textContent = `Temporada ${state.currentSeason.year}`;
+        elements.pageTitle.textContent = `AMBO ${state.currentSeason.seriesLabel}`;
+        if (mode === 'playoffs') {
+            elements.pageDescription.textContent = isKeeper
+                ? 'Chaveamento completo da liga Keeper, com rodadas, progressão e placares dos confrontos.'
+                : 'Chaveamentos das duas ligas, com chave principal, consolação, rodadas e placares.';
+        } else {
+            elements.pageDescription.textContent = isKeeper
+                ? 'Classificação final da liga Keeper, com campanha, pontuação e FPTS de cada participante.'
+                : 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.';
+        }
+        updateDocumentTitle();
+    }
+
+    function showSeasonStandings(options = {}) {
+        if (!state.currentSeason) return;
+        updateSeasonHeader('season');
+        showOnlyView('season');
+        renderSeasonRanking();
+        if (options.updateUrl !== false) writeRoute(currentSeasonRoute(), options.replace ? 'replace' : 'push');
+    }
+
+    function showSeasonPlayoffs(options = {}) {
+        if (!state.currentSeason) return;
+        updateSeasonHeader('playoffs');
+        showOnlyView('playoffs');
+        renderPlayoffs();
+        if (options.updateUrl !== false) writeRoute(currentPlayoffsRoute(), options.replace ? 'replace' : 'push');
+    }
+
     function renderSeasonStats(year, seriesLabel, snapshots, combined, isKeeper = false) {
         const allFallback = snapshots.every(snapshot => snapshot.usedFallback);
         const anyFallback = snapshots.some(snapshot => snapshot.usedFallback);
@@ -1140,6 +1463,7 @@
         }
 
         const currentRequest = ++state.requestToken;
+        const requestedView = options.view === 'playoffs' ? 'playoffs' : 'season';
         const seriesLabel = config.series[seriesKey] || seriesKey;
         setActiveButton(button);
         closeMobileMenu();
@@ -1150,13 +1474,17 @@
         const isKeeper = seriesKey === 'keeper';
         elements.pageEyebrow.textContent = `Temporada ${year}`;
         elements.pageTitle.textContent = `AMBO ${seriesLabel}`;
-        elements.pageDescription.textContent = isKeeper
-            ? 'Classificação final da liga Keeper, com campanha, pontuação e FPTS de cada participante.'
-            : 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.';
+        elements.pageDescription.textContent = requestedView === 'playoffs'
+            ? (isKeeper
+                ? 'Chaveamento completo da liga Keeper, com rodadas, progressão e placares dos confrontos.'
+                : 'Chaveamentos das duas ligas, com chave principal, consolação, rodadas e placares.')
+            : (isKeeper
+                ? 'Classificação final da liga Keeper, com campanha, pontuação e FPTS de cada participante.'
+                : 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.');
         elements.combinedPanel.hidden = isKeeper;
         elements.leaguePanels.classList.toggle('league-grid--single', isKeeper);
         elements.lastUpdate.textContent = 'Carregando dados validados...';
-        showOnlyView('season');
+        showOnlyView(requestedView);
         updateDocumentTitle();
 
         try {
@@ -1201,11 +1529,24 @@
                 sourceLabel,
                 updatedAt
             };
+            state.playoffLeagueIndex = Math.min(
+                Math.max(Number(options.league || 1) - 1, 0),
+                Math.max(snapshots.length - 1, 0)
+            );
+            state.playoffBracket = options.bracket === 'losers' ? 'losers' : 'winners';
+            state.playoffRound = Math.max(Number(options.round || 1), 1);
             renderSeasonStats(year, seriesLabel, snapshots, combined, isKeeper);
-            renderSeasonRanking();
+            if (requestedView === 'playoffs') {
+                showSeasonPlayoffs({ updateUrl: false });
+            } else {
+                showSeasonStandings({ updateUrl: false });
+            }
             const formattedDate = formatDateTime(updatedAt);
             elements.lastUpdate.textContent = formattedDate ? `${sourceLabel} · ${formattedDate}` : sourceLabel;
-            if (options.updateUrl !== false) writeRoute(currentSeasonRoute(), options.replace ? 'replace' : 'push');
+            if (options.updateUrl !== false) {
+                const route = requestedView === 'playoffs' ? currentPlayoffsRoute() : currentSeasonRoute();
+                writeRoute(route, options.replace ? 'replace' : 'push');
+            }
         } catch (error) {
             if (currentRequest !== state.requestToken) return;
             console.error(error);
@@ -1214,6 +1555,10 @@
             elements.combinedCards.replaceChildren();
             elements.leaguePanels.replaceChildren();
             elements.seasonStats.replaceChildren();
+            elements.playoffStats.replaceChildren();
+            elements.playoffBracketDesktop.replaceChildren();
+            elements.playoffRoundTabs.replaceChildren();
+            elements.playoffMobileRound.replaceChildren();
             elements.rankingStatus.textContent = 'Falha de validação';
             elements.lastUpdate.textContent = 'Dados indisponíveis';
             showError(`Não foi possível carregar as ligas: ${error.message}.`);
@@ -1272,6 +1617,43 @@
                     { label: 'FPTS', value: row => formatNumber(row.fpts) },
                     { key: 'leagueAppearances', label: 'Ligas' }
                 ], state.currentProfile.history)
+            };
+        }
+        if (state.currentView === 'playoffs' && state.currentSeason && state.currentPlayoffData) {
+            const { snapshot, built, bracketKey } = state.currentPlayoffData;
+            const rows = built.rounds.flatMap(round => round.matches.map(match => {
+                const team1 = getRosterPresentation(snapshot, match.team1RosterId);
+                const team2 = getRosterPresentation(snapshot, match.team2RosterId);
+                const winner = getRosterPresentation(snapshot, match.winnerRosterId);
+                return {
+                    round: round.label,
+                    week: match.week || '',
+                    matchId: match.matchId,
+                    placement: match.placementLabel || '',
+                    team1: team1?.teamName || (match.isBye && !match.team1RosterId ? 'BYE' : 'A definir'),
+                    manager1: team1?.managerName || '',
+                    score1: match.team1Score === null || match.team1Score === undefined ? '' : formatNumber(match.team1Score),
+                    team2: team2?.teamName || (match.isBye && !match.team2RosterId ? 'BYE' : 'A definir'),
+                    manager2: team2?.managerName || '',
+                    score2: match.team2Score === null || match.team2Score === undefined ? '' : formatNumber(match.team2Score),
+                    winner: winner?.teamName || ''
+                };
+            }));
+            return {
+                filename: `ambo-${state.currentSeason.year}-${state.currentSeason.seriesKey}-liga-${state.playoffLeagueIndex + 1}-${bracketKey}.csv`,
+                csv: core.rowsToCsv([
+                    { key: 'round', label: 'Rodada' },
+                    { key: 'week', label: 'Semana' },
+                    { key: 'matchId', label: 'Jogo' },
+                    { key: 'placement', label: 'Disputa' },
+                    { key: 'team1', label: 'Equipe 1' },
+                    { key: 'manager1', label: 'Manager 1' },
+                    { key: 'score1', label: 'Placar 1' },
+                    { key: 'team2', label: 'Equipe 2' },
+                    { key: 'manager2', label: 'Manager 2' },
+                    { key: 'score2', label: 'Placar 2' },
+                    { key: 'winner', label: 'Vencedor' }
+                ], rows)
             };
         }
         if (state.currentView === 'season' && state.currentSeason) {
@@ -1391,7 +1773,16 @@
             elements.seasonSort.value = state.seasonSort;
             elements.seasonSearch.value = state.seasonQuery;
             const button = state.navButtons.get(`${route.year}:${route.series}`) || null;
-            await loadSeason(route.year, route.series, button, { updateUrl: false });
+            await loadSeason(route.year, route.series, button, { updateUrl: false, view: 'season' });
+        } else if (route.view === 'playoffs') {
+            const button = state.navButtons.get(`${route.year}:${route.series}`) || null;
+            await loadSeason(route.year, route.series, button, {
+                updateUrl: false,
+                view: 'playoffs',
+                league: route.league,
+                bracket: route.bracket,
+                round: route.round
+            });
         } else {
             showChampions(state.championsButton, { updateUrl: false });
         }
@@ -1399,11 +1790,13 @@
         if (options.replace) {
             const normalizedRoute = route.view === 'season'
                 ? currentSeasonRoute()
-                : route.view === 'history'
-                    ? currentHistoryRoute()
-                    : route.view === 'profile'
-                        ? { view: 'profile', manager: route.manager, series: state.historyFilter }
-                        : { view: 'champions' };
+                : route.view === 'playoffs'
+                    ? currentPlayoffsRoute()
+                    : route.view === 'history'
+                        ? currentHistoryRoute()
+                        : route.view === 'profile'
+                            ? { view: 'profile', manager: route.manager, series: state.historyFilter }
+                            : { view: 'champions' };
             writeRoute(normalizedRoute, 'replace');
         }
     }
@@ -1471,6 +1864,17 @@
         });
         registerServiceWorker();
     }
+
+    elements.seasonStandingsTab.addEventListener('click', () => showSeasonStandings());
+    elements.seasonPlayoffsTab.addEventListener('click', () => showSeasonPlayoffs());
+    elements.playoffBracketTabs.addEventListener('click', event => {
+        const button = event.target.closest('[data-bracket]');
+        if (!button || button.disabled) return;
+        state.playoffBracket = button.dataset.bracket === 'losers' ? 'losers' : 'winners';
+        state.playoffRound = 1;
+        renderPlayoffs();
+        writeRoute(currentPlayoffsRoute(), 'replace');
+    });
 
     elements.historySeriesFilter.addEventListener('change', event => {
         state.historyFilter = event.target.value;

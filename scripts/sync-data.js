@@ -81,7 +81,8 @@ function trimLeague(league) {
         status: league?.status || null,
         previous_league_id: league?.previous_league_id ? String(league.previous_league_id) : null,
         settings: {
-            playoff_teams: Number(league?.settings?.playoff_teams || 0)
+            playoff_teams: Number(league?.settings?.playoff_teams || 0),
+            playoff_week_start: Number(league?.settings?.playoff_week_start || 0)
         }
     };
 }
@@ -111,6 +112,34 @@ function trimUser(user) {
         display_name: user?.display_name || null,
         avatar: user?.avatar || null,
         metadata: user?.metadata || null
+    };
+}
+
+
+function trimMatchup(matchup) {
+    return {
+        roster_id: Number(matchup?.roster_id),
+        matchup_id: matchup?.matchup_id === null || matchup?.matchup_id === undefined
+            ? null
+            : Number(matchup.matchup_id),
+        points: Number.isFinite(Number(matchup?.points)) ? Number(matchup.points) : null,
+        custom_points: matchup?.custom_points === null || matchup?.custom_points === undefined
+            ? null
+            : Number(matchup.custom_points)
+    };
+}
+
+async function fetchPlayoffMatchups(leagueId, league, winnersBracket, losersBracket) {
+    const weeks = core.getPlayoffWeekNumbers(league, winnersBracket, losersBracket);
+    const entries = await Promise.all(weeks.map(async week => {
+        const rows = await fetchJson(`${API_BASE_URL}/league/${leagueId}/matchups/${week}`, true);
+        return [String(week), (rows || []).map(trimMatchup)];
+    }));
+
+    return {
+        weekStart: weeks[0] || null,
+        weeks,
+        matchupsByWeek: Object.fromEntries(entries)
     };
 }
 
@@ -223,6 +252,7 @@ async function fetchLeagueSnapshot(leagueId, index) {
 
     const rosters = (rawRosters || []).map(trimRoster);
     const users = (rawUsers || []).map(trimUser);
+    const playoffs = await fetchPlayoffMatchups(leagueId, league, winnersBracket, losersBracket);
     const calculated = core.calculateStandings(winnersBracket, losersBracket, rosters, league);
     const validation = core.validateStandings(calculated.standings, rosters.length);
 
@@ -238,6 +268,7 @@ async function fetchLeagueSnapshot(leagueId, index) {
         users,
         winnersBracket: winnersBracket || [],
         losersBracket: losersBracket || [],
+        playoffs,
         standings: calculated.standings,
         usedFallback: calculated.usedFallback,
         validation

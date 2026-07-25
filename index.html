@@ -21,10 +21,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=5.3.4">
+    <link rel="stylesheet" href="styles.css?v=6.0.0">
     <script src="ambo-core.js" defer></script>
     <script src="config.js" defer></script>
-    <script src="script.js?v=5.3.4" defer></script>
+    <script src="script.js?v=6.0.0" defer></script>
 </head>
 <body>
     <div class="page-glow page-glow--one" aria-hidden="true"></div>
@@ -73,6 +73,17 @@
 
             <div id="action-feedback" class="action-feedback" role="status" aria-live="polite" hidden></div>
             <div id="error-message" class="alert" role="alert" hidden></div>
+
+            <nav id="season-tabs" class="season-tabs" aria-label="Visualização da temporada" hidden>
+                <button id="season-standings-tab" class="season-tab is-active" type="button" aria-current="page">
+                    <span aria-hidden="true">▦</span>
+                    Classificação
+                </button>
+                <button id="season-playoffs-tab" class="season-tab" type="button">
+                    <span aria-hidden="true">⌁</span>
+                    Playoffs
+                </button>
+            </nav>
 
             <section id="champions-view" class="view" aria-labelledby="page-title">
                 <div id="champion-stats" class="stats-grid"></div>
@@ -262,6 +273,48 @@
                 </article>
 
                 <div id="league-panels" class="league-grid"></div>
+            </section>
+
+            <section id="playoffs-view" class="view" aria-labelledby="page-title" hidden>
+                <div id="playoff-stats" class="stats-grid"></div>
+
+                <article class="panel panel--featured playoffs-panel">
+                    <div class="panel__header panel__header--wrap">
+                        <div>
+                            <p class="panel__eyebrow">Caminho até o título</p>
+                            <h2 id="playoff-panel-title">Chaveamento dos playoffs</h2>
+                        </div>
+                        <span id="playoff-status" class="pill"></span>
+                    </div>
+
+                    <div class="playoff-toolbar">
+                        <div id="playoff-league-control" class="playoff-control-group">
+                            <span class="playoff-control-label">Liga</span>
+                            <div id="playoff-league-tabs" class="segmented-control" role="group" aria-label="Selecionar liga"></div>
+                        </div>
+                        <div class="playoff-control-group">
+                            <span class="playoff-control-label">Chave</span>
+                            <div id="playoff-bracket-tabs" class="segmented-control" role="group" aria-label="Selecionar chave">
+                                <button type="button" data-bracket="winners" class="segment-button is-active">Principal</button>
+                                <button type="button" data-bracket="losers" class="segment-button">Consolação</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="playoff-empty" class="empty-state" hidden>
+                        <strong>Chaveamento indisponível</strong>
+                        <span>Execute novamente a sincronização para incluir os dados dos playoffs desta liga.</span>
+                    </div>
+
+                    <div id="playoff-bracket-desktop" class="playoff-bracket desktop-bracket" aria-label="Chaveamento dos playoffs"></div>
+
+                    <div class="mobile-bracket">
+                        <div id="playoff-round-tabs" class="round-tabs" role="group" aria-label="Selecionar rodada"></div>
+                        <div id="playoff-mobile-round" class="playoff-mobile-round"></div>
+                    </div>
+
+                    <p class="panel-note">Os placares são vinculados às semanas de playoffs do Sleeper. Quando houver ajuste manual do comissário, o valor corrigido é usado no chaveamento.</p>
+                </article>
             </section>
         </main>
     </div>
