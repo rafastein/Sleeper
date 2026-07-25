@@ -187,7 +187,9 @@ function upsertManager(registry, user) {
 }
 
 async function resolveLeagueIds(year, seriesKey, seasonConfig, discoveryUsers) {
-    if (Array.isArray(seasonConfig)) return seasonConfig.map(String);
+    if (Array.isArray(seasonConfig)) {
+        return { ids: seasonConfig.map(String), warning: null };
+    }
 
     const username = String(seasonConfig?.username || '').trim();
     const discoveryKey = String(seasonConfig?.discoveryKey || core.normalizeAlias(username));
@@ -235,10 +237,18 @@ async function resolveLeagueIds(year, seriesKey, seasonConfig, discoveryUsers) {
         const candidates = (leagues || [])
             .map(league => `${league?.name || 'Sem nome'} (${league?.league_id || '?'})`)
             .join(', ');
+
+        if (seasonConfig?.optional === true && ids.length === 0) {
+            return {
+                ids: [],
+                warning: `${year}/${seriesKey}: nenhuma liga correspondente foi encontrada para este usuário. Candidatas: ${candidates || 'nenhuma'}`
+            };
+        }
+
         throw new Error(`${year}/${seriesKey}: encontradas ${ids.length} de ${expectedLeagues} ligas. Candidatas: ${candidates || 'nenhuma'}`);
     }
 
-    return ids;
+    return { ids, warning: null };
 }
 
 async function fetchLeagueSnapshot(leagueId, index) {
@@ -313,6 +323,7 @@ async function main() {
     const manifestPath = `${snapshotBase}/manifest.json`;
     const manifest = readJson(manifestPath, { schemaVersion: 1, generatedAt: null, snapshots: [] });
     const generatedAt = new Date().toISOString();
+    const warnings = [];
 
     for (const year of selectedYears) {
         for (const seriesKey of selectedSeries) {
@@ -320,7 +331,17 @@ async function main() {
             if (!seasonConfig) continue;
 
             process.stdout.write(`→ ${year} ${config.series[seriesKey]}: resolvendo ligas... `);
-            const leagueIds = await resolveLeagueIds(year, seriesKey, seasonConfig, discoveryUsers);
+            const resolution = await resolveLeagueIds(year, seriesKey, seasonConfig, discoveryUsers);
+            const leagueIds = resolution.ids;
+
+            if (!leagueIds.length) {
+                const warning = resolution.warning || `${year}/${seriesKey}: nenhuma liga encontrada`;
+                warnings.push(warning);
+                console.log('IGNORADA');
+                console.warn(`  ⚠ ${warning}`);
+                continue;
+            }
+
             console.log(leagueIds.join(', '));
 
             const leagues = [];
@@ -359,6 +380,11 @@ async function main() {
     writeJson(managerPath, managerRegistry, args.dryRun);
     writeJson(discoveryPath, discoveryUsers, args.dryRun);
     writeJson(manifestPath, manifest, args.dryRun);
+
+    if (warnings.length) {
+        console.log(`\n⚠ ${warnings.length} recorte(s) opcional(is) não foram encontrados e foram ignorados:`);
+        warnings.forEach(warning => console.log(`  - ${warning}`));
+    }
 
     console.log(args.dryRun
         ? '\n✓ Validação concluída sem gravar arquivos.'

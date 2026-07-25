@@ -945,6 +945,11 @@
                 const candidates = leagues
                     .map(league => `${league?.name || 'Sem nome'} (${league?.league_id || '?'})`)
                     .join(', ');
+
+                if (seasonConfig.optional === true && matchedLeagueIds.length === 0) {
+                    return [];
+                }
+
                 throw new Error(`foram encontradas ${matchedLeagueIds.length} de ${expectedLeagues} ligas em ${year}. Candidatas: ${candidates || 'nenhuma'}`);
             }
             return matchedLeagueIds;
@@ -1504,6 +1509,9 @@
             } else {
                 const leagueIds = await resolveLeagueIds(year, seriesKey);
                 if (currentRequest !== state.requestToken) return;
+                if (!leagueIds.length) {
+                    throw new Error(`a liga ${seriesLabel} de ${year} ainda não foi localizada no Sleeper para o usuário configurado; cadastre o ID da liga para importar esse ano`);
+                }
                 snapshots = (await Promise.all(
                     leagueIds.map((leagueId, index) => fetchLeagueSnapshot(leagueId, index))
                 )).sort((a, b) => a.index - b.index);

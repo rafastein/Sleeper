@@ -7,7 +7,8 @@ const KEEPER_DISCOVERY = Object.freeze({
     discoveryKey: 'keeperSeed',
     username: 'rafastein',
     nameIncludes: ['keeper'],
-    expectedLeagues: 1
+    expectedLeagues: 1,
+    optional: true
 });
 
 function keeperDiscovery() {

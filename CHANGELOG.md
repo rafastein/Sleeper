@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.0.2 — Keeper opcional por temporada
+
+- A sincronização não falha quando uma liga Keeper não aparece entre as ligas do usuário em um ano específico.
+- Recortes Keeper ausentes são registrados como aviso e ignorados; Série A e Série B continuam sendo processadas.
+- Ambiguidades (mais ligas que o esperado) e falhas em ligas obrigatórias continuam interrompendo a Action.
+- Cache do PWA e versão dos assets atualizados.
+
 ## 6.0.1 — GitHub Actions em Node.js 24
 
 - Atualiza `actions/checkout` e `actions/setup-node` para `v5`.
