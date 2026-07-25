@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ambo-v5-5';
+const CACHE_VERSION = 'ambo-v5-6';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 const APP_SHELL = [
@@ -85,7 +85,12 @@ self.addEventListener('fetch', event => {
 
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_vercel/')) return;
 
-    if (/\.(?:css|js|png|svg|webmanifest)$/.test(url.pathname)) {
+    if (/\.(?:css|js)$/.test(url.pathname)) {
+        event.respondWith(networkFirst(request));
+        return;
+    }
+
+    if (/\.(?:png|svg|webmanifest)$/.test(url.pathname)) {
         event.respondWith(cacheFirst(request));
     }
 });

@@ -75,7 +75,12 @@ test('ranking histórico não exibe coluna de pontos', () => {
     const script = fs.readFileSync(path.join(ROOT, 'script.js'), 'utf8');
     const renderMatch = script.match(/function renderHistoricalRanking\(\)[\s\S]*?async function showHistoricalRanking/);
     assert.ok(renderMatch, 'renderização histórica não encontrada');
-    assert.doesNotMatch(renderMatch[0], /manager\.totalPoints/);
+    assert.doesNotMatch(renderMatch[0], /manager\.(?:points|totalPoints)/);
+
+    const rowAppend = renderMatch[0].match(/row\.append\([\s\S]*?\n            \);/);
+    assert.ok(rowAppend, 'células da linha histórica não encontradas');
+    const cells = rowAppend[0].match(/createElement\('td'/g) || [];
+    assert.equal(cells.length, 6, 'a linha deve ter 6 células de métricas após o manager');
 });
 
 
@@ -87,4 +92,13 @@ test('Keeper exibe somente a classificação da liga, sem ranking combinado', ()
     assert.match(script, /elements\.combinedPanel\.hidden = isKeeper/);
     assert.match(script, /singleLeague: isKeeper/);
     assert.match(script, /Classificação final da liga Keeper/);
+});
+
+
+test('assets de código usam rede primeiro para evitar JavaScript antigo', () => {
+    const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
+    assert.match(html, /script\.js\?v=5\.3\.3/);
+    assert.match(html, /styles\.css\?v=5\.3\.3/);
+    assert.match(sw, /\.\(\?:css\|js\).*networkFirst/s);
 });

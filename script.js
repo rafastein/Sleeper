@@ -692,6 +692,8 @@
                 createElement('span', 'entity-meta', `${manager.firstYear}–${manager.lastYear} · ${manager.leagueAppearances} liga${manager.leagueAppearances === 1 ? '' : 's'}`)
             );
 
+            // O ranking histórico exibe apenas conquistas e desempenho.
+            // Pontos acumulados permanecem no modelo, mas não viram uma célula nesta tabela.
             row.append(
                 createRankCell(rank),
                 avatarCell,
