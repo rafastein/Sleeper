@@ -680,6 +680,8 @@
         if (Number.isInteger(resolved) && resolved > 0) return resolved;
 
         seen.add(sourceId);
+        const sourceSlot = outcome === 'w' ? null : null;
+        void sourceSlot;
         return null;
     }
 

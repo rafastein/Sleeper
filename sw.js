@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ambo-v6-playoffs';
+const CACHE_VERSION = 'ambo-v6.0.1-playoffs-node24';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 const APP_SHELL = [

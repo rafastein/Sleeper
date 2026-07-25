@@ -1,17 +1,13 @@
 # Changelog
 
-## 6.0.0 — Chaveamento visual dos playoffs
+## 6.0.1 — GitHub Actions em Node.js 24
 
-- adiciona uma tela própria de playoffs para Keeper, Série A e Série B;
-- exibe seletor entre Liga 1 e Liga 2 nas séries com duas ligas;
-- permite alternar entre chave principal e chave de consolação;
-- monta o bracket horizontal no desktop e a navegação por rodada no celular;
-- mostra participantes, BYEs, placares, vencedores, campeão e partidas ainda indefinidas;
-- prioriza `custom_points` quando houver correção de pontuação pelo comissário;
-- sincroniza os matchups das semanas de playoffs junto com os snapshots;
-- adiciona URLs compartilháveis, exportação CSV e suporte ao histórico offline;
-- amplia a allowlist do proxy Vercel para os endpoints semanais de matchups;
-- inclui testes de semanas, progressão do bracket, placares, rotas e infraestrutura.
+- Atualiza `actions/checkout` e `actions/setup-node` para `v5`.
+- Padroniza os workflows em Node.js 24.
+- Remove configurações e passos duplicados dos arquivos YAML.
+- Mantém log completo do sincronizador com `tee` e falha correta por `pipefail`.
+- Preserva os snapshots existentes no pacote de atualização segura.
+- Atualiza a versão do cache do PWA.
 
 ## 5.3.2 — Keeper sem ranking combinado
 

@@ -6,6 +6,7 @@ const path = require('node:path');
 const ROOT = path.resolve(__dirname, '..');
 const proxy = require('../api/sleeper');
 const config = require('../config');
+const packageJson = require('../package.json');
 
 function readJson(file) {
     return JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8'));
@@ -99,8 +100,9 @@ test('Keeper exibe somente a classificação da liga, sem ranking combinado', ()
 test('assets de código usam rede primeiro para evitar JavaScript antigo', () => {
     const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
     const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
-    assert.match(html, /script\.js\?v=6\.0\.0/);
-    assert.match(html, /styles\.css\?v=6\.0\.0/);
+    const escapedVersion = packageJson.version.replace(/\./g, '\\.');
+    assert.match(html, new RegExp(`script\\.js\\?v=${escapedVersion}`));
+    assert.match(html, new RegExp(`styles\\.css\\?v=${escapedVersion}`));
     assert.match(sw, /\.\(\?:css\|js\).*networkFirst/s);
 });
 

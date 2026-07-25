@@ -230,33 +230,6 @@ Quando o losers bracket reinicia em 1, o sistema soma a quantidade de times dos 
 4. menor FPTS sofrido.
 
 
-## Playoffs — chaveamento visual
-
-Cada temporada agora possui duas visualizações: **Classificação** e **Playoffs**.
-
-- **Keeper:** mostra o chaveamento da única liga;
-- **Série A e Série B:** oferecem seletor entre Liga 1 e Liga 2;
-- cada liga permite alternar entre **Chave principal** e **Consolação**;
-- no desktop, as rodadas são exibidas lado a lado;
-- no celular, o usuário navega por Quartas, Semifinais e Final;
-- placares corrigidos pelo comissário são identificados e têm prioridade sobre o placar original;
-- partidas futuras aparecem como **A definir** e folgas como **BYE**.
-
-Exemplo de URL compartilhável:
-
-```text
-?view=playoffs&year=2025&series=serieA&league=2&bracket=losers&round=3
-```
-
-Os snapshots guardam os brackets e os matchups das semanas de playoffs. Depois de instalar esta versão, execute novamente a Action **Atualizar snapshots** para preencher os placares históricos. Enquanto isso, a estrutura do chaveamento pode aparecer com placares indisponíveis.
-
-Para sincronizar localmente uma temporada:
-
-```bash
-npm run sync -- --year 2025
-```
-
-
 ## Etapa 4 — infraestrutura e produção
 
 A versão 5 adiciona:

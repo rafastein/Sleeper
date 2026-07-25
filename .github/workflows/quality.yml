@@ -5,17 +5,27 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - name: Baixar repositório
+        uses: actions/checkout@v5
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v5
         with:
-          node-version: 24
-          package-manager-cache: false
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
       - name: Exibir versões
         run: |
           node --version
           npm --version
-      - run: npm run check
+
+      - name: Executar validações
+        run: npm run check
