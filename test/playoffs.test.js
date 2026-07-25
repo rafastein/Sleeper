@@ -76,6 +76,26 @@ test('placar corrigido pelo comissário tem prioridade', () => {
     assert.equal(semifinal.team2ScoreDetails.customPoints, 116.7);
 });
 
+const losersBracket = [
+    { r: 1, m: 8, t1: 7, t2: 12, w: 7, l: 12 },
+    { r: 1, m: 9, t1: 8, t2: 11, w: 8, l: 11 },
+    { r: 1, m: 10, t1: 9, t2: 10, w: 9, l: 10 },
+    { r: 2, m: 11, t1_from: { w: 8 }, t2_from: { w: 9 }, w: 8, l: 9, p: 5 },
+    { r: 2, m: 12, t1: 6, t2_from: { w: 10 }, w: 6, l: 10 },
+    { r: 3, m: 13, t1: 7, t2_from: { w: 12 }, w: 7, l: 6, p: 1 },
+    { r: 3, m: 14, t1_from: { l: 11 }, t2: 11, w: 9, l: 11, p: 3 }
+];
+
+test('consolação usa rótulos de 7º, 9º e 11º lugares', () => {
+    const result = core.buildPlayoffRounds(losersBracket, league, {}, { bracketType: 'losers' });
+    const final = result.rounds[2].matches.find(match => match.placement === 1);
+    const third = result.rounds[2].matches.find(match => match.placement === 3);
+    const fifth = result.rounds[1].matches.find(match => match.placement === 5);
+    assert.equal(final.placementLabel, 'Disputa do 7º lugar');
+    assert.equal(third.placementLabel, 'Disputa do 9º lugar');
+    assert.equal(fifth.placementLabel, 'Disputa do 11º lugar');
+});
+
 test('rota de playoffs preserva liga, chave e rodada', () => {
     const query = core.serializeRoute({
         view: 'playoffs',

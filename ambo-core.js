@@ -729,20 +729,28 @@
         return `Rodada ${roundNumber}`;
     }
 
-    function getPlacementLabel(placement) {
+    function getPlacementLabel(placement, options = {}) {
         const value = Number(placement);
         if (!Number.isInteger(value) || value < 1) return '';
-        if (value === 1) return 'Disputa do título';
-        if (value === 3) return 'Disputa do 3º lugar';
-        return `Disputa do ${value}º lugar`;
+
+        const offset = Math.max(0, Number(options?.offset) || 0);
+        const finalPlacement = value + offset;
+
+        if (finalPlacement === 1) return 'Disputa do título';
+        if (finalPlacement === 3) return 'Disputa do 3º lugar';
+        return `Disputa do ${finalPlacement}º lugar`;
     }
 
-    function buildPlayoffRounds(bracket, league, matchupsByWeek = {}) {
+    function buildPlayoffRounds(bracket, league, matchupsByWeek = {}, options = {}) {
         const matches = Array.isArray(bracket) ? bracket : [];
         const matchById = new Map(matches.map(match => [Number(match?.m), match]));
         const totalRounds = getPlayoffRoundCount(matches);
         const weekNumbers = getPlayoffWeekNumbers(league, matches);
         const rounds = [];
+        const bracketType = options?.bracketType === 'losers' ? 'losers' : 'winners';
+        const placementOffset = bracketType === 'losers'
+            ? Math.max(0, Number(league?.settings?.playoff_teams || 0))
+            : 0;
 
         for (let roundNumber = 1; roundNumber <= totalRounds; roundNumber += 1) {
             const week = weekNumbers[roundNumber - 1] || null;
@@ -776,7 +784,7 @@
                         round: roundNumber,
                         week,
                         placement: Number.isInteger(Number(match?.p)) ? Number(match.p) : null,
-                        placementLabel: getPlacementLabel(match?.p),
+                        placementLabel: getPlacementLabel(match?.p, { offset: placementOffset }),
                         team1RosterId,
                         team2RosterId,
                         winnerRosterId,

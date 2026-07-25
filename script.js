@@ -1348,7 +1348,7 @@
         renderPlayoffBracketTabs(snapshot);
         const bracket = state.playoffBracket === 'losers' ? snapshot.losersBracket : snapshot.winnersBracket;
         const matchupsByWeek = snapshot.playoffs?.matchupsByWeek || {};
-        const built = core.buildPlayoffRounds(bracket, snapshot.league, matchupsByWeek);
+        const built = core.buildPlayoffRounds(bracket, snapshot.league, matchupsByWeek, { bracketType: state.playoffBracket });
         state.currentPlayoffData = { snapshot, built, bracketKey: state.playoffBracket };
 
         const bracketLabel = state.playoffBracket === 'winners' ? 'Chave principal' : 'Consolação';
