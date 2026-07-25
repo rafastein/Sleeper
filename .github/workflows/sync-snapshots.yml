@@ -26,12 +26,20 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Exibir versões
+        run: |
+          node --version
+          npm --version
+
       - name: Montar argumentos
         id: args
         shell: bash
@@ -44,10 +52,17 @@ jobs:
             if [ -n "${{ inputs.year }}" ]; then ARGS="$ARGS --year ${{ inputs.year }}"; fi
             if [ -n "${{ inputs.series }}" ]; then ARGS="$ARGS --series ${{ inputs.series }}"; fi
           fi
+          echo "Argumentos: $ARGS"
           echo "value=$ARGS" >> "$GITHUB_OUTPUT"
+
       - name: Baixar e validar dados do Sleeper
-        run: node scripts/sync-data.js ${{ steps.args.outputs.value }}
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/sync-data.js ${{ steps.args.outputs.value }} 2>&1 | tee sync.log
+
       - run: npm run check
+
       - name: Commitar snapshots atualizados
         shell: bash
         run: |
