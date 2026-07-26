@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-25T16:35:56.470Z",
+  "generatedAt": "2026-07-26T13:59:26.213Z",
   "snapshots": [
     {
       "year": 2025,
@@ -82,7 +82,7 @@
     {
       "year": 2023,
       "seriesKey": "serieB",
-      "generatedAt": "2026-07-25T16:35:56.470Z",
+      "generatedAt": "2026-07-26T13:59:26.213Z",
       "leagues": [
         "989661009860243456",
         "989661264643211264"

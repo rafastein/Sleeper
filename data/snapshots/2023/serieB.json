@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-25T16:35:56.470Z",
+  "generatedAt": "2026-07-26T13:59:26.213Z",
   "source": "Sleeper API",
   "year": 2023,
   "seriesKey": "serieB",
@@ -24,6 +24,7 @@
         {
           "roster_id": 1,
           "owner_id": "459817765377667072",
+          "co_owners": [],
           "metadata": {
             "record": "WLLLLWLWLWLWWW",
             "streak": "3W"
@@ -41,6 +42,7 @@
         {
           "roster_id": 2,
           "owner_id": "466669691117498368",
+          "co_owners": [],
           "metadata": {
             "record": "WLWWWLLWLLLWLL",
             "streak": "2L"
@@ -58,6 +60,7 @@
         {
           "roster_id": 3,
           "owner_id": "455157080240680960",
+          "co_owners": [],
           "metadata": {
             "record": "WLWLLWLLWLWWWW",
             "streak": "4W"
@@ -75,6 +78,7 @@
         {
           "roster_id": 4,
           "owner_id": "867416391458897920",
+          "co_owners": [],
           "metadata": {
             "record": "LLLWWLWWWLLLLW",
             "streak": "1W"
@@ -92,6 +96,7 @@
         {
           "roster_id": 5,
           "owner_id": "867415604578131968",
+          "co_owners": [],
           "metadata": {
             "record": "LWLWWLWLLLWLWW",
             "streak": "2W"
@@ -109,6 +114,7 @@
         {
           "roster_id": 6,
           "owner_id": "455127152711430144",
+          "co_owners": [],
           "metadata": {
             "record": "LLLLLWWLLWLLLL",
             "streak": "4L"
@@ -126,6 +132,7 @@
         {
           "roster_id": 7,
           "owner_id": "459814872146767872",
+          "co_owners": [],
           "metadata": {
             "record": "WWWLWLWLWLLLWL",
             "streak": "1L"
@@ -143,6 +150,7 @@
         {
           "roster_id": 8,
           "owner_id": "589183856876228608",
+          "co_owners": [],
           "metadata": {
             "record": "LWWLLWWLWWWWLW",
             "streak": "1W"
@@ -160,6 +168,9 @@
         {
           "roster_id": 9,
           "owner_id": "458977644550025216",
+          "co_owners": [
+            "460216259665981440"
+          ],
           "metadata": {
             "record": "LWLWLWLWWLLWWW",
             "streak": "3W"
@@ -177,6 +188,7 @@
         {
           "roster_id": 10,
           "owner_id": "460430879521501184",
+          "co_owners": [],
           "metadata": {
             "record": "WWWLLLLLLWWLWL",
             "streak": "1L"
@@ -194,6 +206,7 @@
         {
           "roster_id": 11,
           "owner_id": "860271647331045376",
+          "co_owners": [],
           "metadata": {
             "allow_pn_scoring": "off",
             "record": "WLLWWWWWWWWWLL",
@@ -212,6 +225,7 @@
         {
           "roster_id": 12,
           "owner_id": "593833332224086016",
+          "co_owners": [],
           "metadata": {
             "record": "LWWWWLLWLWWLLL",
             "streak": "3L"
@@ -943,6 +957,7 @@
         {
           "roster_id": 1,
           "owner_id": "460430879521501184",
+          "co_owners": [],
           "metadata": {
             "record": "LWLWWWLLWWLLWL",
             "streak": "1L"
@@ -960,6 +975,7 @@
         {
           "roster_id": 2,
           "owner_id": "867416391458897920",
+          "co_owners": [],
           "metadata": {
             "allow_pn_news": "off",
             "allow_pn_scoring": "on",
@@ -979,6 +995,7 @@
         {
           "roster_id": 3,
           "owner_id": "455157080240680960",
+          "co_owners": [],
           "metadata": {
             "record": "WWLLWLWWWLWWLL",
             "streak": "2L"
@@ -996,6 +1013,7 @@
         {
           "roster_id": 4,
           "owner_id": "867415604578131968",
+          "co_owners": [],
           "metadata": {
             "record": "LLLWLWLWWLLWLW",
             "streak": "1W"
@@ -1013,6 +1031,7 @@
         {
           "roster_id": 5,
           "owner_id": "466669691117498368",
+          "co_owners": [],
           "metadata": {
             "record": "WLWWWWWLLWLWWW",
             "streak": "3W"
@@ -1030,6 +1049,7 @@
         {
           "roster_id": 6,
           "owner_id": "593833332224086016",
+          "co_owners": [],
           "metadata": {
             "record": "LLLLLLLWLLLLLW",
             "streak": "1W"
@@ -1047,6 +1067,7 @@
         {
           "roster_id": 7,
           "owner_id": "455127152711430144",
+          "co_owners": [],
           "metadata": {
             "record": "WLWLWWWWLLWWWW",
             "streak": "4W"
@@ -1064,6 +1085,7 @@
         {
           "roster_id": 8,
           "owner_id": "459817765377667072",
+          "co_owners": [],
           "metadata": {
             "allow_pn_scoring": "off",
             "record": "WWWWLLWWWLWWWL",
@@ -1082,6 +1104,7 @@
         {
           "roster_id": 9,
           "owner_id": "860271647331045376",
+          "co_owners": [],
           "metadata": {
             "record": "LWWLLLLLWLWLWL",
             "streak": "1L"
@@ -1099,6 +1122,7 @@
         {
           "roster_id": 10,
           "owner_id": "459814872146767872",
+          "co_owners": [],
           "metadata": {
             "record": "WLLLWLLLLWWLLW",
             "streak": "1W"
@@ -1116,6 +1140,7 @@
         {
           "roster_id": 11,
           "owner_id": "589183856876228608",
+          "co_owners": [],
           "metadata": {
             "record": "LLWLWWLLWWWLLW",
             "streak": "1W"
@@ -1133,6 +1158,9 @@
         {
           "roster_id": 12,
           "owner_id": "458977644550025216",
+          "co_owners": [
+            "460216259665981440"
+          ],
           "metadata": {
             "record": "WWLWLLWWLWLWWL",
             "streak": "1L"
