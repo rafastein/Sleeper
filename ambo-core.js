@@ -209,8 +209,40 @@
         return { valid: errors.length === 0, errors };
     }
 
+    function getRosterUserCandidates(roster, users) {
+        const userById = new Map((users || []).map(user => [String(user?.user_id || ''), user]));
+        const candidateIds = [
+            roster?.owner_id,
+            ...(Array.isArray(roster?.co_owners) ? roster.co_owners : [])
+        ].filter(Boolean).map(String);
+
+        return [...new Set(candidateIds)]
+            .map(userId => userById.get(userId))
+            .filter(Boolean);
+    }
+
     function getUserForRoster(roster, users) {
-        return (users || []).find(user => String(user.user_id) === String(roster?.owner_id)) || null;
+        const candidates = getRosterUserCandidates(roster, users);
+        if (!candidates.length) return null;
+
+        const owner = candidates.find(user => String(user?.user_id) === String(roster?.owner_id)) || candidates[0];
+        const teamNames = [
+            roster?.metadata?.team_name,
+            owner?.metadata?.team_name
+        ].map(normalizeAlias).filter(Boolean);
+
+        if (teamNames.length && candidates.length > 1) {
+            const matchingCoOwner = candidates.find(user => {
+                if (String(user?.user_id) === String(roster?.owner_id)) return false;
+                const aliases = [user?.username, user?.display_name]
+                    .map(normalizeAlias)
+                    .filter(Boolean);
+                return aliases.some(alias => teamNames.includes(alias));
+            });
+            if (matchingCoOwner) return matchingCoOwner;
+        }
+
+        return owner;
     }
 
     function getManagerName(user, roster) {
@@ -921,6 +953,7 @@
         calculateStandings,
         validateStandings,
         validateLeagueSnapshot,
+        getRosterUserCandidates,
         getUserForRoster,
         getManagerName,
         getTeamName,

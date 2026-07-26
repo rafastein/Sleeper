@@ -123,3 +123,57 @@ test('cadastro canônico soma duas contas do mesmo manager', () => {
     assert.equal(combined[0].appearances, 2);
     assert.equal(combined[0].fpts, 2100.75);
 });
+
+
+test('co-owner cujo nome corresponde ao nome da equipe é exibido como manager principal', () => {
+    const roster = {
+        roster_id: 4,
+        owner_id: 'dedebenjor-id',
+        co_owners: ['jptavares-id'],
+        metadata: null
+    };
+    const users = [
+        {
+            user_id: 'dedebenjor-id',
+            username: 'dedebenjor',
+            display_name: 'dedebenjor',
+            metadata: { team_name: 'Jptavares' }
+        },
+        {
+            user_id: 'jptavares-id',
+            username: 'Jptavares',
+            display_name: 'Jptavares',
+            metadata: null
+        }
+    ];
+
+    const manager = core.getUserForRoster(roster, users);
+    assert.equal(manager.user_id, 'jptavares-id');
+    assert.equal(core.getManagerName(manager, roster), 'Jptavares');
+});
+
+test('owner original continua sendo usado quando o nome da equipe não identifica um co-owner', () => {
+    const roster = {
+        roster_id: 4,
+        owner_id: 'owner-id',
+        co_owners: ['co-owner-id'],
+        metadata: null
+    };
+    const users = [
+        {
+            user_id: 'owner-id',
+            username: 'owner',
+            display_name: 'Owner',
+            metadata: { team_name: 'Recife Bucs' }
+        },
+        {
+            user_id: 'co-owner-id',
+            username: 'guest',
+            display_name: 'Guest',
+            metadata: null
+        }
+    ];
+
+    const manager = core.getUserForRoster(roster, users);
+    assert.equal(manager.user_id, 'owner-id');
+});

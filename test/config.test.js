@@ -2,7 +2,10 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const config = require('../config.js');
+const ROOT = path.resolve(__dirname, '..');
 
 test('todas as temporadas possuem Keeper, Série A e Série B', () => {
     for (const [year, season] of Object.entries(config.leagueIds)) {
@@ -27,8 +30,6 @@ test('anos de snapshot existem na configuração', () => {
     }
 });
 
-const fs = require('node:fs');
-const path = require('node:path');
 
 test('sincronizador ignora somente recortes opcionais com zero ligas', () => {
     const source = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'sync-data.js'), 'utf8');
@@ -41,4 +42,10 @@ test('interface trata Keeper opcional sem tentar carregar uma lista vazia', () =
     const source = fs.readFileSync(path.join(__dirname, '..', 'script.js'), 'utf8');
     assert.match(source, /seasonConfig\.optional === true && matchedLeagueIds\.length === 0/);
     assert.match(source, /a liga \${seriesLabel} de \${year} ainda não foi localizada no Sleeper/);
+});
+
+
+test('sincronizador preserva co-owners dos rosters', () => {
+    const sync = fs.readFileSync(path.join(ROOT, 'scripts', 'sync-data.js'), 'utf8');
+    assert.match(sync, /co_owners:\s*Array\.isArray\(roster\?\.co_owners\)/);
 });

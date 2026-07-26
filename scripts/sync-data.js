@@ -92,6 +92,9 @@ function trimRoster(roster) {
     return {
         roster_id: Number(roster?.roster_id),
         owner_id: roster?.owner_id ? String(roster.owner_id) : null,
+        co_owners: Array.isArray(roster?.co_owners)
+            ? roster.co_owners.filter(Boolean).map(String)
+            : [],
         metadata: roster?.metadata || null,
         settings: {
             wins: Number(settings.wins || 0),

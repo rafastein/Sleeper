@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.0.4 — Co-owners e manager principal
+
+- Preserva o campo `co_owners` nos snapshots gerados pela API.
+- Quando o nome da equipe corresponde ao username/display name de um co-owner, esse co-owner passa a ser exibido como manager principal.
+- Corrige especificamente o roster `Jptavares` da Série B de 2023, sem alterar os times próprios do dedebenjor em outras ligas.
+- Mantém o owner original como fallback quando não existe correspondência segura.
+
 ## 6.0.2 — Keeper opcional por temporada
 
 - A sincronização não falha quando uma liga Keeper não aparece entre as ligas do usuário em um ano específico.

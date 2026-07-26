@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ambo-v6.0.2-optional-keeper';
+const CACHE_VERSION = 'ambo-v6.0.4-coowners';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 const APP_SHELL = [
