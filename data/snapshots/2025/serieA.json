@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-25T16:35:56.470Z",
+  "generatedAt": "2026-07-27T12:37:59.331Z",
   "source": "Sleeper API",
   "year": 2025,
   "seriesKey": "serieA",
@@ -24,6 +24,7 @@
         {
           "roster_id": 1,
           "owner_id": "458977644550025216",
+          "co_owners": [],
           "metadata": {
             "allow_pn_news": "off",
             "allow_pn_scoring": "on",
@@ -54,6 +55,7 @@
         {
           "roster_id": 2,
           "owner_id": "445582191489970176",
+          "co_owners": [],
           "metadata": {
             "record": "LWWLWLLLLLLLLW",
             "streak": "1W"
@@ -71,6 +73,7 @@
         {
           "roster_id": 3,
           "owner_id": "449069284769918976",
+          "co_owners": [],
           "metadata": {
             "allow_pn_news": "off",
             "allow_pn_scoring": "on",
@@ -90,6 +93,7 @@
         {
           "roster_id": 4,
           "owner_id": "455115982172581888",
+          "co_owners": [],
           "metadata": {
             "allow_pn_inactive_starters": "on",
             "allow_pn_player_injury_status": "on",
@@ -111,6 +115,7 @@
         {
           "roster_id": 5,
           "owner_id": "460216259665981440",
+          "co_owners": [],
           "metadata": {
             "allow_pn_news": "off",
             "allow_pn_scoring": "on",
@@ -130,6 +135,7 @@
         {
           "roster_id": 6,
           "owner_id": "714183253740851200",
+          "co_owners": [],
           "metadata": {
             "allow_pn_scoring": "off",
             "record": "LWWLLLWLLWLLLL",
@@ -149,6 +155,7 @@
         {
           "roster_id": 7,
           "owner_id": "449023164270243840",
+          "co_owners": [],
           "metadata": {
             "record": "WWLLLWLLWLLWLL",
             "streak": "2L"
@@ -166,6 +173,7 @@
         {
           "roster_id": 8,
           "owner_id": "449600776445095936",
+          "co_owners": [],
           "metadata": {
             "allow_pn_scoring": "on",
             "league_avatar": "",
@@ -187,6 +195,7 @@
         {
           "roster_id": 9,
           "owner_id": "867416391458897920",
+          "co_owners": [],
           "metadata": {
             "allow_pn_inactive_starters": "on",
             "allow_pn_player_injury_status": "off",
@@ -209,6 +218,7 @@
         {
           "roster_id": 10,
           "owner_id": "459817765377667072",
+          "co_owners": [],
           "metadata": {
             "record": "LLWWLLWWLWLLWW",
             "streak": "2W"
@@ -226,6 +236,7 @@
         {
           "roster_id": 11,
           "owner_id": "867415604578131968",
+          "co_owners": [],
           "metadata": {
             "record": "WLLLLWWWLWWWWL",
             "streak": "1L"
@@ -243,6 +254,7 @@
         {
           "roster_id": 12,
           "owner_id": "455157080240680960",
+          "co_owners": [],
           "metadata": {
             "record": "WWWWLWWWWWWWLW",
             "streak": "1W"
@@ -933,6 +945,7 @@
         {
           "roster_id": 1,
           "owner_id": "458977644550025216",
+          "co_owners": [],
           "metadata": {
             "p_nick_1479": "Negociável",
             "p_nick_2168": "Negociável",
@@ -964,6 +977,7 @@
         {
           "roster_id": 2,
           "owner_id": "445582191489970176",
+          "co_owners": [],
           "metadata": {
             "record": "LWWLWLWWLWLLWW",
             "streak": "2W"
@@ -981,6 +995,7 @@
         {
           "roster_id": 3,
           "owner_id": "449069284769918976",
+          "co_owners": [],
           "metadata": {
             "record": "WLWWWLLLWWLWWL",
             "streak": "1L"
@@ -998,6 +1013,7 @@
         {
           "roster_id": 4,
           "owner_id": "455115982172581888",
+          "co_owners": [],
           "metadata": {
             "allow_pn_inactive_starters": "on",
             "allow_pn_player_injury_status": "on",
@@ -1019,6 +1035,7 @@
         {
           "roster_id": 5,
           "owner_id": "460216259665981440",
+          "co_owners": [],
           "metadata": {
             "record": "LLWLLLWLLLLWWW",
             "streak": "3W"
@@ -1036,6 +1053,7 @@
         {
           "roster_id": 6,
           "owner_id": "714183253740851200",
+          "co_owners": [],
           "metadata": {
             "allow_pn_news": "off",
             "allow_pn_scoring": "off",
@@ -1056,6 +1074,7 @@
         {
           "roster_id": 7,
           "owner_id": "449023164270243840",
+          "co_owners": [],
           "metadata": {
             "record": "WWWWLLLWLLWLWL",
             "streak": "1L"
@@ -1073,6 +1092,7 @@
         {
           "roster_id": 8,
           "owner_id": "449600776445095936",
+          "co_owners": [],
           "metadata": {
             "allow_pn_scoring": "on",
             "record": "WWWWLLWLWWWWLL",
@@ -1092,6 +1112,7 @@
         {
           "roster_id": 9,
           "owner_id": "867416391458897920",
+          "co_owners": [],
           "metadata": {
             "allow_pn_inactive_starters": "on",
             "allow_pn_player_injury_status": "off",
@@ -1114,6 +1135,7 @@
         {
           "roster_id": 10,
           "owner_id": "459817765377667072",
+          "co_owners": [],
           "metadata": {
             "allow_pn_news": "off",
             "allow_pn_scoring": "off",
@@ -1133,6 +1155,7 @@
         {
           "roster_id": 11,
           "owner_id": "867415604578131968",
+          "co_owners": [],
           "metadata": {
             "record": "LLLLWWLLWWWLLW",
             "streak": "1W"
@@ -1150,6 +1173,7 @@
         {
           "roster_id": 12,
           "owner_id": "455157080240680960",
+          "co_owners": [],
           "metadata": {
             "record": "LWWWWWWWWLWWWW",
             "streak": "4W"
