@@ -875,13 +875,13 @@
 
     function parseRoute(search, options = {}) {
         const params = new URLSearchParams(String(search || '').replace(/^\?/, ''));
-        const allowedViews = new Set(['champions', 'history', 'profile', 'season', 'playoffs']);
+        const allowedViews = new Set(['home', 'champions', 'history', 'profile', 'season', 'playoffs']);
         const allowedSeries = new Set(['all', 'keeper', 'serieA', 'serieB']);
         const allowedHistorySorts = new Set(['points', 'titles', 'podiums', 'average']);
         const allowedSeasonSorts = new Set(['points', 'fpts', 'bestRank', 'name']);
         const configuredYears = new Set((options.years || []).map(Number));
 
-        const view = allowedViews.has(params.get('view')) ? params.get('view') : 'champions';
+        const view = allowedViews.has(params.get('view')) ? params.get('view') : 'home';
         const series = allowedSeries.has(params.get('series')) ? params.get('series') : 'all';
         const yearValue = Number(params.get('year'));
         const year = Number.isInteger(yearValue) && (!configuredYears.size || configuredYears.has(yearValue))
@@ -891,7 +891,7 @@
         const seasonSort = allowedSeasonSorts.has(params.get('sort')) ? params.get('sort') : 'points';
 
         if ((view === 'season' || view === 'playoffs') && (!year || series === 'all')) {
-            return { view: 'champions' };
+            return { view: 'home' };
         }
         if (view === 'profile' && !params.get('manager')) {
             return { view: 'history', series, sort: historySort, query: params.get('q') || '' };
@@ -918,8 +918,8 @@
 
     function serializeRoute(route = {}) {
         const params = new URLSearchParams();
-        const view = route.view || 'champions';
-        params.set('view', view);
+        const view = route.view || 'home';
+        if (view !== 'home') params.set('view', view);
 
         if (view === 'history') {
             if (route.series && route.series !== 'all') params.set('series', route.series);
@@ -941,7 +941,8 @@
             if (Number(route.round) > 1) params.set('round', String(route.round));
         }
 
-        return `?${params.toString()}`;
+        const query = params.toString();
+        return query ? `?${query}` : '';
     }
 
     return Object.freeze({

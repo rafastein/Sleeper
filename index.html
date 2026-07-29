@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AMBO">
-    <meta name="description" content="Histórico de campeões e rankings das ligas AMBO no Sleeper.">
+    <meta name="description" content="Portal histórico das ligas AMBO com campeões, rankings, playoffs e trajetórias.">
     <meta property="og:title" content="AMBO • Central Sleeper">
-    <meta property="og:description" content="Rankings, campeões e histórico das ligas AMBO.">
+    <meta property="og:description" content="Campeões, rankings, playoffs e história das ligas AMBO em um só lugar.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="/social-card.png">
     <meta property="og:image:alt" content="AMBO Central Sleeper — rankings e história das ligas">
@@ -21,10 +21,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=6.0.4">
+    <link rel="stylesheet" href="styles.css?v=7.0.0">
     <script src="ambo-core.js" defer></script>
     <script src="config.js" defer></script>
-    <script src="script.js?v=6.0.4" defer></script>
+    <script src="script.js?v=7.0.0" defer></script>
 </head>
 <body>
     <div class="page-glow page-glow--one" aria-hidden="true"></div>
@@ -85,7 +85,93 @@
                 </button>
             </nav>
 
-            <section id="champions-view" class="view" aria-labelledby="page-title">
+            <section id="home-view" class="view" aria-labelledby="page-title">
+                <article class="home-hero panel panel--featured">
+                    <div class="home-hero__content">
+                        <p class="panel__eyebrow">Fantasy football · desde 2017</p>
+                        <h2>A história da AMBO, temporada por temporada</h2>
+                        <p>Campeões, rankings, playoffs e trajetórias das ligas Keeper, Série A e Série B reunidos em uma central viva.</p>
+                        <div class="home-hero__actions">
+                            <button id="home-latest-season" class="home-primary-button" type="button">Ver temporada mais recente</button>
+                            <button id="home-ranking" class="home-secondary-button" type="button">Abrir ranking histórico</button>
+                        </div>
+                    </div>
+                    <div class="home-hero__season" aria-label="Temporada mais recente">
+                        <span>Temporada mais recente</span>
+                        <strong id="home-latest-year">—</strong>
+                        <small id="home-latest-status">Carregando dados oficiais</small>
+                    </div>
+                </article>
+
+                <div id="home-stats" class="stats-grid stats-grid--four"></div>
+
+                <article class="panel panel--featured">
+                    <div class="panel__header panel__header--wrap">
+                        <div>
+                            <p class="panel__eyebrow">Última temporada</p>
+                            <h2 id="home-season-title">Destaques da temporada</h2>
+                        </div>
+                        <span id="home-season-status" class="pill"></span>
+                    </div>
+                    <div id="home-season-cards" class="home-season-grid"></div>
+                </article>
+
+                <div class="home-dashboard-grid">
+                    <article class="panel panel--featured">
+                        <div class="panel__header">
+                            <div>
+                                <p class="panel__eyebrow">Hall dos recordes</p>
+                                <h2>Grandes marcas da AMBO</h2>
+                            </div>
+                        </div>
+                        <div id="home-records" class="home-records-grid"></div>
+                    </article>
+
+                    <article class="panel panel--featured">
+                        <div class="panel__header">
+                            <div>
+                                <p class="panel__eyebrow">Navegação rápida</p>
+                                <h2>Explore a central</h2>
+                            </div>
+                        </div>
+                        <div class="home-quick-links">
+                            <button id="home-champions-link" class="home-quick-link" type="button">
+                                <span aria-hidden="true">★</span>
+                                <strong>Hall de campeões</strong>
+                                <small>Todos os vencedores por ano</small>
+                            </button>
+                            <button id="home-history-link" class="home-quick-link" type="button">
+                                <span aria-hidden="true">∞</span>
+                                <strong>Ranking histórico</strong>
+                                <small>Títulos, vices e pódios</small>
+                            </button>
+                            <button id="home-playoffs-link" class="home-quick-link" type="button">
+                                <span aria-hidden="true">⌁</span>
+                                <strong id="home-playoffs-link-title">Playoffs recentes</strong>
+                                <small>Chave principal e consolação</small>
+                            </button>
+                            <button id="home-standings-link" class="home-quick-link" type="button">
+                                <span aria-hidden="true">▦</span>
+                                <strong id="home-standings-link-title">Classificação recente</strong>
+                                <small>Ranking e ligas da temporada</small>
+                            </button>
+                        </div>
+                    </article>
+                </div>
+
+                <article class="panel panel--featured">
+                    <div class="panel__header panel__header--wrap">
+                        <div>
+                            <p class="panel__eyebrow">Memória recente</p>
+                            <h2>Campeões das últimas temporadas</h2>
+                        </div>
+                        <button id="home-all-champions" class="panel-link-button" type="button">Ver Hall completo →</button>
+                    </div>
+                    <div id="home-recent-champions" class="home-champions-grid"></div>
+                </article>
+            </section>
+
+            <section id="champions-view" class="view" aria-labelledby="page-title" hidden>
                 <div id="champion-stats" class="stats-grid"></div>
 
                 <article class="panel panel--featured">

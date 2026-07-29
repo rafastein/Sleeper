@@ -21,9 +21,14 @@ test('serializa e restaura a rota de uma temporada', () => {
     assert.equal(route.query, 'Jp Tavares');
 });
 
-test('rota inválida de temporada volta ao hall de campeões', () => {
+test('rota inválida de temporada volta para a página inicial', () => {
     const route = core.parseRoute('?view=season&year=1999&series=serieA', { years: [2024, 2025] });
-    assert.deepEqual(route, { view: 'champions' });
+    assert.deepEqual(route, { view: 'home' });
+});
+
+test('a raiz do site representa a página inicial sem query string', () => {
+    assert.deepEqual(core.parseRoute('', { years: [2024, 2025] }).view, 'home');
+    assert.equal(core.serializeRoute({ view: 'home' }), '');
 });
 
 test('busca ignora maiúsculas, espaços e acentos', () => {

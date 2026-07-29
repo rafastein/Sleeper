@@ -1665,3 +1665,527 @@ th:last-child {
         font-size: 0.84rem;
     }
 }
+
+/* Versão 7.0: página inicial */
+.home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(210px, 0.55fr);
+    align-items: stretch;
+    gap: 0;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 88% 20%, rgba(85, 214, 190, 0.16), transparent 32%),
+        linear-gradient(145deg, rgba(16, 31, 52, 0.96), rgba(8, 21, 37, 0.9));
+}
+
+.home-hero__content {
+    padding: clamp(24px, 4vw, 46px);
+}
+
+.home-hero__content h2 {
+    max-width: 740px;
+    font-size: clamp(1.65rem, 3.1vw, 2.75rem);
+    letter-spacing: -0.045em;
+}
+
+.home-hero__content > p:not(.panel__eyebrow) {
+    max-width: 720px;
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 0.94rem;
+}
+
+.home-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.home-primary-button,
+.home-secondary-button,
+.home-card-button,
+.panel-link-button {
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 11px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 160ms ease;
+}
+
+.home-primary-button,
+.home-card-button--primary {
+    border-color: rgba(85, 214, 190, 0.32);
+    background: var(--primary);
+    color: #052019;
+}
+
+.home-primary-button:hover,
+.home-card-button--primary:hover {
+    background: #78e3cf;
+}
+
+.home-secondary-button,
+.home-card-button,
+.panel-link-button {
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--text);
+}
+
+.home-secondary-button:hover,
+.home-card-button:hover,
+.panel-link-button:hover {
+    border-color: rgba(85, 214, 190, 0.3);
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.home-primary-button:focus-visible,
+.home-secondary-button:focus-visible,
+.home-card-button:focus-visible,
+.home-quick-link:focus-visible,
+.home-manager-link:focus-visible,
+.home-record-card__name:focus-visible,
+.home-champion-year__name:focus-visible,
+.panel-link-button:focus-visible {
+    outline: 3px solid rgba(85, 214, 190, 0.35);
+    outline-offset: 2px;
+}
+
+.home-hero__season {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    min-height: 230px;
+    padding: 30px;
+    border-left: 1px solid var(--border);
+    background: rgba(5, 16, 29, 0.32);
+    text-align: center;
+}
+
+.home-hero__season span {
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.home-hero__season strong {
+    margin: 7px 0 2px;
+    color: var(--primary);
+    font-size: clamp(3rem, 7vw, 5.8rem);
+    font-weight: 800;
+    letter-spacing: -0.07em;
+    line-height: 1;
+}
+
+.home-hero__season small {
+    max-width: 210px;
+    color: #70849b;
+    font-size: 0.68rem;
+}
+
+.home-season-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 18px;
+}
+
+.home-season-card {
+    display: flex;
+    min-width: 0;
+    min-height: 330px;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: linear-gradient(150deg, rgba(16, 31, 52, 0.83), rgba(9, 23, 40, 0.72));
+}
+
+.home-season-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.home-season-card__identity {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.home-season-card__identity > div {
+    min-width: 0;
+}
+
+.home-season-card__identity strong,
+.home-season-card__label {
+    display: block;
+}
+
+.home-season-card__identity strong {
+    margin-top: 2px;
+    font-size: 1.05rem;
+}
+
+.home-season-card__label,
+.home-season-card__status,
+.home-season-card__meta {
+    color: var(--muted);
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.home-season-card__icon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    flex: 0 0 auto;
+    border: 1px solid rgba(85, 214, 190, 0.28);
+    border-radius: 11px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.home-season-card__status {
+    color: var(--primary);
+}
+
+.home-season-card__status.is-muted {
+    color: #70849b;
+}
+
+.home-podium {
+    display: grid;
+    flex: 1;
+}
+
+.home-podium__row {
+    display: grid;
+    grid-template-columns: 34px auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-height: 65px;
+    padding: 11px 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.home-podium__row--1 {
+    background: linear-gradient(90deg, rgba(248, 201, 92, 0.07), transparent 72%);
+}
+
+.home-podium__place {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.home-podium__row--1 .home-podium__place { color: var(--gold); }
+.home-podium__row--2 .home-podium__place { color: var(--silver); }
+.home-podium__row--3 .home-podium__place { color: var(--bronze); }
+
+.home-podium__identity {
+    min-width: 0;
+}
+
+.home-manager-link,
+.home-record-card__name,
+.home-champion-year__name {
+    display: block;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-weight: 800;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.home-manager-link:disabled,
+.home-record-card__name:disabled,
+.home-champion-year__name:disabled {
+    cursor: default;
+}
+
+.home-manager-link:not(:disabled):hover,
+.home-record-card__name:not(:disabled):hover,
+.home-champion-year__name:not(:disabled):hover {
+    color: var(--primary);
+}
+
+.home-podium__identity span {
+    display: block;
+    margin-top: 2px;
+    color: #70849b;
+    font-size: 0.64rem;
+}
+
+.home-season-card__footer {
+    display: grid;
+    gap: 10px;
+    padding: 13px 15px 15px;
+}
+
+.home-season-card__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.home-card-button {
+    min-height: 36px;
+    padding: 7px 9px;
+    font-size: 0.68rem;
+}
+
+.home-season-card__empty {
+    display: grid;
+    min-height: 230px;
+    place-content: center;
+    gap: 6px;
+    padding: 24px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.home-season-card__empty strong {
+    color: var(--text);
+}
+
+.home-season-card__empty span {
+    font-size: 0.72rem;
+}
+
+.home-dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+    gap: 18px;
+}
+
+.home-records-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--border);
+}
+
+.home-record-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 13px;
+    min-height: 138px;
+    padding: 18px;
+    background: rgba(9, 22, 38, 0.93);
+}
+
+.home-record-card__icon {
+    display: grid;
+    width: 39px;
+    height: 39px;
+    place-items: center;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.035);
+    font-size: 1rem;
+}
+
+.home-record-card__content {
+    min-width: 0;
+}
+
+.home-record-card__label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 0.63rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.home-record-card__value {
+    display: block;
+    margin-top: 5px;
+    color: var(--primary);
+    font-size: 1.02rem;
+}
+
+.home-record-card small {
+    display: block;
+    margin-top: 3px;
+    color: #70849b;
+    font-size: 0.63rem;
+}
+
+.home-quick-links {
+    display: grid;
+    gap: 1px;
+    background: var(--border);
+}
+
+.home-quick-link {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 2px 12px;
+    min-height: 78px;
+    padding: 14px 18px;
+    border: 0;
+    background: rgba(9, 22, 38, 0.93);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: 150ms ease;
+}
+
+.home-quick-link:hover {
+    background: rgba(85, 214, 190, 0.07);
+}
+
+.home-quick-link > span {
+    display: grid;
+    grid-row: 1 / span 2;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    border-radius: 11px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.home-quick-link strong {
+    align-self: end;
+    font-size: 0.78rem;
+}
+
+.home-quick-link small {
+    align-self: start;
+    color: var(--muted);
+    font-size: 0.64rem;
+}
+
+.panel-link-button {
+    min-height: 34px;
+    padding: 6px 10px;
+    color: var(--primary);
+}
+
+.home-champions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    padding: 18px;
+}
+
+.home-champion-year {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: rgba(9, 23, 40, 0.72);
+}
+
+.home-champion-year__year {
+    display: block;
+    padding: 14px 15px;
+    border-bottom: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 1.08rem;
+}
+
+.home-champion-year__list {
+    display: grid;
+}
+
+.home-champion-year__item {
+    display: grid;
+    grid-template-columns: 66px auto minmax(0, 1fr);
+    align-items: center;
+    gap: 9px;
+    min-height: 62px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.home-champion-year__item:last-child {
+    border-bottom: 0;
+}
+
+.home-champion-year__series {
+    color: var(--muted);
+    font-size: 0.64rem;
+    font-weight: 800;
+}
+
+.home-champion-year__item .avatar,
+.home-champion-year__item .avatar-placeholder {
+    width: 30px;
+    height: 30px;
+}
+
+@media (max-width: 1180px) {
+    .home-season-grid,
+    .home-champions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-season-card {
+        min-height: 0;
+    }
+
+    .home-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .home-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .home-hero__season {
+        min-height: 160px;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+    }
+
+    .home-records-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-season-grid,
+    .home-champions-grid {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 430px) {
+    .home-hero__actions,
+    .home-season-card__actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .home-primary-button,
+    .home-secondary-button {
+        width: 100%;
+    }
+}

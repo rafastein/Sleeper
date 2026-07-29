@@ -1,5 +1,17 @@
 # Changelog
 
+## 7.0.0 — Página inicial da AMBO
+
+- Adiciona uma Home como rota raiz do site.
+- Resume temporadas catalogadas, managers, títulos oficiais e snapshots validados.
+- Mostra os pódios da temporada mais recente para Keeper, Série A e Série B.
+- Cria Hall dos recordes com maior campeão, mais pódios, mais participações e melhor média.
+- Mostra os campeões das três temporadas mais recentes, usando Hall oficial e fallback por snapshots.
+- Inclui atalhos para Hall, ranking histórico, classificações e playoffs.
+- Mantém todos os dados da Home dinâmicos, sem duplicar campeões no HTML.
+- Corrige o alinhamento residual das métricas no ranking histórico.
+- Atualiza o cache PWA e adiciona testes específicos da Home.
+
 ## 6.0.4 — Co-owners e manager principal
 
 - Preserva o campo `co_owners` nos snapshots gerados pela API.

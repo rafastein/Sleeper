@@ -17,6 +17,7 @@
 
     const state = {
         activeButton: null,
+        homeButton: null,
         championsButton: null,
         historyButton: null,
         requestToken: 0,
@@ -42,7 +43,9 @@
         playoffBracket: 'winners',
         playoffRound: 1,
         currentPlayoffData: null,
-        currentView: 'champions',
+        homeLatestYear: null,
+        homeDefaultSeries: 'serieA',
+        currentView: 'home',
         feedbackTimer: null,
         historySearchTimer: null,
         seasonSearchTimer: null,
@@ -52,6 +55,7 @@
 
     const elements = {
         navigation: document.getElementById('navigation'),
+        homeView: document.getElementById('home-view'),
         championsView: document.getElementById('champions-view'),
         rankingView: document.getElementById('ranking-view'),
         playoffsView: document.getElementById('playoffs-view'),
@@ -70,6 +74,23 @@
         installApp: document.getElementById('install-app'),
         networkStatus: document.getElementById('network-status'),
         networkDot: document.getElementById('network-dot'),
+        homeStats: document.getElementById('home-stats'),
+        homeLatestSeason: document.getElementById('home-latest-season'),
+        homeRanking: document.getElementById('home-ranking'),
+        homeLatestYear: document.getElementById('home-latest-year'),
+        homeLatestStatus: document.getElementById('home-latest-status'),
+        homeSeasonTitle: document.getElementById('home-season-title'),
+        homeSeasonStatus: document.getElementById('home-season-status'),
+        homeSeasonCards: document.getElementById('home-season-cards'),
+        homeRecords: document.getElementById('home-records'),
+        homeRecentChampions: document.getElementById('home-recent-champions'),
+        homeChampionsLink: document.getElementById('home-champions-link'),
+        homeHistoryLink: document.getElementById('home-history-link'),
+        homePlayoffsLink: document.getElementById('home-playoffs-link'),
+        homeStandingsLink: document.getElementById('home-standings-link'),
+        homePlayoffsLinkTitle: document.getElementById('home-playoffs-link-title'),
+        homeStandingsLinkTitle: document.getElementById('home-standings-link-title'),
+        homeAllChampions: document.getElementById('home-all-champions'),
         championStats: document.getElementById('champion-stats'),
         championsBody: document.querySelector('#champions-table tbody'),
         championsRange: document.getElementById('champions-range'),
@@ -294,6 +315,7 @@
 
     function showOnlyView(viewName) {
         const views = {
+            home: elements.homeView,
             champions: elements.championsView,
             history: elements.historyView,
             profile: elements.profileView,
@@ -310,6 +332,7 @@
         elements.seasonStandingsTab.toggleAttribute('aria-current', viewName === 'season');
         elements.seasonPlayoffsTab.classList.toggle('is-active', viewName === 'playoffs');
         elements.seasonPlayoffsTab.toggleAttribute('aria-current', viewName === 'playoffs');
+        elements.exportCsv.hidden = viewName === 'home';
         state.currentView = viewName;
     }
 
@@ -389,6 +412,17 @@
     function renderNavigation() {
         const fragment = document.createDocumentFragment();
 
+        const homeButton = createElement('button', 'nav-button');
+        homeButton.type = 'button';
+        homeButton.dataset.view = 'home';
+        homeButton.append(
+            createElement('span', 'nav-button__icon', '⌂'),
+            createElement('span', '', 'Início')
+        );
+        homeButton.addEventListener('click', () => showHome(homeButton));
+        state.homeButton = homeButton;
+        fragment.appendChild(homeButton);
+
         const championsButton = createElement('button', 'nav-button');
         championsButton.type = 'button';
         championsButton.dataset.view = 'champions';
@@ -432,6 +466,272 @@
         });
 
         elements.navigation.replaceChildren(fragment);
+    }
+
+    function getHomeRanking(sortBy = 'titles') {
+        return core.aggregateHistoricalRanking(state.historyEntries, {
+            seriesKey: 'all',
+            sortBy,
+            officialChampions: config.champions,
+            registry: state.managerRegistry || { managers: [] }
+        });
+    }
+
+    function getHomeSnapshot(year, seriesKey) {
+        return state.historyPayloads.find(payload =>
+            Number(payload?.year) === Number(year) && payload?.seriesKey === seriesKey
+        ) || null;
+    }
+
+    function getHomeChampion(year, seriesKey, ranking = []) {
+        const officialRow = config.champions.find(row => Number(row.year) === Number(year));
+        const officialName = officialRow?.[seriesKey] || null;
+        const snapshotEntry = state.historyEntries.find(entry =>
+            Number(entry.year) === Number(year)
+            && entry.seriesKey === seriesKey
+            && Number(entry.rank) === 1
+            && !entry.provisional
+        ) || null;
+        const name = officialName || snapshotEntry?.managerName || null;
+        const normalizedName = core.normalizeAlias(name || '');
+        const manager = snapshotEntry
+            ? ranking.find(item => item.canonicalId === snapshotEntry.canonicalId)
+            : ranking.find(item => core.normalizeAlias(item.managerName) === normalizedName);
+
+        return {
+            name,
+            canonicalId: snapshotEntry?.canonicalId || manager?.canonicalId || null,
+            avatar: snapshotEntry?.avatar || manager?.avatar || null
+        };
+    }
+
+    function createHomeProfileButton(name, canonicalId, className = 'home-manager-link') {
+        const button = createElement('button', className, name || '—');
+        button.type = 'button';
+        button.disabled = !canonicalId;
+        if (canonicalId) button.addEventListener('click', () => showManagerProfile(canonicalId));
+        return button;
+    }
+
+    function openHomeSeason(seriesKey, view = 'season') {
+        const year = Number(state.homeLatestYear);
+        if (!year || !seriesKey) {
+            showFeedback('A temporada mais recente ainda não está disponível.');
+            return;
+        }
+        const button = state.navButtons.get(`${year}:${seriesKey}`) || null;
+        loadSeason(year, seriesKey, button, { view }).catch(handleRouteError);
+    }
+
+    function createHomeSeasonCard(year, seriesKey, ranking) {
+        const payload = getHomeSnapshot(year, seriesKey);
+        const seriesLabel = config.series[seriesKey] || seriesKey;
+        const article = createElement('article', 'home-season-card');
+        article.dataset.series = seriesKey;
+
+        const header = createElement('div', 'home-season-card__header');
+        const identity = createElement('div', 'home-season-card__identity');
+        identity.append(
+            createElement('span', 'home-season-card__icon', getSeriesIcon(seriesKey, seriesLabel)),
+            createElement('div', '')
+        );
+        identity.lastElementChild.append(
+            createElement('span', 'home-season-card__label', `AMBO ${seriesLabel}`),
+            createElement('strong', '', year)
+        );
+        const official = Boolean(payload && !payload.leagues.some(league => league.usedFallback));
+        header.append(identity, createElement('span', `home-season-card__status${official ? '' : ' is-muted'}`, official ? 'Oficial' : 'Indisponível'));
+        article.appendChild(header);
+
+        if (!payload) {
+            const empty = createElement('div', 'home-season-card__empty');
+            empty.append(
+                createElement('strong', '', 'Snapshot ainda não localizado'),
+                createElement('span', '', 'A Action pode sincronizar esta competição quando os dados estiverem disponíveis.')
+            );
+            article.appendChild(empty);
+            return article;
+        }
+
+        const standings = core.calculateCombinedStandings(payload.leagues, state.managerRegistry || { managers: [] });
+        const podium = createElement('div', 'home-podium');
+        standings.slice(0, 3).forEach((manager, index) => {
+            const row = createElement('div', `home-podium__row home-podium__row--${index + 1}`);
+            row.append(
+                createElement('span', 'home-podium__place', `${index + 1}º`),
+                createAvatar(manager.avatar, manager.managerName)
+            );
+            const identityBlock = createElement('div', 'home-podium__identity');
+            identityBlock.append(
+                createHomeProfileButton(manager.managerName, manager.ownerKey),
+                createElement('span', '', seriesKey === 'keeper'
+                    ? `${manager.points} pontos na liga`
+                    : `${manager.points} pontos combinados`)
+            );
+            row.appendChild(identityBlock);
+            podium.appendChild(row);
+        });
+        article.appendChild(podium);
+
+        const footer = createElement('div', 'home-season-card__footer');
+        footer.append(
+            createElement('span', 'home-season-card__meta', `${payload.leagues.length} liga${payload.leagues.length === 1 ? '' : 's'} · ${standings.length} managers`)
+        );
+        const actions = createElement('div', 'home-season-card__actions');
+        const standingsButton = createElement('button', 'home-card-button', 'Classificação');
+        standingsButton.type = 'button';
+        standingsButton.addEventListener('click', () => openHomeSeason(seriesKey, 'season'));
+        const playoffsButton = createElement('button', 'home-card-button home-card-button--primary', 'Playoffs');
+        playoffsButton.type = 'button';
+        playoffsButton.addEventListener('click', () => openHomeSeason(seriesKey, 'playoffs'));
+        actions.append(standingsButton, playoffsButton);
+        footer.appendChild(actions);
+        article.appendChild(footer);
+        return article;
+    }
+
+    function createHomeRecordCard(icon, label, manager, value, detail) {
+        const card = createElement('article', 'home-record-card');
+        card.appendChild(createElement('span', 'home-record-card__icon', icon));
+        const content = createElement('div', 'home-record-card__content');
+        content.append(
+            createElement('span', 'home-record-card__label', label),
+            createHomeProfileButton(manager?.managerName || '—', manager?.canonicalId, 'home-record-card__name'),
+            createElement('strong', 'home-record-card__value', value || '—'),
+            createElement('small', '', detail || '')
+        );
+        card.appendChild(content);
+        return card;
+    }
+
+    function renderHomeRecords(ranking) {
+        const titlesLeader = ranking[0] || null;
+        const podiumLeader = [...ranking].sort((a, b) =>
+            Number(b.podiums || 0) - Number(a.podiums || 0)
+            || Number(b.titles || 0) - Number(a.titles || 0)
+            || a.managerName.localeCompare(b.managerName, 'pt-BR')
+        )[0] || null;
+        const appearancesLeader = [...ranking].sort((a, b) =>
+            Number(b.participations || 0) - Number(a.participations || 0)
+            || Number(b.leagueAppearances || 0) - Number(a.leagueAppearances || 0)
+            || a.managerName.localeCompare(b.managerName, 'pt-BR')
+        )[0] || null;
+        const averageLeader = [...ranking]
+            .filter(manager => Number(manager.participations || 0) >= 3 && Number.isFinite(manager.averageFinish))
+            .sort((a, b) =>
+                Number(a.averageFinish) - Number(b.averageFinish)
+                || Number(b.participations || 0) - Number(a.participations || 0)
+            )[0] || null;
+
+        elements.homeRecords.replaceChildren(
+            createHomeRecordCard('🏆', 'Maior campeão', titlesLeader, titlesLeader ? `${titlesLeader.titles} títulos` : '—', titlesLeader ? `${titlesLeader.secondPlaces} vices · ${titlesLeader.thirdPlaces} terceiros` : ''),
+            createHomeRecordCard('⭐', 'Mais pódios', podiumLeader, podiumLeader ? `${podiumLeader.podiums} pódios` : '—', podiumLeader ? `${podiumLeader.titles} títulos no histórico` : ''),
+            createHomeRecordCard('♾', 'Mais participações', appearancesLeader, appearancesLeader ? `${appearancesLeader.participations} recortes` : '—', appearancesLeader ? `${appearancesLeader.leagueAppearances} ligas disputadas` : ''),
+            createHomeRecordCard('◎', 'Melhor média', averageLeader, averageLeader ? formatPlacement(averageLeader.averageFinish, 2) : '—', averageLeader ? `Mínimo de 3 participações` : '')
+        );
+    }
+
+    function renderHomeRecentChampions(latestYear, ranking) {
+        const years = [...new Set([
+            latestYear,
+            ...config.champions.map(row => Number(row.year))
+        ].filter(Number.isFinite))].sort((a, b) => b - a).slice(0, 3);
+
+        const fragment = document.createDocumentFragment();
+        years.forEach(year => {
+            const card = createElement('article', 'home-champion-year');
+            card.appendChild(createElement('strong', 'home-champion-year__year', year));
+            const list = createElement('div', 'home-champion-year__list');
+            ['keeper', 'serieA', 'serieB'].forEach(seriesKey => {
+                const champion = getHomeChampion(year, seriesKey, ranking);
+                const item = createElement('div', 'home-champion-year__item');
+                item.append(
+                    createElement('span', 'home-champion-year__series', config.series[seriesKey]),
+                    champion.avatar ? createAvatar(champion.avatar, champion.name) : createElement('span', 'avatar-placeholder', getInitials(champion.name || '—')),
+                    createHomeProfileButton(champion.name || '—', champion.canonicalId, 'home-champion-year__name')
+                );
+                list.appendChild(item);
+            });
+            card.appendChild(list);
+            fragment.appendChild(card);
+        });
+        elements.homeRecentChampions.replaceChildren(fragment);
+    }
+
+    function renderHome() {
+        const ranking = getHomeRanking('titles');
+        const payloadYears = state.historyPayloads.map(payload => Number(payload.year)).filter(Number.isFinite);
+        const latestYear = payloadYears.length ? Math.max(...payloadYears) : Math.max(...configuredYears);
+        const latestPayloads = Object.keys(config.series)
+            .map(seriesKey => getHomeSnapshot(latestYear, seriesKey))
+            .filter(Boolean);
+        const availableSeries = Object.keys(config.series).filter(seriesKey => getHomeSnapshot(latestYear, seriesKey));
+        state.homeLatestYear = latestYear;
+        state.homeDefaultSeries = availableSeries.includes('serieA') ? 'serieA' : (availableSeries[0] || 'serieA');
+
+        elements.homeLatestYear.textContent = latestYear;
+        elements.homeLatestStatus.textContent = `${latestPayloads.length} de ${Object.keys(config.series).length} competições sincronizadas`;
+        elements.homeSeasonTitle.textContent = `Destaques de ${latestYear}`;
+        elements.homeSeasonStatus.textContent = `${latestPayloads.length} recorte${latestPayloads.length === 1 ? '' : 's'} disponível${latestPayloads.length === 1 ? '' : 'is'}`;
+        elements.homePlayoffsLinkTitle.textContent = `Playoffs ${latestYear}`;
+        elements.homeStandingsLinkTitle.textContent = `Classificações ${latestYear}`;
+        elements.homePlayoffsLink.dataset.series = availableSeries.includes('keeper') ? 'keeper' : state.homeDefaultSeries;
+        elements.homeStandingsLink.dataset.series = state.homeDefaultSeries;
+
+        const seasonYears = new Set([
+            ...config.champions.map(row => Number(row.year)),
+            ...payloadYears
+        ].filter(Number.isFinite));
+        const officialRecuts = new Set(state.historyEntries
+            .filter(entry => !entry.provisional)
+            .map(entry => `${entry.year}:${entry.seriesKey}`));
+        const totalTitles = ranking.reduce((sum, manager) => sum + Number(manager.titles || 0), 0);
+
+        setStats(elements.homeStats, [
+            { label: 'Temporadas catalogadas', value: seasonYears.size, detail: seasonYears.size ? `${Math.min(...seasonYears)}–${Math.max(...seasonYears)}` : 'Aguardando histórico' },
+            { label: 'Managers no histórico', value: ranking.length, detail: 'Identidades canônicas e aliases unificados' },
+            { label: 'Títulos oficiais', value: totalTitles, detail: 'Keeper, Série A e Série B' },
+            { label: 'Recortes validados', value: officialRecuts.size, detail: 'Snapshots oficiais disponíveis' }
+        ]);
+
+        elements.homeSeasonCards.replaceChildren(
+            ...Object.keys(config.series).map(seriesKey => createHomeSeasonCard(latestYear, seriesKey, ranking))
+        );
+        renderHomeRecords(ranking);
+        renderHomeRecentChampions(latestYear, ranking);
+    }
+
+    async function showHome(button = state.homeButton, options = {}) {
+        const currentRequest = ++state.requestToken;
+        state.currentSeason = null;
+        state.currentProfile = null;
+        setActiveButton(button);
+        closeMobileMenu();
+        showError();
+        showLoading(true);
+        showOnlyView('home');
+
+        elements.pageEyebrow.textContent = 'Central oficial da AMBO';
+        elements.pageTitle.textContent = 'Tudo o que importa nas ligas AMBO';
+        elements.pageDescription.textContent = 'Acompanhe a temporada mais recente e revisite campeões, rankings, playoffs e trajetórias históricas.';
+        elements.lastUpdate.textContent = 'Carregando a central...';
+        updateDocumentTitle();
+
+        try {
+            const data = await loadHistoricalData();
+            if (currentRequest !== state.requestToken) return;
+            renderHome();
+            const updatedAt = formatDateTime(data.manifest?.generatedAt);
+            elements.lastUpdate.textContent = updatedAt ? `Dados atualizados em ${updatedAt}` : 'Snapshots oficiais';
+            if (options.updateUrl !== false) writeRoute({ view: 'home' }, options.replace ? 'replace' : 'push');
+        } catch (error) {
+            if (currentRequest !== state.requestToken) return;
+            renderHome();
+            elements.lastUpdate.textContent = 'Histórico parcialmente disponível';
+            showError(`A Home foi aberta, mas alguns dados históricos não puderam ser carregados: ${error.message}.`);
+        } finally {
+            if (currentRequest === state.requestToken) showLoading(false);
+        }
     }
 
     function getTitleCounts() {
@@ -1770,7 +2070,9 @@
         elements.historySort.value = state.historySort;
         elements.historySearch.value = state.historyQuery;
 
-        if (route.view === 'history') {
+        if (route.view === 'home') {
+            await showHome(state.homeButton, { updateUrl: false });
+        } else if (route.view === 'history') {
             await showHistoricalRanking(state.historyButton, { updateUrl: false });
         } else if (route.view === 'profile') {
             await loadHistoricalData();
@@ -1792,7 +2094,7 @@
                 round: route.round
             });
         } else {
-            showChampions(state.championsButton, { updateUrl: false });
+            await showHome(state.homeButton, { updateUrl: false });
         }
 
         if (options.replace) {
@@ -1804,7 +2106,9 @@
                         ? currentHistoryRoute()
                         : route.view === 'profile'
                             ? { view: 'profile', manager: route.manager, series: state.historyFilter }
-                            : { view: 'champions' };
+                            : route.view === 'champions'
+                                ? { view: 'champions' }
+                                : { view: 'home' };
             writeRoute(normalizedRoute, 'replace');
         }
     }
@@ -1872,6 +2176,14 @@
         });
         registerServiceWorker();
     }
+
+    elements.homeLatestSeason.addEventListener('click', () => openHomeSeason(state.homeDefaultSeries, 'season'));
+    elements.homeRanking.addEventListener('click', () => showHistoricalRanking(state.historyButton));
+    elements.homeChampionsLink.addEventListener('click', () => showChampions(state.championsButton));
+    elements.homeHistoryLink.addEventListener('click', () => showHistoricalRanking(state.historyButton));
+    elements.homePlayoffsLink.addEventListener('click', () => openHomeSeason(elements.homePlayoffsLink.dataset.series || state.homeDefaultSeries, 'playoffs'));
+    elements.homeStandingsLink.addEventListener('click', () => openHomeSeason(elements.homeStandingsLink.dataset.series || state.homeDefaultSeries, 'season'));
+    elements.homeAllChampions.addEventListener('click', () => showChampions(state.championsButton));
 
     elements.seasonStandingsTab.addEventListener('click', () => showSeasonStandings());
     elements.seasonPlayoffsTab.addEventListener('click', () => showSeasonPlayoffs());

@@ -1,6 +1,20 @@
 # AMBO • Central Sleeper
 
-Painel estático, compartilhável e responsivo para consultar campeões, rankings anuais e o desempenho histórico das ligas AMBO.
+Portal estático, compartilhável e responsivo para consultar a temporada mais recente, campeões, playoffs, rankings anuais e o desempenho histórico das ligas AMBO.
+
+
+## Versão 7 — página inicial
+
+A raiz do site agora abre uma Home alimentada pelos snapshots e pelo Hall oficial. Ela reúne:
+
+- resumo geral de temporadas, managers, títulos e recortes validados;
+- pódio da temporada mais recente em Keeper, Série A e Série B;
+- atalhos diretos para classificação e playoffs;
+- recordes históricos calculados dinamicamente;
+- campeões das três temporadas mais recentes;
+- navegação **Início** no topo do menu.
+
+A Home não possui exportação CSV. As demais telas continuam usando as rotas existentes, enquanto `/` representa a página inicial.
 
 ## Estrutura
 
