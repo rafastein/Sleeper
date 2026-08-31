@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-24T10:06:15.173Z",
+  "generatedAt": "2026-08-31T17:05:24.554Z",
   "snapshots": [
     {
       "year": 2025,
       "seriesKey": "keeper",
-      "generatedAt": "2026-08-24T10:06:15.173Z",
+      "generatedAt": "2026-08-31T17:05:24.554Z",
       "leagues": [
         "1258111637957640192"
       ],
@@ -14,7 +14,7 @@
     {
       "year": 2025,
       "seriesKey": "serieA",
-      "generatedAt": "2026-08-24T10:06:15.173Z",
+      "generatedAt": "2026-08-31T17:05:24.554Z",
       "leagues": [
         "1253457352703614976",
         "1253457635739447296"
@@ -24,7 +24,7 @@
     {
       "year": 2025,
       "seriesKey": "serieB",
-      "generatedAt": "2026-08-24T10:06:15.173Z",
+      "generatedAt": "2026-08-31T17:05:24.554Z",
       "leagues": [
         "1253459941541281792",
         "1253460428399321088"
