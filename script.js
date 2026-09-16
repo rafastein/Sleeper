@@ -21,6 +21,7 @@
         championsButton: null,
         historyButton: null,
         requestToken: 0,
+        seasonLoadingToken: null,
         resolvedLeagueIds: new Map(),
         managerRegistryPromise: null,
         managerRegistry: null,
@@ -69,6 +70,7 @@
         error: document.getElementById('error-message'),
         actionFeedback: document.getElementById('action-feedback'),
         copyLink: document.getElementById('copy-link'),
+        refreshSeason: document.getElementById('refresh-season'),
         sharePage: document.getElementById('share-page'),
         exportCsv: document.getElementById('export-csv'),
         installApp: document.getElementById('install-app'),
@@ -334,6 +336,7 @@
         elements.seasonPlayoffsTab.toggleAttribute('aria-current', viewName === 'playoffs');
         elements.exportCsv.hidden = viewName === 'home';
         state.currentView = viewName;
+        updateRefreshControl();
     }
 
     function setActiveButton(button) {
@@ -540,15 +543,19 @@
             createElement('strong', '', year)
         );
         const official = Boolean(payload && !payload.leagues.some(league => league.usedFallback));
-        header.append(identity, createElement('span', `home-season-card__status${official ? '' : ' is-muted'}`, official ? 'Oficial' : 'Indisponível'));
+        header.append(identity, createElement('span', `home-season-card__status${official ? '' : ' is-muted'}`, official ? 'Oficial' : payload ? 'Parcial' : 'Em andamento'));
         article.appendChild(header);
 
         if (!payload) {
             const empty = createElement('div', 'home-season-card__empty');
             empty.append(
-                createElement('strong', '', 'Snapshot ainda não localizado'),
-                createElement('span', '', 'A Action pode sincronizar esta competição quando os dados estiverem disponíveis.')
+                createElement('strong', '', 'Acompanhe a temporada'),
+                createElement('span', '', 'Abra a classificação para consultar os resultados mais recentes.')
             );
+            const open = createElement('button', 'home-card-button', 'Classificação');
+            open.type = 'button';
+            open.addEventListener('click', () => openHomeSeason(seriesKey, 'season'));
+            empty.appendChild(open);
             article.appendChild(empty);
             return article;
         }
@@ -633,7 +640,7 @@
 
     function renderHomeRecentChampions(latestYear, ranking) {
         const years = [...new Set([
-            latestYear,
+            ...state.historyPayloads.filter(payload => !payload.leagues.some(league => league.usedFallback)).map(payload => Number(payload.year)),
             ...config.champions.map(row => Number(row.year))
         ].filter(Number.isFinite))].sort((a, b) => b - a).slice(0, 3);
 
@@ -661,7 +668,7 @@
     function renderHome() {
         const ranking = getHomeRanking('titles');
         const payloadYears = state.historyPayloads.map(payload => Number(payload.year)).filter(Number.isFinite);
-        const latestYear = payloadYears.length ? Math.max(...payloadYears) : Math.max(...configuredYears);
+        const latestYear = Math.max(...payloadYears, ...configuredYears);
         const latestPayloads = Object.keys(config.series)
             .map(seriesKey => getHomeSnapshot(latestYear, seriesKey))
             .filter(Boolean);
@@ -712,7 +719,7 @@
         showOnlyView('home');
 
         elements.pageEyebrow.textContent = 'Central oficial da AMBO';
-        elements.pageTitle.textContent = 'Tudo o que importa nas ligas AMBO';
+        elements.pageTitle.textContent = 'Ligas AMBO';
         elements.pageDescription.textContent = 'Acompanhe a temporada mais recente e revisite campeões, rankings, playoffs e trajetórias históricas.';
         elements.lastUpdate.textContent = 'Carregando a central...';
         updateDocumentTitle();
@@ -1038,7 +1045,6 @@
                 createElement('td', 'points-value', manager.titles),
                 createElement('td', '', manager.secondPlaces),
                 createElement('td', '', manager.thirdPlaces),
-                createElement('td', '', manager.participations),
                 createElement('td', '', formatPlacement(manager.bestFinish)),
                 createElement('td', '', Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—')
             );
@@ -1281,7 +1287,7 @@
             fetchOptionalBracket(leagueId, 'winners_bracket'),
             fetchOptionalBracket(leagueId, 'losers_bracket')
         ]);
-        const playoffWeeks = core.getPlayoffWeekNumbers(league, winnersBracket, losersBracket);
+        const playoffWeeks = (winnersBracket?.length || losersBracket?.length) ? core.getPlayoffWeekNumbers(league, winnersBracket, losersBracket) : [];
         const matchupEntries = await Promise.all(playoffWeeks.map(async week => {
             try {
                 const rows = await fetchJson(`${DIRECT_API_BASE_URL}/league/${leagueId}/matchups/${week}`);
@@ -1306,7 +1312,7 @@
                 matchupsByWeek: Object.fromEntries(matchupEntries)
             },
             standings: calculated.standings,
-            usedFallback: calculated.usedFallback
+            usedFallback: calculated.usedFallback || Boolean(league.status && league.status !== 'complete')
         };
     }
 
@@ -1378,7 +1384,7 @@
     function renderLeaguePanel(snapshot, query = '', options = {}) {
         const panel = elements.leaguePanelTemplate.content.firstElementChild.cloneNode(true);
         const singleLeague = Boolean(options.singleLeague);
-        panel.querySelector('.league-number').textContent = singleLeague ? 'Classificação oficial' : `Liga ${snapshot.index + 1}`;
+        panel.querySelector('.league-number').textContent = singleLeague ? (snapshot.usedFallback ? 'Classificação parcial' : 'Classificação oficial') : `Liga ${snapshot.index + 1}`;
         panel.querySelector('.league-name').textContent = snapshot.league.name || (singleLeague ? 'AMBO Keeper' : `Liga ${snapshot.index + 1}`);
         panel.querySelector('.league-season').textContent = snapshot.usedFallback ? 'Classificação parcial' : `Temporada ${snapshot.league.season}`;
 
@@ -1679,7 +1685,9 @@
                 ? 'Chaveamento completo da liga Keeper, com rodadas, progressão e placares dos confrontos.'
                 : 'Chaveamentos das duas ligas, com chave principal, consolação, rodadas e placares.';
         } else {
-            elements.pageDescription.textContent = isKeeper
+            elements.pageDescription.textContent = state.currentSeason.snapshots.some(snapshot => snapshot.usedFallback)
+                ? 'Classificação parcial, atualizada com os resultados consolidados no Sleeper. Campanha, FPTS e pontos do ranking acompanham cada rodada.'
+                : isKeeper
                 ? 'Classificação final da liga Keeper, com campanha, pontuação e FPTS de cada participante.'
                 : 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.';
         }
@@ -1767,13 +1775,15 @@
             return;
         }
 
+        const previousSeason = options.refresh ? state.currentSeason : null;
         const currentRequest = ++state.requestToken;
-        const requestedView = options.view === 'playoffs' ? 'playoffs' : 'season';
+        state.seasonLoadingToken = currentRequest;
+        let requestedView = options.view === 'playoffs' ? 'playoffs' : 'season';
         const seriesLabel = config.series[seriesKey] || seriesKey;
         setActiveButton(button);
         closeMobileMenu();
         showError();
-        showLoading(true);
+        if (!options.refresh) showLoading(true);
         state.currentProfile = null;
 
         const isKeeper = seriesKey === 'keeper';
@@ -1793,37 +1803,36 @@
         updateDocumentTitle();
 
         try {
-            const [registry, localSnapshot] = await Promise.all([
-                loadManagerRegistry(),
-                loadLocalSeasonSnapshot(year, seriesKey)
-            ]);
-            if (currentRequest !== state.requestToken) return;
-
-            let snapshots;
-            let sourceLabel;
-            let updatedAt;
-            if (localSnapshot) {
-                snapshots = localSnapshot.leagues.slice().sort((a, b) => a.index - b.index);
-                sourceLabel = 'Snapshot oficial';
-                updatedAt = localSnapshot.generatedAt;
-            } else {
-                const leagueIds = await resolveLeagueIds(year, seriesKey);
-                if (currentRequest !== state.requestToken) return;
-                if (!leagueIds.length) {
-                    throw new Error(`a liga ${seriesLabel} de ${year} ainda não foi localizada no Sleeper para o usuário configurado; cadastre o ID da liga para importar esse ano`);
+            const registry = await loadManagerRegistry();
+            const result = await window.AMBO_SEASON_DATA.load({
+                preferLive: Number(year) === Number(config.liveSeasonYear),
+                loadSaved: async () => previousSeason ? {
+                    leagues: previousSeason.snapshots,
+                    generatedAt: previousSeason.updatedAt
+                } : loadLocalSeasonSnapshot(year, seriesKey),
+                loadLive: async () => {
+                    const leagueIds = await resolveLeagueIds(year, seriesKey);
+                    if (!leagueIds.length) {
+                        throw new Error(`a liga ${seriesLabel} de ${year} ainda não foi localizada no Sleeper para o usuário configurado; cadastre o ID da liga para importar esse ano`);
+                    }
+                    return Promise.all(leagueIds.map((leagueId, index) => fetchLeagueSnapshot(leagueId, index)));
+                },
+                validate: snapshots => {
+                    if (!Array.isArray(snapshots) || !snapshots.length) throw new Error('nenhuma liga disponível');
+                    snapshots.forEach((snapshot, index) => {
+                        const validation = core.validateLeagueSnapshot(snapshot);
+                        if (!validation.valid) throw new Error(`Liga ${index + 1} inválida: ${validation.errors.join('; ')}`);
+                    });
                 }
-                snapshots = (await Promise.all(
-                    leagueIds.map((leagueId, index) => fetchLeagueSnapshot(leagueId, index))
-                )).sort((a, b) => a.index - b.index);
-                sourceLabel = 'Sleeper API';
-                updatedAt = new Date().toISOString();
-            }
-
-            snapshots.forEach((snapshot, index) => {
-                const validation = core.validateLeagueSnapshot(snapshot);
-                if (!validation.valid) throw new Error(`Liga ${index + 1} inválida: ${validation.errors.join('; ')}`);
             });
             if (currentRequest !== state.requestToken) return;
+            if (options.refresh) requestedView = state.currentView === 'playoffs' ? 'playoffs' : 'season';
+            const snapshots = result.snapshots.slice().sort((a, b) => a.index - b.index);
+            const updatedAt = result.updatedAt;
+            const partial = snapshots.some(snapshot => snapshot.usedFallback);
+            const sourceLabel = result.stale ? 'Não foi possível atualizar · última classificação disponível'
+                : result.live ? 'Consultado no Sleeper'
+                : partial ? 'Classificação parcial salva' : 'Snapshot oficial';
 
             const combined = calculateCombinedStandings(snapshots, registry)
                 .map((standing, index) => ({ ...standing, officialRank: index + 1 }));
@@ -1850,7 +1859,9 @@
                 showSeasonStandings({ updateUrl: false });
             }
             const formattedDate = formatDateTime(updatedAt);
-            elements.lastUpdate.textContent = formattedDate ? `${sourceLabel} · ${formattedDate}` : sourceLabel;
+            elements.lastUpdate.textContent = (formattedDate ? `${sourceLabel} · ${formattedDate}` : sourceLabel)
+                + (Number(year) === Number(config.liveSeasonYear) ? ' · Atualização automática a cada 5 min' : '');
+            updateRefreshControl();
             if (options.updateUrl !== false) {
                 const route = requestedView === 'playoffs' ? currentPlayoffsRoute() : currentSeasonRoute();
                 writeRoute(route, options.replace ? 'replace' : 'push');
@@ -1871,8 +1882,27 @@
             elements.lastUpdate.textContent = 'Dados indisponíveis';
             showError(`Não foi possível carregar as ligas: ${error.message}.`);
         } finally {
+            if (state.seasonLoadingToken === currentRequest) state.seasonLoadingToken = null;
             if (currentRequest === state.requestToken) showLoading(false);
+            updateRefreshControl();
         }
+    }
+
+    function updateRefreshControl() {
+        const seasonView = ['season', 'playoffs'].includes(state.currentView);
+        elements.refreshSeason.hidden = !seasonView || Number(state.currentSeason?.year) !== Number(config.liveSeasonYear);
+        elements.refreshSeason.disabled = state.seasonLoadingToken !== null;
+        elements.refreshSeason.textContent = elements.refreshSeason.disabled ? 'Atualizando…' : 'Atualizar';
+    }
+
+    function refreshCurrentSeason() {
+        const season = state.currentSeason;
+        if (!season || state.seasonLoadingToken !== null || !['season', 'playoffs'].includes(state.currentView)
+            || season.year !== Number(config.liveSeasonYear)) return;
+        return loadSeason(season.year, season.seriesKey, state.activeButton, {
+            refresh: true, updateUrl: false, view: state.currentView,
+            league: state.playoffLeagueIndex + 1, bracket: state.playoffBracket, round: state.playoffRound
+        });
     }
 
     function sanitizeFileName(value) {
@@ -2228,6 +2258,10 @@
         }, SEARCH_DEBOUNCE_MS);
     });
     elements.profileBack.addEventListener('click', () => showHistoricalRanking(state.historyButton));
+    elements.refreshSeason.addEventListener('click', refreshCurrentSeason);
+    window.setInterval(() => {
+        if (!document.hidden && navigator.onLine) refreshCurrentSeason();
+    }, Number(config.liveRefreshMs) || 300000);
     elements.copyLink.addEventListener('click', copyCurrentLink);
     elements.sharePage.addEventListener('click', shareCurrentPage);
     elements.exportCsv.addEventListener('click', downloadCsv);

@@ -21,10 +21,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=7.0.0">
+    <link rel="stylesheet" href="styles.css?v=7.1.2">
     <script src="ambo-core.js" defer></script>
     <script src="config.js" defer></script>
-    <script src="script.js?v=7.0.0" defer></script>
+    <script src="season-data.js" defer></script>
+    <script src="script.js?v=7.1.2" defer></script>
 </head>
 <body>
     <div class="page-glow page-glow--one" aria-hidden="true"></div>
@@ -64,6 +65,7 @@
                     <div id="last-update" class="last-update" aria-live="polite"></div>
                     <div class="page-actions" aria-label="Ações da página">
                         <button id="install-app" class="action-button" type="button" hidden>Instalar app</button>
+                        <button id="refresh-season" class="action-button" type="button" hidden>Atualizar</button>
                         <button id="copy-link" class="action-button" type="button">Copiar link</button>
                         <button id="share-page" class="action-button" type="button">Compartilhar</button>
                         <button id="export-csv" class="action-button action-button--primary" type="button">Exportar CSV</button>
@@ -252,7 +254,6 @@
                                     <th scope="col">Títulos</th>
                                     <th scope="col">Vices</th>
                                     <th scope="col">3º lugares</th>
-                                    <th scope="col">Participações</th>
                                     <th scope="col">Melhor</th>
                                     <th scope="col">Média</th>
                                 </tr>

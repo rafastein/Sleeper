@@ -1,5 +1,24 @@
 # Changelog
 
+## 7.1.2 — Título da página inicial
+
+- Simplifica o título principal da Home para **Ligas AMBO**.
+
+## 7.1.1 — Ajuste no ranking histórico
+
+- Remove a coluna **Participações** da tabela do ranking histórico.
+- Mantém o dado nos cálculos internos, nos perfis e na exportação CSV.
+
+## 7.1.0 — Temporada 2026 em andamento
+
+- Inclui Keeper, Série A e Série B de 2026, com ligas verificadas pela renovação de 2025.
+- Consulta atual ao abrir, atualização automática a cada cinco minutos e botão Atualizar.
+- Preserva dados válidos com aviso e data quando a consulta falha.
+- Mantém a classificação parcial fora dos títulos e do ranking histórico.
+- Atualiza os atalhos da Home para 2026 e identifica destaques parciais.
+- Inclui snapshots reais de 2026; sincronização de segurança diária.
+- Reduz o cache do proxy para 60 segundos e atualiza o PWA.
+
 ## 7.0.0 — Página inicial da AMBO
 
 - Adiciona uma Home como rota raiz do site.

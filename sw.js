@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ambo-v7.0.0-home';
+const CACHE_VERSION = 'ambo-v7.1.2-home-title';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 const APP_SHELL = [
@@ -7,6 +7,7 @@ const APP_SHELL = [
     '/styles.css',
     '/ambo-core.js',
     '/config.js',
+    '/season-data.js',
     '/script.js',
     '/manifest.webmanifest',
     '/favicon.svg',

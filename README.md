@@ -3,6 +3,28 @@
 Portal estático, compartilhável e responsivo para consultar a temporada mais recente, campeões, playoffs, rankings anuais e o desempenho histórico das ligas AMBO.
 
 
+## Versão 7.1 — temporada 2026
+
+Keeper, Série A e Série B de 2026 usam o mesmo layout das temporadas anteriores. A classificação consulta o Sleeper ao abrir a página e a cada cinco minutos enquanto a aba estiver visível e conectada. O botão **Atualizar** permite uma nova consulta manual.
+
+A campanha e os FPTS são os resultados acumulados disponibilizados pelo Sleeper, não uma projeção dos jogos em andamento. As posições e os pontos do ranking combinado são recalculados a cada consulta, seguindo as regras já usadas pela AMBO. Não há seletor para reconstruir classificações de rodadas anteriores.
+
+- Temporada em andamento: dados consultados primeiro no Sleeper; classificação parcial.
+- Falha na consulta: conserva a última classificação válida, com aviso e data da consulta anterior.
+- Temporadas encerradas anteriores: continuam usando os snapshots oficiais.
+- Classificações parciais não geram títulos ou estatísticas no ranking histórico oficial.
+- A página inicial abre 2026. Seus destaques usam os snapshots da sincronização diária; a classificação consulta a API.
+- O proxy mantém cache de até 60 segundos.
+
+A Action **Atualizar snapshots** agora roda diariamente às 09:17 UTC (06:17 em Brasília), criando a cópia de segurança de 2026. A atualização das classificações abertas não depende dessa Action. A execução manual aceita 2026 em andamento; anos anteriores continuam exigindo classificação final, exceto com `--allow-fallback` explícito.
+
+```bash
+npm run sync:current
+npm run check
+```
+
+Ao encerrar a temporada, sincronize novamente os resultados. Para abrir outra temporada ao vivo, cadastre as ligas e atualize `liveSeasonYear` em `config.js`.
+
 ## Versão 7 — página inicial
 
 A raiz do site agora abre uma Home alimentada pelos snapshots e pelo Hall oficial. Ela reúne:
@@ -263,7 +285,7 @@ Após o deploy, abra o projeto na Vercel e habilite **Web Analytics** e **Speed 
 
 ### Sincronização automática
 
-A Action `Atualizar snapshots` continua aceitando execução manual e também roda toda segunda-feira às 09:17 UTC. Na execução programada, sincroniza apenas o ano mais recente configurado e permite snapshot provisório. Recortes provisórios continuam fora do ranking histórico oficial.
+A Action `Atualizar snapshots` continua aceitando execução manual e também roda diariamente às 09:17 UTC. Na execução programada, sincroniza apenas o ano mais recente configurado e permite snapshot provisório. Recortes provisórios continuam fora do ranking histórico oficial.
 
 ### Testar
 

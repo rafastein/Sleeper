@@ -20,6 +20,12 @@ test('página inicial possui resumo, temporada recente, recordes e campeões', (
     assert.match(html, /id="home-recent-champions"/);
 });
 
+test('página inicial usa o título curto Ligas AMBO', () => {
+    const script = read('script.js');
+    assert.match(script, /elements\.pageTitle\.textContent = 'Ligas AMBO'/);
+    assert.doesNotMatch(script, /Tudo o que importa nas ligas AMBO/);
+});
+
 test('Home usa snapshots e ranking histórico, sem dados fixos de campeão recente', () => {
     const script = read('script.js');
     const home = script.match(/function getHomeRanking[\s\S]*?function getTitleCounts/);

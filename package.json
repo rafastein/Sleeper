@@ -1,6 +1,6 @@
 {
   "name": "ambo-sleeper",
-  "version": "7.0.0",
+  "version": "7.1.2",
   "private": true,
   "description": "Central histórica das ligas AMBO com Keeper, Série A, Série B, snapshots e dados do Sleeper.",
   "scripts": {
@@ -10,7 +10,8 @@
     "sync": "node scripts/sync-data.js",
     "sync:2025": "node scripts/sync-data.js --year 2025",
     "sync:history": "node scripts/sync-data.js",
-    "test:infra": "node --test test/infrastructure.test.js"
+    "test:infra": "node --test test/infrastructure.test.js",
+    "sync:current": "node scripts/sync-data.js --year 2026 --allow-fallback"
   },
   "engines": {
     "node": ">=18"

@@ -133,7 +133,7 @@ function trimMatchup(matchup) {
 }
 
 async function fetchPlayoffMatchups(leagueId, league, winnersBracket, losersBracket) {
-    const weeks = core.getPlayoffWeekNumbers(league, winnersBracket, losersBracket);
+    const weeks = (winnersBracket?.length || losersBracket?.length) ? core.getPlayoffWeekNumbers(league, winnersBracket, losersBracket) : [];
     const entries = await Promise.all(weeks.map(async week => {
         const rows = await fetchJson(`${API_BASE_URL}/league/${leagueId}/matchups/${week}`, true);
         return [String(week), (rows || []).map(trimMatchup)];
@@ -283,7 +283,7 @@ async function fetchLeagueSnapshot(leagueId, index) {
         losersBracket: losersBracket || [],
         playoffs,
         standings: calculated.standings,
-        usedFallback: calculated.usedFallback,
+        usedFallback: calculated.usedFallback || Boolean(league.status && league.status !== 'complete'),
         validation
     };
 }
@@ -352,7 +352,7 @@ async function main() {
                 const leagueId = leagueIds[index];
                 process.stdout.write(`  • liga ${index + 1}: baixando e validando... `);
                 const snapshot = await fetchLeagueSnapshot(leagueId, index);
-                if (snapshot.usedFallback && !args.allowFallback) {
+                if (snapshot.usedFallback && !args.allowFallback && year !== Number(config.liveSeasonYear)) {
                     throw new Error(`liga ${leagueId} ainda usa classificação provisória; rode com --allow-fallback somente se isso for intencional`);
                 }
                 snapshot.users.forEach(user => upsertManager(managerRegistry, user));

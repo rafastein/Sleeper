@@ -68,21 +68,23 @@ test('página registra manifesto, monitoramento e instalação', () => {
     assert.match(html, /_vercel\/speed-insights\/script\.js/);
 });
 
-test('ranking histórico não exibe coluna de pontos', () => {
+test('ranking histórico não exibe colunas de pontos nem participações', () => {
     const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
     const match = html.match(/<table id="history-table"[\s\S]*?<\/table>/);
     assert.ok(match, 'tabela histórica não encontrada');
     assert.doesNotMatch(match[0], />Pontos<\/th>/);
+    assert.doesNotMatch(match[0], />Participações<\/th>/);
 
     const script = fs.readFileSync(path.join(ROOT, 'script.js'), 'utf8');
     const renderMatch = script.match(/function renderHistoricalRanking\(\)[\s\S]*?async function showHistoricalRanking/);
     assert.ok(renderMatch, 'renderização histórica não encontrada');
     assert.doesNotMatch(renderMatch[0], /manager\.(?:points|totalPoints)/);
+    assert.doesNotMatch(renderMatch[0], /manager\.participations/);
 
     const rowAppend = renderMatch[0].match(/row\.append\([\s\S]*?\n            \);/);
     assert.ok(rowAppend, 'células da linha histórica não encontradas');
     const cells = rowAppend[0].match(/createElement\('td'/g) || [];
-    assert.equal(cells.length, 6, 'a linha deve ter 6 células de métricas após o manager');
+    assert.equal(cells.length, 5, 'a linha deve ter 5 células de métricas após o manager');
 });
 
 

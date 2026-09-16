@@ -16,7 +16,24 @@ function keeperDiscovery() {
 }
 
 const AMBO_CONFIG = Object.freeze({
+    liveSeasonYear: 2026,
+    liveRefreshMs: 300000,
     leagueIds: {
+        2026: {
+            keeper: keeperDiscovery(),
+            serieA: {
+                discoveryKey: 'serieASeed',
+                username: 'Jptavares',
+                previousLeagueIds: ['1253457352703614976', '1253457635739447296'],
+                expectedLeagues: 2
+            },
+            serieB: {
+                discoveryKey: 'serieBSeed',
+                username: 'rafastein',
+                previousLeagueIds: ['1253459941541281792', '1253460428399321088'],
+                expectedLeagues: 2
+            }
+        },
         2025: {
             keeper: keeperDiscovery(),
             serieA: {
@@ -70,7 +87,7 @@ const AMBO_CONFIG = Object.freeze({
         discoveryUsersPath: 'data/discovery-users.json',
         snapshotsBasePath: 'data/snapshots',
         preferSnapshots: true,
-        snapshotYears: [2020, 2021, 2022, 2023, 2024, 2025]
+        snapshotYears: [2020, 2021, 2022, 2023, 2024, 2025, 2026]
     },
 
     api: {

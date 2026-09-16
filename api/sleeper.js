@@ -49,7 +49,7 @@ async function handler(request, response) {
 
         response.setHeader('Content-Type', upstream.headers.get('content-type') || 'application/json; charset=utf-8');
         response.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-        response.setHeader('CDN-Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
+        response.setHeader('CDN-Cache-Control', 'public, s-maxage=60');
         response.setHeader('X-AMBO-Source', 'sleeper-proxy');
         return response.status(upstream.status).send(body);
     } catch (error) {

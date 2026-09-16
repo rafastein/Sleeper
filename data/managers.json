@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-14T15:55:04.868Z",
+  "generatedAt": "2026-09-16T21:20:48.686Z",
   "managers": [
     {
       "canonicalId": "brunocamposl",
@@ -273,6 +273,16 @@
       ],
       "aliases": [
         "ReLoGinho0"
+      ]
+    },
+    {
+      "canonicalId": "rennangtp",
+      "displayName": "RennanGTP",
+      "sleeperUserIds": [
+        "1387889496728547328"
+      ],
+      "aliases": [
+        "RennanGTP"
       ]
     },
     {
