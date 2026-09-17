@@ -1089,6 +1089,48 @@ th:last-child {
     border-bottom: 1px solid var(--border);
 }
 
+.mobile-ranking-card--compact {
+    padding: 12px 10px;
+    gap: 0;
+}
+
+.mobile-ranking-card--compact .mobile-ranking-card__header {
+    grid-template-columns: 26px 32px minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.mobile-ranking-card--compact .rank-number {
+    width: 26px;
+    height: 28px;
+    font-size: 0.8rem;
+}
+
+.mobile-ranking-card--compact .mobile-ranking-card__header > img,
+.mobile-ranking-card--compact .avatar-placeholder {
+    width: 32px;
+    height: 32px;
+}
+
+.mobile-ranking-card--compact .entity-name {
+    display: block;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.mobile-ranking-card--compact .entity-meta {
+    margin-top: 3px;
+    font-size: 0.7rem;
+    line-height: 1.4;
+}
+
+.mobile-ranking-card--compact .mobile-ranking-card__score {
+    grid-column: 4;
+    grid-row: 1;
+    justify-self: end;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+}
+
 .mobile-ranking-card:last-child {
     border-bottom: 0;
 }

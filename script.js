@@ -288,8 +288,9 @@
         return metric;
     }
 
-    function createMobileRankingCard({ rank, total, avatar, name, meta, score, metrics, onNameClick }) {
+    function createMobileRankingCard({ rank, total, avatar, name, meta, score, metrics, onNameClick, compact = false }) {
         const card = createElement('article', 'mobile-ranking-card');
+        if (compact) card.classList.add('mobile-ranking-card--compact');
         applyRankClass(card, rank, total);
 
         const header = createElement('div', 'mobile-ranking-card__header');
@@ -308,6 +309,11 @@
         entity.appendChild(createElement('span', 'entity-meta', meta));
         header.appendChild(entity);
         header.appendChild(createElement('strong', 'mobile-ranking-card__score', score));
+
+        if (compact) {
+            card.append(header);
+            return card;
+        }
 
         const metricsGrid = createElement('div', 'mobile-ranking-card__metrics');
         metrics.forEach(metric => metricsGrid.appendChild(createMobileMetric(metric.label, metric.value)));
@@ -1346,14 +1352,9 @@
                 total: totalManagers,
                 avatar: standing.avatar,
                 name: standing.managerName,
-                meta: `${standing.appearances} liga${standing.appearances === 1 ? '' : 's'} combinada${standing.appearances === 1 ? '' : 's'}`,
+                meta: `FPTS ${formatNumber(standing.fpts)}`,
                 score: `${standing.points} pts`,
-                metrics: [
-                    { label: 'Melhor posição', value: formatPlacement(standing.bestRank) },
-                    { label: 'FPTS', value: formatNumber(standing.fpts) },
-                    { label: 'Ligas', value: standing.appearances },
-                    { label: 'Posição oficial', value: formatPlacement(officialRank) }
-                ]
+                compact: true
             }));
         });
 

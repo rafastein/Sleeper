@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.3 — Ranking combinado compacto no celular
+
+- Posição, avatar e manager à esquerda; pontos à direita e FPTS abaixo do nome.
+- Remove os quatro blocos de métricas e informações repetidas somente no ranking combinado mobile.
+- Preserva a tabela desktop, regras de classificação e dados históricos.
+
 ## 7.1.2 — Título da página inicial
 
 - Simplifica o título principal da Home para **Ligas AMBO**.
