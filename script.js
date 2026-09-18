@@ -288,7 +288,7 @@
         return metric;
     }
 
-    function createMobileRankingCard({ rank, total, avatar, name, meta, score, scoreLabel, team, metrics, onNameClick, compact = false }) {
+    function createMobileRankingCard({ rank, total, avatar, name, meta, score, team, metrics, onNameClick, compact = false }) {
         const card = createElement('article', 'mobile-ranking-card');
         if (compact) card.classList.add('mobile-ranking-card--compact');
         applyRankClass(card, rank, total);
@@ -310,7 +310,6 @@
         if (team && team !== name) entity.appendChild(createElement('span', 'mobile-ranking-card__team', team));
         header.appendChild(entity);
         const scoreElement = createElement('strong', 'mobile-ranking-card__score', score);
-        if (scoreLabel) scoreElement.appendChild(createElement('small', 'mobile-ranking-card__score-label', scoreLabel));
         header.appendChild(scoreElement);
 
         if (compact) {
@@ -564,7 +563,7 @@
             identity.append(
                 createElement('span', 'home-group-leader__group', `Líder · ${group.name}`),
                 createHomeProfileButton(manager.displayName, manager.canonicalId),
-                createElement('span', '', `${leader.campaignLabel} ${leader.campaign} · FPTS ${formatNumber(leader.fpts)}`)
+                createElement('span', '', `${leader.campaign} · FPTS ${formatNumber(leader.fpts)}`)
             );
             row.appendChild(identity);
             list.appendChild(row);
@@ -1421,7 +1420,6 @@
                 managerName: getManagerName(user, roster),
                 teamName: getTeamName(user, roster),
                 campaign: ties ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`,
-                campaignLabel: ties ? 'V–D–E' : 'V–D',
                 fpts: getRosterPoints(roster)
             };
         });
@@ -1477,9 +1475,8 @@
                 avatar: user?.avatar,
                 name: managerName,
                 team: teamName !== managerName ? teamName : '',
-                meta: showRankingPoints ? `${item.campaignLabel} ${campaign} · FPTS ${formatNumber(fpts)}` : `FPTS ${formatNumber(fpts)}`,
+                meta: showRankingPoints ? `${campaign} · FPTS ${formatNumber(fpts)}` : `FPTS ${formatNumber(fpts)}`,
                 score: showRankingPoints ? `${standing.points} pts` : campaign,
-                scoreLabel: showRankingPoints ? '' : item.campaignLabel,
                 compact: true
             }));
         });

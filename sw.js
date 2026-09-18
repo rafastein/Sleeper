@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ambo-v7.1.5-home-and-compact-leagues';
+const CACHE_VERSION = 'ambo-v7.1.6-campaign-numbers';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 const APP_SHELL = [

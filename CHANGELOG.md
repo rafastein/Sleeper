@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.6 — Campanha somente com números
+
+- Remove as siglas V–D e V–D–E da Home e das classificações. Mantém os números, inclusive empates, e FPTS.
+- Simplifica o cabeçalho desktop para “Campanha” e atualiza o cache do aplicativo.
+- Não altera dados nem regras de classificação.
+
 ## 7.1.5 — Temporada atual no topo e classificações compactas
 
 - Move os destaques da temporada atual para o primeiro bloco da Home, abaixo do texto de apresentação.

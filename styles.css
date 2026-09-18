@@ -1134,15 +1134,6 @@ th:last-child {
     white-space: nowrap;
 }
 
-.mobile-ranking-card__score-label {
-    display: block;
-    margin-top: 2px;
-    color: var(--muted);
-    font-size: 0.6rem;
-    font-weight: 600;
-    text-align: right;
-}
-
 .mobile-ranking-card--compact .mobile-ranking-card__score {
     grid-column: 4;
     grid-row: 1;

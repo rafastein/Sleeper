@@ -70,7 +70,8 @@ test('Home Keeper mostra um líder por grupo, na ordem dos grupos, sem pontuaç�
     assert.ok(leaders.every(row => byClass(row, 'home-manager-link')[0].canonicalId));
     assert.equal(byClass(card, 'home-podium__place').length, 0);
     assert.doesNotMatch(textOf(card), /pontos|\d+º/);
-    assert.match(textOf(card), /V–D 1-0 · FPTS/);
+    assert.match(textOf(card), /1-0 · FPTS/);
+    assert.doesNotMatch(textOf(card), /V[–-]D/);
     assert.match(textOf(card), /1 liga · 12 managers/);
 });
 
