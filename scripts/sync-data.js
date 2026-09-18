@@ -19,6 +19,7 @@ function parseArgs(argv) {
         else if (value === '--series') args.series.push(String(argv[++index]));
         else if (value === '--allow-fallback') args.allowFallback = true;
         else if (value === '--dry-run') args.dryRun = true;
+        else if (value === '--divisions-only') args.divisionsOnly = true;
         else if (value === '--help' || value === '-h') args.help = true;
         else throw new Error(`argumento desconhecido: ${value}`);
     }
@@ -37,6 +38,7 @@ Opções:
   --series CHAVE      Limita a keeper, serieA ou serieB (pode repetir)
   --allow-fallback    Aceita classificação regular provisória
   --dry-run           Valida sem gravar arquivos
+  --divisions-only    Recupera só os grupos nos snapshots Keeper existentes
 `);
 }
 
@@ -80,7 +82,10 @@ function trimLeague(league) {
         season: String(league?.season || ''),
         status: league?.status || null,
         previous_league_id: league?.previous_league_id ? String(league.previous_league_id) : null,
+        metadata: Object.fromEntries(Object.entries(league?.metadata || {})
+            .filter(([key]) => /^division_\d+$/.test(key))),
         settings: {
+            divisions: Number(league?.settings?.divisions || 0),
             playoff_teams: Number(league?.settings?.playoff_teams || 0),
             playoff_week_start: Number(league?.settings?.playoff_week_start || 0)
         }
@@ -97,6 +102,8 @@ function trimRoster(roster) {
             : [],
         metadata: roster?.metadata || null,
         settings: {
+            division: Number.isInteger(Number(settings.division)) && Number(settings.division) > 0
+                ? Number(settings.division) : null,
             wins: Number(settings.wins || 0),
             losses: Number(settings.losses || 0),
             ties: Number(settings.ties || 0),
@@ -303,13 +310,75 @@ function updateManifest(manifest, snapshot) {
     manifest.snapshots.sort((a, b) => Number(b.year) - Number(a.year) || a.seriesKey.localeCompare(b.seriesKey));
 }
 
+// Backfill metadata only: never replace a user's saved scores or playoff results.
+function enrichSnapshotDivisions(snapshot, league, rosters) {
+    if (String(league?.league_id) !== String(snapshot.leagueId)
+        || String(league?.season) !== String(snapshot.league?.season)) {
+        throw new Error('liga ou temporada divergente ao recuperar grupos');
+    }
+    if (!Array.isArray(rosters)) throw new Error('rosters ausentes ao recuperar grupos');
+    const byId = new Map(rosters.map(roster => [Number(roster.roster_id), roster]));
+    if (byId.size !== rosters.length || byId.size !== snapshot.rosters.length
+        || snapshot.rosters.some(roster => !byId.has(Number(roster.roster_id)))) {
+        throw new Error('participantes divergentes ao recuperar grupos');
+    }
+    const trimmedLeague = trimLeague(league);
+    const preservedMetadata = Object.fromEntries(Object.entries(snapshot.league.metadata || {})
+        .filter(([key]) => !/^division_\d+$/.test(key)));
+    const enriched = {
+        ...snapshot,
+        league: {
+            ...snapshot.league,
+            metadata: { ...preservedMetadata, ...trimmedLeague.metadata },
+            settings: { ...snapshot.league.settings, divisions: trimmedLeague.settings.divisions }
+        },
+        rosters: snapshot.rosters.map(roster => ({
+            ...roster,
+            settings: {
+                ...roster.settings,
+                division: trimRoster(byId.get(Number(roster.roster_id))).settings.division
+            }
+        }))
+    };
+    if (!core.buildDivisionStandings(enriched.league, enriched.rosters).complete) {
+        throw new Error('grupos incompletos: snapshot original preservado');
+    }
+    return enriched;
+}
+
+async function syncKeeperDivisions(years, dryRun) {
+    const pending = [];
+    for (const year of years) {
+        const file = `${config.data.snapshotsBasePath}/${year}/keeper.json`;
+        const payload = readJson(file, null);
+        if (!payload) {
+            console.log(`→ ${year} Keeper: sem snapshot; nenhum grupo inferido.`);
+            continue;
+        }
+        const leagues = await Promise.all(payload.leagues.map(async snapshot => {
+            const [league, rosters] = await Promise.all([
+                fetchJson(`${API_BASE_URL}/league/${snapshot.leagueId}`),
+                fetchJson(`${API_BASE_URL}/league/${snapshot.leagueId}/rosters`)
+            ]);
+            return enrichSnapshotDivisions(snapshot, league, rosters);
+        }));
+        pending.push({ file, payload: { ...payload, leagues } });
+        console.log(`→ ${year} Keeper: grupos conferidos; resultados preservados.`);
+    }
+    // Fetch and validate every requested year before writing any of them.
+    pending.forEach(item => writeJson(item.file, item.payload, dryRun));
+    console.log(dryRun ? '✓ Grupos validados sem gravar arquivos.'
+        : '✓ Grupos atualizados. Campanhas, playoffs, managers e manifest não foram alterados.');
+}
+
 async function main() {
     const args = parseArgs(process.argv.slice(2));
     if (args.help) return printHelp();
 
     const allYears = Object.keys(config.leagueIds).map(Number).sort((a, b) => a - b);
     const selectedYears = args.years.length ? [...new Set(args.years)] : allYears;
-    const selectedSeries = args.series.length ? [...new Set(args.series)] : Object.keys(config.series);
+    const selectedSeries = args.series.length ? [...new Set(args.series)]
+        : args.divisionsOnly ? ['keeper'] : Object.keys(config.series);
 
     selectedYears.forEach(year => {
         if (!config.leagueIds[year]) throw new Error(`temporada ${year} não está no config.js`);
@@ -317,6 +386,13 @@ async function main() {
     selectedSeries.forEach(seriesKey => {
         if (!config.series[seriesKey]) throw new Error(`série ${seriesKey} não existe`);
     });
+
+    if (args.divisionsOnly) {
+        if (selectedSeries.some(key => key !== 'keeper')) {
+            throw new Error('--divisions-only aceita somente a Keeper');
+        }
+        return syncKeeperDivisions(selectedYears, args.dryRun);
+    }
 
     const managerPath = config.data.managerRegistryPath;
     const discoveryPath = config.data.discoveryUsersPath;
@@ -394,7 +470,11 @@ async function main() {
         : '\n✓ Snapshots, user_ids e cadastro de managers atualizados.');
 }
 
-main().catch(error => {
-    console.error(`\n✗ ${error.message}`);
-    process.exitCode = 1;
-});
+if (require.main === module) {
+    main().catch(error => {
+        console.error(`\n✗ ${error.message}`);
+        process.exitCode = 1;
+    });
+}
+
+module.exports = { trimLeague, trimRoster, enrichSnapshotDivisions, parseArgs };

@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ambo-v7.1.3-compact-mobile';
+const CACHE_VERSION = 'ambo-v7.1.4-keeper-groups';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 const APP_SHELL = [

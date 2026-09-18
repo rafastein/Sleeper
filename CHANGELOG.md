@@ -1,5 +1,14 @@
 # Changelog
 
+## 7.1.4 — Keeper por grupos em todas as temporadas disponíveis
+
+- Recupera os nomes e os participantes dos grupos de cada liga de 2021 a 2026, consultando o Sleeper por temporada.
+- Exibe a temporada regular em três classificações independentes, com campanha e FPTS; não atribui pontos de ranking por colocação no grupo.
+- Mantém a classificação final após os playoffs em um painel separado nos anos concluídos, sem alterar títulos, placares ou ranking histórico.
+- Aplica linhas compactas à Keeper mobile e identifica grupo e posição no CSV.
+- Preserva os campos de divisão nas próximas sincronizações e permite recuperar só esses campos com `npm run sync:keeper:groups`.
+- Não infere grupos para anos sem dados. Atualiza a versão do cache e inclui testes de cálculo, recuperação e renderização.
+
 ## 7.1.3 — Ranking combinado compacto no celular
 
 - Posição, avatar e manager à esquerda; pontos à direita e FPTS abaixo do nome.

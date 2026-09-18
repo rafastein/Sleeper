@@ -48,6 +48,43 @@
         return Number(a?.roster_id || 0) - Number(b?.roster_id || 0);
     }
 
+    // Division positions describe the regular season, never playoff placements.
+    // Use each league's own membership; roster IDs alone do not identify a group.
+    function buildDivisionStandings(league, rosters = []) {
+        const configuredCount = Number(league?.settings?.divisions || 0);
+        const groupsById = new Map();
+        const unassignedRosterIds = [];
+
+        rosters.forEach(roster => {
+            const id = Number(roster?.settings?.division);
+            if (!Number.isInteger(id) || id < 1 || (configuredCount > 0 && id > configuredCount)) {
+                unassignedRosterIds.push(roster.roster_id);
+                return;
+            }
+            if (!groupsById.has(id)) groupsById.set(id, []);
+            groupsById.get(id).push(roster);
+        });
+
+        const groups = [...groupsById.entries()]
+            .sort(([a], [b]) => a - b)
+            .map(([id, members]) => ({
+                id,
+                name: String(league?.metadata?.[`division_${id}`] || `Grupo ${id}`),
+                standings: members.slice().sort(compareRegularSeasonRosters).map((roster, index) => ({
+                    rosterId: roster.roster_id,
+                    rank: index + 1,
+                    source: 'regular-season'
+                }))
+            }));
+
+        return {
+            groups,
+            unassignedRosterIds,
+            complete: groups.length > 0 && unassignedRosterIds.length === 0
+                && (configuredCount <= 0 || groups.length === configuredCount)
+        };
+    }
+
     function getBracketRosterIds(bracket) {
         const rosterIds = new Set();
 
@@ -949,6 +986,7 @@
         normalizeAlias,
         getRosterPoints,
         compareRegularSeasonRosters,
+        buildDivisionStandings,
         getBracketRosterIds,
         applyPlacementMatches,
         calculateStandings,

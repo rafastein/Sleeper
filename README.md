@@ -2,6 +2,14 @@
 
 Portal estático, compartilhável e responsivo para consultar a temporada mais recente, campeões, playoffs, rankings anuais e o desempenho histórico das ligas AMBO.
 
+## Versão 7.1.4 — Keeper por grupos
+
+A Keeper mostra os grupos da temporada regular de cada ano, com classificação reiniciando em 1 em cada grupo, campanha e FPTS. Nos anos concluídos, a classificação final após os playoffs aparece em um painel separado. Grupos não concedem títulos nem alteram o ranking histórico.
+
+O pacote inclui grupos verificados para 2021–2026. Não há dados de grupos de 2020 ou anteriores no projeto. A recuperação usa o ID de cada liga/temporada, não a composição de 2026.
+
+Para atualizar um repositório que já possui dados mais recentes, preserve sua pasta `data/`, atualize o código e execute `npm run sync:keeper:groups`. Esse comando recupera somente os campos de grupo dos snapshots Keeper existentes. Veja **README-AJUSTE-KEEPER.md** para instalação e teste.
+
 
 ## Versão 7.1 — temporada 2026
 

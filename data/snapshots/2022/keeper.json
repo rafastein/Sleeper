@@ -17,7 +17,13 @@
         "previous_league_id": "705505969660043264",
         "settings": {
           "playoff_teams": 6,
-          "playoff_week_start": 15
+          "playoff_week_start": 15,
+          "divisions": 3
+        },
+        "metadata": {
+          "division_1": "AMBO Norte",
+          "division_2": "AMBO Central",
+          "division_3": "AMBO Sul"
         }
       },
       "rosters": [
@@ -35,7 +41,8 @@
             "fpts": 1654,
             "fpts_decimal": 10,
             "fpts_against": 1505,
-            "fpts_against_decimal": 70
+            "fpts_against_decimal": 70,
+            "division": 1
           }
         },
         {
@@ -52,7 +59,8 @@
             "fpts": 1639,
             "fpts_decimal": 65,
             "fpts_against": 1576,
-            "fpts_against_decimal": 40
+            "fpts_against_decimal": 40,
+            "division": 2
           }
         },
         {
@@ -69,7 +77,8 @@
             "fpts": 1618,
             "fpts_decimal": 85,
             "fpts_against": 1563,
-            "fpts_against_decimal": 60
+            "fpts_against_decimal": 60,
+            "division": 3
           }
         },
         {
@@ -86,7 +95,8 @@
             "fpts": 1592,
             "fpts_decimal": 10,
             "fpts_against": 1417,
-            "fpts_against_decimal": 99
+            "fpts_against_decimal": 99,
+            "division": 3
           }
         },
         {
@@ -103,7 +113,8 @@
             "fpts": 1477,
             "fpts_decimal": 15,
             "fpts_against": 1441,
-            "fpts_against_decimal": 35
+            "fpts_against_decimal": 35,
+            "division": 1
           }
         },
         {
@@ -120,7 +131,8 @@
             "fpts": 1508,
             "fpts_decimal": 80,
             "fpts_against": 1490,
-            "fpts_against_decimal": 5
+            "fpts_against_decimal": 5,
+            "division": 2
           }
         },
         {
@@ -137,7 +149,8 @@
             "fpts": 1586,
             "fpts_decimal": 90,
             "fpts_against": 1566,
-            "fpts_against_decimal": 70
+            "fpts_against_decimal": 70,
+            "division": 2
           }
         },
         {
@@ -154,7 +167,8 @@
             "fpts": 1511,
             "fpts_decimal": 50,
             "fpts_against": 1539,
-            "fpts_against_decimal": 5
+            "fpts_against_decimal": 5,
+            "division": 2
           }
         },
         {
@@ -171,7 +185,8 @@
             "fpts": 1289,
             "fpts_decimal": 45,
             "fpts_against": 1491,
-            "fpts_against_decimal": 30
+            "fpts_against_decimal": 30,
+            "division": 3
           }
         },
         {
@@ -188,7 +203,8 @@
             "fpts": 1370,
             "fpts_decimal": 50,
             "fpts_against": 1497,
-            "fpts_against_decimal": 80
+            "fpts_against_decimal": 80,
+            "division": 1
           }
         },
         {
@@ -205,7 +221,8 @@
             "fpts": 1511,
             "fpts_decimal": 20,
             "fpts_against": 1474,
-            "fpts_against_decimal": 99
+            "fpts_against_decimal": 99,
+            "division": 1
           }
         },
         {
@@ -222,7 +239,8 @@
             "fpts": 1393,
             "fpts_decimal": 15,
             "fpts_against": 1588,
-            "fpts_against_decimal": 40
+            "fpts_against_decimal": 40,
+            "division": 3
           }
         }
       ],

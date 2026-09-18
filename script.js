@@ -1362,8 +1362,8 @@
         elements.combinedCards.replaceChildren(cardFragment);
     }
 
-    function getLeagueRows(snapshot, query = '') {
-        const rows = snapshot.standings.map(standing => {
+    function getLeagueRows(snapshot, query = '', standings = snapshot.standings) {
+        const rows = standings.map(standing => {
             const roster = snapshot.rosters.find(item => item.roster_id === standing.rosterId);
             const user = getUserForRoster(roster, snapshot.users);
             const wins = Number(roster?.settings?.wins || 0);
@@ -1385,39 +1385,54 @@
     function renderLeaguePanel(snapshot, query = '', options = {}) {
         const panel = elements.leaguePanelTemplate.content.firstElementChild.cloneNode(true);
         const singleLeague = Boolean(options.singleLeague);
-        panel.querySelector('.league-number').textContent = singleLeague ? (snapshot.usedFallback ? 'Classificação parcial' : 'Classificação oficial') : `Liga ${snapshot.index + 1}`;
-        panel.querySelector('.league-name').textContent = snapshot.league.name || (singleLeague ? 'AMBO Keeper' : `Liga ${snapshot.index + 1}`);
-        panel.querySelector('.league-season').textContent = snapshot.usedFallback ? 'Classificação parcial' : `Temporada ${snapshot.league.season}`;
+        const division = options.division;
+        const standings = division ? division.standings : snapshot.standings;
+        panel.querySelector('.league-number').textContent = division ? 'Temporada regular · classificação do grupo'
+            : singleLeague ? (snapshot.usedFallback ? 'Classificação geral parcial' : 'Resultado após os playoffs') : `Liga ${snapshot.index + 1}`;
+        panel.querySelector('.league-name').textContent = division ? division.name
+            : singleLeague && !snapshot.usedFallback ? 'Classificação final da liga Keeper'
+            : snapshot.league.name || `Liga ${snapshot.index + 1}`;
+        panel.querySelector('.league-season').textContent = division ? `${standings.length} times · ${snapshot.league.season}`
+            : snapshot.usedFallback ? 'Classificação parcial' : `Temporada ${snapshot.league.season}`;
+        if (division) {
+            panel.querySelector('.league-points-heading').remove();
+            panel.querySelector('th.col-rank').textContent = 'Pos. grupo';
+            panel.querySelector('.league-team-heading').textContent = 'Manager / equipe';
+        }
 
         const body = panel.querySelector('tbody');
         const cards = panel.querySelector('.league-mobile-cards');
+        cards.setAttribute('aria-label', division ? `Classificação do grupo ${division.name}`
+            : snapshot.usedFallback ? 'Classificação geral parcial da liga' : 'Classificação final da liga');
         const tableFragment = document.createDocumentFragment();
         const cardFragment = document.createDocumentFragment();
-        const rows = getLeagueRows(snapshot, query);
+        const rows = getLeagueRows(snapshot, query, standings);
 
         rows.forEach(item => {
             const { standing, roster, user, managerName, teamName, campaign, fpts } = item;
             const row = document.createElement('tr');
-            applyRankClass(row, standing.rank, snapshot.standings.length);
+            applyRankClass(row, standing.rank, standings.length);
             const avatarCell = createElement('td', 'col-avatar');
             avatarCell.appendChild(createAvatar(user?.avatar, managerName));
             row.append(
                 createRankCell(standing.rank),
                 avatarCell,
-                createEntityCell(teamName, managerName),
-                createElement('td', '', campaign),
-                createElement('td', 'points-value', standing.points),
-                createElement('td', '', formatNumber(fpts))
+                createEntityCell(division ? managerName : teamName,
+                    division ? (teamName !== managerName ? teamName : '') : managerName),
+                createElement('td', '', campaign)
             );
+            if (!division) row.appendChild(createElement('td', 'points-value', standing.points));
+            row.appendChild(createElement('td', '', formatNumber(fpts)));
             tableFragment.appendChild(row);
 
             cardFragment.appendChild(createMobileRankingCard({
                 rank: standing.rank,
-                total: snapshot.standings.length,
+                total: standings.length,
                 avatar: user?.avatar,
-                name: teamName,
-                meta: managerName,
-                score: `${standing.points} pts`,
+                name: singleLeague ? managerName : teamName,
+                meta: singleLeague ? `FPTS ${formatNumber(fpts)}${division ? '' : ` · ${campaign}`}` : managerName,
+                score: division ? campaign : `${standing.points} pts`,
+                compact: singleLeague,
                 metrics: [
                     { label: 'Campanha', value: campaign },
                     { label: 'FPTS', value: formatNumber(fpts) },
@@ -1436,6 +1451,18 @@
         body.replaceChildren(tableFragment);
         cards.replaceChildren(cardFragment);
         return panel;
+    }
+
+    function renderKeeperPanels(snapshot) {
+        const divisions = core.buildDivisionStandings(snapshot.league, snapshot.rosters);
+        if (!divisions.complete) {
+            const notice = createElement('p', 'alert', 'Os grupos deste ano não estão completos nos dados disponíveis. A tabela abaixo é geral, não a classificação por grupo.');
+            notice.setAttribute('role', 'status');
+            return [notice, renderLeaguePanel(snapshot, '', { singleLeague: true })];
+        }
+        const panels = divisions.groups.map(division => renderLeaguePanel(snapshot, '', { singleLeague: true, division }));
+        if (!snapshot.usedFallback) panels.push(renderLeaguePanel(snapshot, '', { singleLeague: true }));
+        return panels;
     }
 
     function getRosterPresentation(snapshot, rosterId) {
@@ -1686,10 +1713,10 @@
                 ? 'Chaveamento completo da liga Keeper, com rodadas, progressão e placares dos confrontos.'
                 : 'Chaveamentos das duas ligas, com chave principal, consolação, rodadas e placares.';
         } else {
-            elements.pageDescription.textContent = state.currentSeason.snapshots.some(snapshot => snapshot.usedFallback)
+            elements.pageDescription.textContent = isKeeper
+                ? 'Temporada regular por grupo: campanha em vitórias–derrotas (–empates) e FPTS. Nos anos concluídos, a classificação final após os playoffs aparece separadamente.'
+                : state.currentSeason.snapshots.some(snapshot => snapshot.usedFallback)
                 ? 'Classificação parcial, atualizada com os resultados consolidados no Sleeper. Campanha, FPTS e pontos do ranking acompanham cada rodada.'
-                : isKeeper
-                ? 'Classificação final da liga Keeper, com campanha, pontuação e FPTS de cada participante.'
                 : 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.';
         }
         updateDocumentTitle();
@@ -1715,11 +1742,14 @@
         const allFallback = snapshots.every(snapshot => snapshot.usedFallback);
         const anyFallback = snapshots.some(snapshot => snapshot.usedFallback);
         const leader = combined[0];
+        const divisions = isKeeper && snapshots[0] ? core.buildDivisionStandings(snapshots[0].league, snapshots[0].rosters) : null;
         const stats = isKeeper
             ? [
                 { label: 'Temporada', value: year, detail: seriesLabel },
-                { label: 'Participantes', value: combined.length, detail: 'Uma liga' },
-                {
+                { label: 'Participantes', value: combined.length, detail: divisions?.complete ? `${divisions.groups.length} grupos · uma liga` : 'Uma liga' },
+                anyFallback && divisions?.complete ? {
+                    label: 'Situação', value: 'Em andamento', detail: 'Classificação por grupo abaixo'
+                } : {
                     label: allFallback ? 'Líder atual' : 'Campeão',
                     value: leader?.managerName || '—',
                     detail: leader ? `${formatPlacement(leader.bestRank)} lugar · ${formatNumber(leader.fpts)} FPTS` : 'Sem dados disponíveis'
@@ -1748,11 +1778,11 @@
 
         elements.combinedPanel.hidden = isKeeper;
         elements.leaguePanels.classList.toggle('league-grid--single', isKeeper);
-        elements.leaguePanels.replaceChildren(...state.currentSeason.snapshots.map(snapshot => renderLeaguePanel(
+        elements.leaguePanels.replaceChildren(...state.currentSeason.snapshots.flatMap(snapshot => isKeeper ? renderKeeperPanels(snapshot) : [renderLeaguePanel(
             snapshot,
-            isKeeper ? '' : state.seasonQuery,
+            state.seasonQuery,
             { singleLeague: isKeeper }
-        )));
+        )]));
 
         if (isKeeper) {
             elements.combinedBody.replaceChildren();
@@ -1795,7 +1825,7 @@
                 ? 'Chaveamento completo da liga Keeper, com rodadas, progressão e placares dos confrontos.'
                 : 'Chaveamentos das duas ligas, com chave principal, consolação, rodadas e placares.')
             : (isKeeper
-                ? 'Classificação final da liga Keeper, com campanha, pontuação e FPTS de cada participante.'
+                ? 'Classificação por grupos da Keeper, com campanha e FPTS. Resultados finais dos playoffs são exibidos separadamente.'
                 : 'Ranking combinado das duas ligas, com busca, ordenação, classificação final e pontuação acumulada.');
         elements.combinedPanel.hidden = isKeeper;
         elements.leaguePanels.classList.toggle('league-grid--single', isKeeper);
@@ -1998,15 +2028,24 @@
         if (state.currentView === 'season' && state.currentSeason) {
             if (state.currentSeason.seriesKey === 'keeper') {
                 const snapshot = state.currentSeason.snapshots[0];
-                const rows = snapshot ? getLeagueRows(snapshot) : [];
+                const divisions = snapshot ? core.buildDivisionStandings(snapshot.league, snapshot.rosters) : null;
+                const rows = divisions?.complete
+                    ? divisions.groups.flatMap(group => getLeagueRows(snapshot, '', group.standings)
+                        .map(row => ({ ...row, group: group.name,
+                            finalRank: snapshot.usedFallback ? '' : snapshot.standings.find(item => item.rosterId === row.standing.rosterId)?.rank })))
+                    : snapshot ? getLeagueRows(snapshot) : [];
                 return {
                     filename: `ambo-${state.currentSeason.year}-keeper.csv`,
                     csv: core.rowsToCsv([
-                        { label: 'Posição', value: row => row.standing.rank },
+                        ...(divisions?.complete ? [
+                            { key: 'group', label: 'Grupo' },
+                            { label: 'Posição no grupo (temporada regular)', value: row => row.standing.rank },
+                            { key: 'finalRank', label: 'Posição final após playoffs' }
+                        ] : [{ label: 'Posição geral', value: row => row.standing.rank }]),
                         { key: 'teamName', label: 'Equipe' },
                         { key: 'managerName', label: 'Manager' },
                         { key: 'campaign', label: 'Campanha' },
-                        { label: 'Pontos', value: row => row.standing.points },
+                        ...(!divisions?.complete ? [{ label: 'Pontos', value: row => row.standing.points }] : []),
                         { label: 'FPTS', value: row => formatNumber(row.fpts) }
                     ], rows)
                 };
