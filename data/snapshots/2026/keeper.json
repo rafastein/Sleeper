@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-17T14:17:20.032Z",
+  "generatedAt": "2026-09-18T13:35:16.113Z",
   "source": "Sleeper API",
   "year": 2026,
   "seriesKey": "keeper",
@@ -15,15 +15,15 @@
         "season": "2026",
         "status": "in_season",
         "previous_league_id": "1258111637957640192",
-        "settings": {
-          "playoff_teams": 6,
-          "playoff_week_start": 15,
-          "divisions": 3
-        },
         "metadata": {
           "division_1": "AMBO Norte",
           "division_2": "AMBO Central",
           "division_3": "AMBO Sul"
+        },
+        "settings": {
+          "divisions": 3,
+          "playoff_teams": 6,
+          "playoff_week_start": 15
         }
       },
       "rosters": [
@@ -36,14 +36,14 @@
             "streak": "1W"
           },
           "settings": {
+            "division": 1,
             "wins": 1,
             "losses": 0,
             "ties": 0,
             "fpts": 133,
             "fpts_decimal": 65,
             "fpts_against": 106,
-            "fpts_against_decimal": 15,
-            "division": 1
+            "fpts_against_decimal": 15
           }
         },
         {
@@ -59,14 +59,14 @@
             "streak": "1L"
           },
           "settings": {
+            "division": 2,
             "wins": 0,
             "losses": 1,
             "ties": 0,
             "fpts": 121,
             "fpts_decimal": 40,
             "fpts_against": 126,
-            "fpts_against_decimal": 35,
-            "division": 2
+            "fpts_against_decimal": 35
           }
         },
         {
@@ -82,14 +82,14 @@
             "streak": "1W"
           },
           "settings": {
+            "division": 3,
             "wins": 1,
             "losses": 0,
             "ties": 0,
             "fpts": 133,
             "fpts_decimal": 30,
             "fpts_against": 108,
-            "fpts_against_decimal": 90,
-            "division": 3
+            "fpts_against_decimal": 90
           }
         },
         {
@@ -101,14 +101,14 @@
             "streak": "1W"
           },
           "settings": {
+            "division": 3,
             "wins": 1,
             "losses": 0,
             "ties": 0,
             "fpts": 129,
             "fpts_decimal": 35,
             "fpts_against": 76,
-            "fpts_against_decimal": 65,
-            "division": 3
+            "fpts_against_decimal": 65
           }
         },
         {
@@ -120,14 +120,14 @@
             "streak": "1L"
           },
           "settings": {
+            "division": 1,
             "wins": 0,
             "losses": 1,
             "ties": 0,
             "fpts": 103,
             "fpts_decimal": 30,
             "fpts_against": 122,
-            "fpts_against_decimal": 20,
-            "division": 1
+            "fpts_against_decimal": 20
           }
         },
         {
@@ -139,14 +139,14 @@
             "streak": "1W"
           },
           "settings": {
+            "division": 2,
             "wins": 1,
             "losses": 0,
             "ties": 0,
             "fpts": 145,
             "fpts_decimal": 50,
             "fpts_against": 89,
-            "fpts_against_decimal": 60,
-            "division": 2
+            "fpts_against_decimal": 60
           }
         },
         {
@@ -158,14 +158,14 @@
             "streak": "1L"
           },
           "settings": {
+            "division": 2,
             "wins": 0,
             "losses": 1,
             "ties": 0,
             "fpts": 89,
             "fpts_decimal": 60,
             "fpts_against": 145,
-            "fpts_against_decimal": 50,
-            "division": 2
+            "fpts_against_decimal": 50
           }
         },
         {
@@ -177,14 +177,14 @@
             "streak": "1W"
           },
           "settings": {
+            "division": 2,
             "wins": 1,
             "losses": 0,
             "ties": 0,
             "fpts": 126,
             "fpts_decimal": 35,
             "fpts_against": 121,
-            "fpts_against_decimal": 40,
-            "division": 2
+            "fpts_against_decimal": 40
           }
         },
         {
@@ -196,14 +196,14 @@
             "streak": "1L"
           },
           "settings": {
+            "division": 3,
             "wins": 0,
             "losses": 1,
             "ties": 0,
             "fpts": 108,
             "fpts_decimal": 90,
             "fpts_against": 133,
-            "fpts_against_decimal": 30,
-            "division": 3
+            "fpts_against_decimal": 30
           }
         },
         {
@@ -215,14 +215,14 @@
             "streak": "1W"
           },
           "settings": {
+            "division": 1,
             "wins": 1,
             "losses": 0,
             "ties": 0,
             "fpts": 122,
             "fpts_decimal": 20,
             "fpts_against": 103,
-            "fpts_against_decimal": 30,
-            "division": 1
+            "fpts_against_decimal": 30
           }
         },
         {
@@ -234,14 +234,14 @@
             "streak": "1L"
           },
           "settings": {
+            "division": 1,
             "wins": 0,
             "losses": 1,
             "ties": 0,
             "fpts": 106,
             "fpts_decimal": 15,
             "fpts_against": 133,
-            "fpts_against_decimal": 65,
-            "division": 1
+            "fpts_against_decimal": 65
           }
         },
         {
@@ -253,14 +253,14 @@
             "streak": "1L"
           },
           "settings": {
+            "division": 3,
             "wins": 0,
             "losses": 1,
             "ties": 0,
             "fpts": 76,
             "fpts_decimal": 65,
             "fpts_against": 129,
-            "fpts_against_decimal": 35,
-            "division": 3
+            "fpts_against_decimal": 35
           }
         }
       ],

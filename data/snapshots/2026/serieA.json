@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-17T14:17:20.032Z",
+  "generatedAt": "2026-09-18T13:35:16.113Z",
   "source": "Sleeper API",
   "year": 2026,
   "seriesKey": "serieA",
@@ -15,7 +15,9 @@
         "season": "2026",
         "status": "in_season",
         "previous_league_id": "1253457352703614976",
+        "metadata": {},
         "settings": {
+          "divisions": 0,
           "playoff_teams": 6,
           "playoff_week_start": 15
         }
@@ -43,6 +45,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -61,6 +64,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -81,6 +85,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -103,6 +108,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -123,6 +129,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -143,6 +150,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -161,6 +169,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -183,6 +192,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -206,6 +216,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -224,6 +235,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -242,6 +254,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -260,6 +273,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -558,8 +572,8 @@
           }
         },
         {
-          "p": 5,
           "m": 5,
+          "p": 5,
           "r": 2,
           "l": null,
           "w": null,
@@ -573,8 +587,8 @@
           }
         },
         {
-          "p": 1,
           "m": 6,
+          "p": 1,
           "r": 3,
           "l": null,
           "w": null,
@@ -588,8 +602,8 @@
           }
         },
         {
-          "p": 3,
           "m": 7,
+          "p": 3,
           "r": 3,
           "l": null,
           "w": null,
@@ -927,7 +941,9 @@
         "season": "2026",
         "status": "in_season",
         "previous_league_id": "1253457635739447296",
+        "metadata": {},
         "settings": {
+          "divisions": 0,
           "playoff_teams": 6,
           "playoff_week_start": 15
         }
@@ -956,6 +972,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -974,6 +991,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -992,6 +1010,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -1014,6 +1033,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -1032,6 +1052,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -1053,6 +1074,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -1071,6 +1093,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -1091,6 +1114,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -1114,6 +1138,7 @@
             "streak": "1W"
           },
           "settings": {
+            "division": null,
             "wins": 1,
             "losses": 0,
             "ties": 0,
@@ -1134,6 +1159,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -1152,6 +1178,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -1170,6 +1197,7 @@
             "streak": "1L"
           },
           "settings": {
+            "division": null,
             "wins": 0,
             "losses": 1,
             "ties": 0,
@@ -1479,8 +1507,8 @@
           }
         },
         {
-          "p": 5,
           "m": 5,
+          "p": 5,
           "r": 2,
           "l": null,
           "w": null,
@@ -1494,8 +1522,8 @@
           }
         },
         {
-          "p": 1,
           "m": 6,
+          "p": 1,
           "r": 3,
           "l": null,
           "w": null,
@@ -1509,8 +1537,8 @@
           }
         },
         {
-          "p": 3,
           "m": 7,
+          "p": 3,
           "r": 3,
           "l": null,
           "w": null,
