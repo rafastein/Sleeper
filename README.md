@@ -2,6 +2,14 @@
 
 Portal estático, compartilhável e responsivo para consultar a temporada mais recente, campeões, playoffs, rankings anuais e o desempenho histórico das ligas AMBO.
 
+## Versão 7.1.5 — Home e classificações compactas
+
+A temporada atual aparece no topo da Home, logo após a apresentação. O card Keeper destaca os líderes dos grupos, sem pódio geral nem pontos de ranking. Nas Séries A/B, os pontos e o ranking combinado continuam iguais.
+
+As classificações individuais no celular usam linhas compactas, com campanha V–D, FPTS e identificação do manager/equipe. A Keeper não mostra pontos de ranking nas tabelas nem em sua exportação de temporada; resultados finais de playoffs continuam separados e preservados.
+
+Esta atualização não modifica dados e não precisa de uma nova sincronização para quem já instalou a 7.1.4. Consulte **README-ATUALIZACAO-7.1.5.md** e preserve a sua pasta `data/` ao instalar.
+
 ## Versão 7.1.4 — Keeper por grupos
 
 A Keeper mostra os grupos da temporada regular de cada ano, com classificação reiniciando em 1 em cada grupo, campanha e FPTS. Nos anos concluídos, a classificação final após os playoffs aparece em um painel separado. Grupos não concedem títulos nem alteram o ranking histórico.

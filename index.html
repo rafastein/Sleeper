@@ -21,11 +21,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=7.1.4">
-    <script src="ambo-core.js?v=7.1.4" defer></script>
+    <link rel="stylesheet" href="styles.css?v=7.1.5">
+    <script src="ambo-core.js?v=7.1.5" defer></script>
     <script src="config.js" defer></script>
     <script src="season-data.js" defer></script>
-    <script src="script.js?v=7.1.4" defer></script>
+    <script src="script.js?v=7.1.5" defer></script>
 </head>
 <body>
     <div class="page-glow page-glow--one" aria-hidden="true"></div>
@@ -88,35 +88,35 @@
             </nav>
 
             <section id="home-view" class="view" aria-labelledby="page-title">
-                <article class="home-hero panel panel--featured">
-                    <div class="home-hero__content">
-                        <p class="panel__eyebrow">Fantasy football · desde 2017</p>
-                        <h2>A história da AMBO, temporada por temporada</h2>
-                        <p>Campeões, rankings, playoffs e trajetórias das ligas Keeper, Série A e Série B reunidos em uma central viva.</p>
-                        <div class="home-hero__actions">
-                            <button id="home-latest-season" class="home-primary-button" type="button">Ver temporada mais recente</button>
-                            <button id="home-ranking" class="home-secondary-button" type="button">Abrir ranking histórico</button>
-                        </div>
-                    </div>
-                    <div class="home-hero__season" aria-label="Temporada mais recente">
-                        <span>Temporada mais recente</span>
-                        <strong id="home-latest-year">—</strong>
-                        <small id="home-latest-status">Carregando dados oficiais</small>
-                    </div>
-                </article>
-
-                <div id="home-stats" class="stats-grid stats-grid--four"></div>
-
-                <article class="panel panel--featured">
+                <article id="home-current-season" class="panel panel--featured" aria-labelledby="home-season-title">
                     <div class="panel__header panel__header--wrap">
                         <div>
-                            <p class="panel__eyebrow">Última temporada</p>
+                            <p class="panel__eyebrow">Temporada atual</p>
                             <h2 id="home-season-title">Destaques da temporada</h2>
                         </div>
                         <span id="home-season-status" class="pill"></span>
                     </div>
                     <div id="home-season-cards" class="home-season-grid"></div>
                 </article>
+
+                <article class="home-hero panel panel--featured">
+                    <div class="home-hero__content">
+                        <p class="panel__eyebrow">Fantasy football · desde 2017</p>
+                        <h2>A história da AMBO, temporada por temporada</h2>
+                        <p>Campeões, rankings, playoffs e trajetórias das ligas Keeper, Série A e Série B.</p>
+                        <div class="home-hero__actions">
+                            <button id="home-latest-season" class="home-primary-button" type="button">Ver temporada atual</button>
+                            <button id="home-ranking" class="home-secondary-button" type="button">Abrir ranking histórico</button>
+                        </div>
+                    </div>
+                    <div class="home-hero__season" aria-label="Temporada atual">
+                        <span>Temporada atual</span>
+                        <strong id="home-latest-year">—</strong>
+                        <small id="home-latest-status">Carregando dados oficiais</small>
+                    </div>
+                </article>
+
+                <div id="home-stats" class="stats-grid stats-grid--four"></div>
 
                 <div class="home-dashboard-grid">
                     <article class="panel panel--featured">
@@ -427,8 +427,8 @@
                         <tr>
                             <th scope="col" class="col-rank">Pos.</th>
                             <th scope="col" class="col-avatar"><span class="sr-only">Avatar</span></th>
-                            <th scope="col" class="league-team-heading">Equipe</th>
-                            <th scope="col">Campanha</th>
+                            <th scope="col" class="league-team-heading">Manager / equipe</th>
+                            <th scope="col" title="Vitórias–derrotas; empates quando houver">Campanha (V–D)</th>
                             <th scope="col" class="league-points-heading">Pontos</th>
                             <th scope="col">FPTS</th>
                         </tr>

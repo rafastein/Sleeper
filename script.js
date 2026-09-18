@@ -288,7 +288,7 @@
         return metric;
     }
 
-    function createMobileRankingCard({ rank, total, avatar, name, meta, score, metrics, onNameClick, compact = false }) {
+    function createMobileRankingCard({ rank, total, avatar, name, meta, score, scoreLabel, team, metrics, onNameClick, compact = false }) {
         const card = createElement('article', 'mobile-ranking-card');
         if (compact) card.classList.add('mobile-ranking-card--compact');
         applyRankClass(card, rank, total);
@@ -307,8 +307,11 @@
             entity.appendChild(createElement('span', 'entity-name', name));
         }
         entity.appendChild(createElement('span', 'entity-meta', meta));
+        if (team && team !== name) entity.appendChild(createElement('span', 'mobile-ranking-card__team', team));
         header.appendChild(entity);
-        header.appendChild(createElement('strong', 'mobile-ranking-card__score', score));
+        const scoreElement = createElement('strong', 'mobile-ranking-card__score', score);
+        if (scoreLabel) scoreElement.appendChild(createElement('small', 'mobile-ranking-card__score-label', scoreLabel));
+        header.appendChild(scoreElement);
 
         if (compact) {
             card.append(header);
@@ -525,11 +528,49 @@
     function openHomeSeason(seriesKey, view = 'season') {
         const year = Number(state.homeLatestYear);
         if (!year || !seriesKey) {
-            showFeedback('A temporada mais recente ainda não está disponível.');
+            showFeedback('A temporada atual ainda não está disponível.');
             return;
         }
         const button = state.navButtons.get(`${year}:${seriesKey}`) || null;
         loadSeason(year, seriesKey, button, { view }).catch(handleRouteError);
+    }
+
+    function createHomeKeeperLeaders(payload) {
+        const section = createElement('div', 'home-group-leaders');
+        section.appendChild(createElement('p', 'home-group-leaders__title', 'Líderes dos grupos'));
+        const snapshots = payload.leagues || [];
+        const divisions = snapshots.map(snapshot => ({
+            snapshot,
+            ...core.buildDivisionStandings(snapshot.league, snapshot.rosters)
+        }));
+        if (!divisions.length || divisions.some(division => !division.complete)) {
+            const empty = createElement('div', 'home-season-card__empty');
+            empty.append(
+                createElement('strong', '', 'Líderes por grupo indisponíveis'),
+                createElement('span', '', 'Os dados salvos ainda não informam todos os grupos. Abra a classificação para consultar a liga.')
+            );
+            section.appendChild(empty);
+            return section;
+        }
+
+        const identityIndex = core.createIdentityIndex(state.managerRegistry || { managers: [] });
+        const list = createElement('ul', 'home-group-leaders__list');
+        divisions.forEach(({ snapshot, groups }) => groups.forEach(group => {
+            const leader = getLeagueRows(snapshot, '', group.standings)[0];
+            const manager = core.resolveCanonicalManager(leader.user, leader.roster, identityIndex);
+            const row = createElement('li', 'home-group-leader');
+            row.appendChild(createAvatar(leader.user?.avatar, manager.displayName));
+            const identity = createElement('div', 'home-group-leader__identity');
+            identity.append(
+                createElement('span', 'home-group-leader__group', `Líder · ${group.name}`),
+                createHomeProfileButton(manager.displayName, manager.canonicalId),
+                createElement('span', '', `${leader.campaignLabel} ${leader.campaign} · FPTS ${formatNumber(leader.fpts)}`)
+            );
+            row.appendChild(identity);
+            list.appendChild(row);
+        }));
+        section.appendChild(list);
+        return section;
     }
 
     function createHomeSeasonCard(year, seriesKey, ranking) {
@@ -566,29 +607,33 @@
             return article;
         }
 
-        const standings = core.calculateCombinedStandings(payload.leagues, state.managerRegistry || { managers: [] });
-        const podium = createElement('div', 'home-podium');
-        standings.slice(0, 3).forEach((manager, index) => {
-            const row = createElement('div', `home-podium__row home-podium__row--${index + 1}`);
-            row.append(
-                createElement('span', 'home-podium__place', `${index + 1}º`),
-                createAvatar(manager.avatar, manager.managerName)
-            );
-            const identityBlock = createElement('div', 'home-podium__identity');
-            identityBlock.append(
-                createHomeProfileButton(manager.managerName, manager.ownerKey),
-                createElement('span', '', seriesKey === 'keeper'
-                    ? `${manager.points} pontos na liga`
-                    : `${manager.points} pontos combinados`)
-            );
-            row.appendChild(identityBlock);
-            podium.appendChild(row);
-        });
-        article.appendChild(podium);
+        const isKeeper = seriesKey === 'keeper';
+        const standings = isKeeper ? [] : core.calculateCombinedStandings(payload.leagues, state.managerRegistry || { managers: [] });
+        const managerCount = isKeeper ? payload.leagues.reduce((total, league) => total + league.rosters.length, 0) : standings.length;
+        if (isKeeper) {
+            article.appendChild(createHomeKeeperLeaders(payload));
+        } else {
+            const podium = createElement('div', 'home-podium');
+            standings.slice(0, 3).forEach((manager, index) => {
+                const row = createElement('div', `home-podium__row home-podium__row--${index + 1}`);
+                row.append(
+                    createElement('span', 'home-podium__place', `${index + 1}º`),
+                    createAvatar(manager.avatar, manager.managerName)
+                );
+                const identityBlock = createElement('div', 'home-podium__identity');
+                identityBlock.append(
+                    createHomeProfileButton(manager.managerName, manager.ownerKey),
+                    createElement('span', '', `${manager.points} pontos combinados`)
+                );
+                row.appendChild(identityBlock);
+                podium.appendChild(row);
+            });
+            article.appendChild(podium);
+        }
 
         const footer = createElement('div', 'home-season-card__footer');
         footer.append(
-            createElement('span', 'home-season-card__meta', `${payload.leagues.length} liga${payload.leagues.length === 1 ? '' : 's'} · ${standings.length} managers`)
+            createElement('span', 'home-season-card__meta', `${payload.leagues.length} liga${payload.leagues.length === 1 ? '' : 's'} · ${managerCount} managers`)
         );
         const actions = createElement('div', 'home-season-card__actions');
         const standingsButton = createElement('button', 'home-card-button', 'Classificação');
@@ -726,7 +771,7 @@
 
         elements.pageEyebrow.textContent = 'Central oficial da AMBO';
         elements.pageTitle.textContent = 'Ligas AMBO';
-        elements.pageDescription.textContent = 'Acompanhe a temporada mais recente e revisite campeões, rankings, playoffs e trajetórias históricas.';
+        elements.pageDescription.textContent = 'Acompanhe a temporada atual e revisite campeões, rankings, playoffs e trajetórias históricas.';
         elements.lastUpdate.textContent = 'Carregando a central...';
         updateDocumentTitle();
 
@@ -1376,6 +1421,7 @@
                 managerName: getManagerName(user, roster),
                 teamName: getTeamName(user, roster),
                 campaign: ties ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`,
+                campaignLabel: ties ? 'V–D–E' : 'V–D',
                 fpts: getRosterPoints(roster)
             };
         });
@@ -1386,6 +1432,7 @@
         const panel = elements.leaguePanelTemplate.content.firstElementChild.cloneNode(true);
         const singleLeague = Boolean(options.singleLeague);
         const division = options.division;
+        const showRankingPoints = !singleLeague && !division;
         const standings = division ? division.standings : snapshot.standings;
         panel.querySelector('.league-number').textContent = division ? 'Temporada regular · classificação do grupo'
             : singleLeague ? (snapshot.usedFallback ? 'Classificação geral parcial' : 'Resultado após os playoffs') : `Liga ${snapshot.index + 1}`;
@@ -1394,8 +1441,8 @@
             : snapshot.league.name || `Liga ${snapshot.index + 1}`;
         panel.querySelector('.league-season').textContent = division ? `${standings.length} times · ${snapshot.league.season}`
             : snapshot.usedFallback ? 'Classificação parcial' : `Temporada ${snapshot.league.season}`;
+        if (!showRankingPoints) panel.querySelector('.league-points-heading').remove();
         if (division) {
-            panel.querySelector('.league-points-heading').remove();
             panel.querySelector('th.col-rank').textContent = 'Pos. grupo';
             panel.querySelector('.league-team-heading').textContent = 'Manager / equipe';
         }
@@ -1417,11 +1464,10 @@
             row.append(
                 createRankCell(standing.rank),
                 avatarCell,
-                createEntityCell(division ? managerName : teamName,
-                    division ? (teamName !== managerName ? teamName : '') : managerName),
+                createEntityCell(managerName, teamName !== managerName ? teamName : ''),
                 createElement('td', '', campaign)
             );
-            if (!division) row.appendChild(createElement('td', 'points-value', standing.points));
+            if (showRankingPoints) row.appendChild(createElement('td', 'points-value', standing.points));
             row.appendChild(createElement('td', '', formatNumber(fpts)));
             tableFragment.appendChild(row);
 
@@ -1429,16 +1475,12 @@
                 rank: standing.rank,
                 total: standings.length,
                 avatar: user?.avatar,
-                name: singleLeague ? managerName : teamName,
-                meta: singleLeague ? `FPTS ${formatNumber(fpts)}${division ? '' : ` · ${campaign}`}` : managerName,
-                score: division ? campaign : `${standing.points} pts`,
-                compact: singleLeague,
-                metrics: [
-                    { label: 'Campanha', value: campaign },
-                    { label: 'FPTS', value: formatNumber(fpts) },
-                    { label: 'Colocação', value: formatPlacement(standing.rank) },
-                    { label: 'Fonte', value: standing.source === 'playoff-bracket' ? 'Playoffs' : 'Temporada regular' }
-                ]
+                name: managerName,
+                team: teamName !== managerName ? teamName : '',
+                meta: showRankingPoints ? `${item.campaignLabel} ${campaign} · FPTS ${formatNumber(fpts)}` : `FPTS ${formatNumber(fpts)}`,
+                score: showRankingPoints ? `${standing.points} pts` : campaign,
+                scoreLabel: showRankingPoints ? '' : item.campaignLabel,
+                compact: true
             }));
         });
 
@@ -2045,7 +2087,6 @@
                         { key: 'teamName', label: 'Equipe' },
                         { key: 'managerName', label: 'Manager' },
                         { key: 'campaign', label: 'Campanha' },
-                        ...(!divisions?.complete ? [{ label: 'Pontos', value: row => row.standing.points }] : []),
                         { label: 'FPTS', value: row => formatNumber(row.fpts) }
                     ], rows)
                 };

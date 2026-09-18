@@ -46,6 +46,7 @@ function template() {
 
 function render(year = 2026, change = () => {}) {
     const snapshot = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'snapshots', String(year), 'keeper.json'))).leagues[0];
+    if (year === 2026) snapshot.usedFallback = true;
     change(snapshot);
     const context = {
         snapshot, core, createElement: element,
@@ -93,7 +94,9 @@ test('grupos e classificação final Keeper usam linhas mobile compactas', () =>
     const final = panels[3];
     assert.equal(final.querySelector('.league-name').textContent, 'Classificação final da liga Keeper');
     assert.equal(final.querySelector('tbody').children.length, 12);
-    assert.equal(final.headings.children.length, 6);
+    assert.equal(final.headings.children.length, 5, 'Keeper final também não tem pontos de ranking');
+    assert.ok(final.querySelector('tbody').children.every(row => row.children.length === 5));
+    assert.ok(final.querySelector('.league-mobile-cards').children.every(card => !String(card.children[0].children[3].textContent).includes('pts')));
 });
 
 test('todos os anos históricos exibem três grupos e a classificação final separada', () => {
@@ -112,11 +115,15 @@ test('ausência de grupo não esconde participantes nem inventa composição', (
     assert.equal(panels[1].querySelector('tbody').children.length, 12);
 });
 
-test('tabela e métricas das Séries A e B não são modificadas pelo modo Keeper', () => {
+test('ligas individuais preservam colunas desktop e recebem linhas mobile compactas com V–D e FPTS', () => {
     const { ordinary } = render();
     assert.equal(ordinary.headings.children.length, 6);
     assert.equal(ordinary.querySelector('tbody').children.length, 12);
-    assert.equal(ordinary.querySelector('.league-mobile-cards').children[0].children.length, 2);
+    const card = ordinary.querySelector('.league-mobile-cards').children[0];
+    assert.equal(card.children.length, 1);
+    assert.match(card.className, /--compact/);
+    assert.match(card.children[0].children[2].children[1].textContent, /V–D(?:–E)? \d+-\d+(?:-\d+)? · FPTS/);
+    assert.match(card.children[0].children[3].textContent, /pts$/);
 });
 
 test('CSV Keeper distingue posição no grupo de posição final após playoffs', () => {
@@ -127,4 +134,31 @@ test('CSV Keeper distingue posição no grupo de posição final após playoffs'
     const historical = render(2025).csv;
     assert.match(historical.csv, /AMBO Norte/);
     assert.ok(Number(historical.csv.trim().split(/\r?\n/)[1].split(';')[2]) > 0);
+    const withoutGroups = render(2026, snapshot => { delete snapshot.rosters[0].settings.division; }).csv;
+    assert.doesNotMatch(withoutGroups.csv.split(/\r?\n/)[0], /Pontos/);
+});
+
+test('Keeper informa V–D–E quando há empate, sem trocar campanha por pontos', () => {
+    const { panels, ordinary } = render(2026, snapshot => { snapshot.rosters.forEach(roster => { roster.settings.ties = 1; }); });
+    const keeperScore = panels[0].querySelector('.league-mobile-cards').children[0].children[0].children[3];
+    assert.match(keeperScore.textContent, /^\d+-\d+-1$/);
+    assert.equal(keeperScore.children[0].textContent, 'V–D–E');
+    const leagueMeta = ordinary.querySelector('.league-mobile-cards').children[0].children[0].children[2].children[1].textContent;
+    assert.match(leagueMeta, /V–D–E \d+-\d+-1/);
+});
+
+test('nome do manager e nome de equipe distintos aparecem sem duplicar nomes iguais', () => {
+    const { ordinary } = render(2026, snapshot => {
+        snapshot.rosters.forEach((roster, index) => {
+            const user = core.getUserForRoster(roster, snapshot.users);
+            user.metadata = { ...user.metadata, team_name: index === 0 ? 'Equipe personalizada de teste' : user.display_name };
+        });
+    });
+    const cards = ordinary.querySelector('.league-mobile-cards').children;
+    const entities = cards.map(card => card.children[0].children[2]);
+    assert.ok(entities.some(entity => entity.children.length === 3), 'equipe personalizada preservada');
+    assert.ok(entities.some(entity => entity.children.length === 2), 'nome idêntico não é repetido');
+    for (const entity of entities.filter(node => node.children.length === 3)) {
+        assert.notEqual(entity.children[0].textContent, entity.children[2].textContent);
+    }
 });

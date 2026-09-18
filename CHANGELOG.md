@@ -1,5 +1,14 @@
 # Changelog
 
+## 7.1.5 — Temporada atual no topo e classificações compactas
+
+- Move os destaques da temporada atual para o primeiro bloco da Home, abaixo do texto de apresentação.
+- Padroniza os textos, botões e rótulos acessíveis como “Temporada atual” e remove “reunidos em uma central viva.”.
+- Substitui o pódio e os pontos da Keeper na Home pelo líder de cada grupo, com grupo, campanha e FPTS. Mantém o pódio combinado das Séries A e B.
+- Aplica o padrão de linha compacta às ligas individuais, com manager, equipe quando diferente, V–D (V–D–E quando necessário), FPTS e pontos apenas nas Séries A/B.
+- Remove pontos de ranking também da classificação final e do CSV de fallback da Keeper; preserva posições finais, campeões e histórico.
+- Não modifica a pasta `data/` nem as regras de cálculo. Atualiza o cache PWA e testa textos, ordem dos blocos, líderes e campanhas.
+
 ## 7.1.4 — Keeper por grupos em todas as temporadas disponíveis
 
 - Recupera os nomes e os participantes dos grupos de cada liga de 2021 a 2026, consultando o Sleeper por temporada.

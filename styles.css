@@ -1123,6 +1123,26 @@ th:last-child {
     line-height: 1.4;
 }
 
+.mobile-ranking-card__team {
+    display: block;
+    margin-top: 2px;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.65rem;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mobile-ranking-card__score-label {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-align: right;
+}
+
 .mobile-ranking-card--compact .mobile-ranking-card__score {
     grid-column: 4;
     grid-row: 1;
@@ -1915,6 +1935,35 @@ th:last-child {
     flex: 1;
 }
 
+.home-group-leaders {
+    flex: 1;
+}
+
+.home-group-leaders__title {
+    margin: 0;
+    padding: 12px 15px 6px;
+    color: var(--muted);
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.home-group-leaders__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.home-group-leader {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border);
+}
+
 .home-podium__row {
     display: grid;
     grid-template-columns: 34px auto minmax(0, 1fr);
@@ -1940,7 +1989,8 @@ th:last-child {
 .home-podium__row--2 .home-podium__place { color: var(--silver); }
 .home-podium__row--3 .home-podium__place { color: var(--bronze); }
 
-.home-podium__identity {
+.home-podium__identity,
+.home-group-leader__identity {
     min-width: 0;
 }
 
@@ -1974,11 +2024,19 @@ th:last-child {
     color: var(--primary);
 }
 
-.home-podium__identity span {
+.home-podium__identity span,
+.home-group-leader__identity span {
     display: block;
     margin-top: 2px;
     color: #70849b;
     font-size: 0.64rem;
+}
+
+.home-group-leader__identity .home-group-leader__group {
+    margin: 0 0 4px;
+    color: var(--primary);
+    font-size: 0.65rem;
+    font-weight: 700;
 }
 
 .home-season-card__footer {
