@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-04T14:47:02.606Z",
+  "generatedAt": "2026-10-05T18:25:07.229Z",
   "source": "Sleeper API",
   "year": 2026,
   "seriesKey": "serieA",
@@ -1507,8 +1507,8 @@
           }
         },
         {
-          "p": 5,
           "m": 5,
+          "p": 5,
           "r": 2,
           "l": null,
           "w": null,
@@ -1522,8 +1522,8 @@
           }
         },
         {
-          "p": 1,
           "m": 6,
+          "p": 1,
           "r": 3,
           "l": null,
           "w": null,
@@ -1537,8 +1537,8 @@
           }
         },
         {
-          "p": 3,
           "m": 7,
+          "p": 3,
           "r": 3,
           "l": null,
           "w": null,
