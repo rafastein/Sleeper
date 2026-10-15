@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-14T14:29:59.690Z",
+  "generatedAt": "2026-10-15T14:09:03.664Z",
   "source": "Sleeper API",
   "year": 2026,
   "seriesKey": "serieA",
@@ -1039,7 +1039,7 @@
             "ties": 0,
             "fpts": 512,
             "fpts_decimal": 68,
-            "fpts_against": 613,
+            "fpts_against": 614,
             "fpts_against_decimal": 96
           }
         },
@@ -1097,7 +1097,7 @@
             "wins": 2,
             "losses": 3,
             "ties": 0,
-            "fpts": 556,
+            "fpts": 557,
             "fpts_decimal": 60,
             "fpts_against": 599,
             "fpts_against_decimal": 90
@@ -1422,8 +1422,8 @@
           }
         },
         {
-          "p": 5,
           "m": 5,
+          "p": 5,
           "r": 2,
           "l": null,
           "w": null,
@@ -1437,8 +1437,8 @@
           }
         },
         {
-          "p": 1,
           "m": 6,
+          "p": 1,
           "r": 3,
           "l": null,
           "w": null,
@@ -1452,8 +1452,8 @@
           }
         },
         {
-          "p": 3,
           "m": 7,
+          "p": 3,
           "r": 3,
           "l": null,
           "w": null,
