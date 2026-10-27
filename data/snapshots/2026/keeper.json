@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-26T16:06:09.183Z",
+  "generatedAt": "2026-10-27T15:20:00.165Z",
   "source": "Sleeper API",
   "year": 2026,
   "seriesKey": "keeper",
@@ -32,18 +32,18 @@
           "owner_id": "445582191489970176",
           "co_owners": [],
           "metadata": {
-            "record": "WWLLWW",
-            "streak": "2W"
+            "record": "WWLLWWL",
+            "streak": "1L"
           },
           "settings": {
             "division": 1,
             "wins": 4,
-            "losses": 2,
+            "losses": 3,
             "ties": 0,
-            "fpts": 777,
-            "fpts_decimal": 30,
-            "fpts_against": 706,
-            "fpts_against_decimal": 50
+            "fpts": 885,
+            "fpts_decimal": 55,
+            "fpts_against": 819,
+            "fpts_against_decimal": 20
           }
         },
         {
@@ -54,19 +54,19 @@
             "allow_pn_inactive_starters": "on",
             "allow_pn_player_injury_status": "on",
             "allow_pn_scoring": "on",
-            "record": "LWLLLL",
+            "record": "LWLLLLL",
             "restrict_pn_scoring_starters_only": "on",
-            "streak": "4L"
+            "streak": "5L"
           },
           "settings": {
             "division": 2,
             "wins": 1,
-            "losses": 5,
+            "losses": 6,
             "ties": 0,
-            "fpts": 522,
-            "fpts_decimal": 30,
-            "fpts_against": 694,
-            "fpts_against_decimal": 35
+            "fpts": 611,
+            "fpts_decimal": 45,
+            "fpts_against": 827,
+            "fpts_against_decimal": 30
           }
         },
         {
@@ -77,19 +77,19 @@
             "allow_pn_inactive_starters": "on",
             "allow_pn_player_injury_status": "on",
             "allow_pn_scoring": "on",
-            "record": "WWLLWW",
+            "record": "WWLLWWW",
             "restrict_pn_scoring_starters_only": "on",
-            "streak": "2W"
+            "streak": "3W"
           },
           "settings": {
             "division": 3,
-            "wins": 4,
+            "wins": 5,
             "losses": 2,
             "ties": 0,
-            "fpts": 693,
-            "fpts_decimal": 30,
-            "fpts_against": 625,
-            "fpts_against_decimal": 30
+            "fpts": 824,
+            "fpts_decimal": 99,
+            "fpts_against": 717,
+            "fpts_against_decimal": 65
           }
         },
         {
@@ -97,18 +97,18 @@
           "owner_id": "458977644550025216",
           "co_owners": [],
           "metadata": {
-            "record": "WLWWLL",
-            "streak": "2L"
+            "record": "WLWWLLL",
+            "streak": "3L"
           },
           "settings": {
             "division": 3,
             "wins": 3,
-            "losses": 3,
+            "losses": 4,
             "ties": 0,
-            "fpts": 611,
-            "fpts_decimal": 75,
-            "fpts_against": 621,
-            "fpts_against_decimal": 5
+            "fpts": 695,
+            "fpts_decimal": 25,
+            "fpts_against": 713,
+            "fpts_against_decimal": 40
           }
         },
         {
@@ -116,18 +116,18 @@
           "owner_id": "459817765377667072",
           "co_owners": [],
           "metadata": {
-            "record": "LWWLWL",
-            "streak": "1L"
+            "record": "LWWLWLW",
+            "streak": "1W"
           },
           "settings": {
             "division": 1,
-            "wins": 3,
+            "wins": 4,
             "losses": 3,
             "ties": 0,
-            "fpts": 709,
-            "fpts_decimal": 80,
-            "fpts_against": 719,
-            "fpts_against_decimal": 65
+            "fpts": 842,
+            "fpts_decimal": 75,
+            "fpts_against": 808,
+            "fpts_against_decimal": 80
           }
         },
         {
@@ -135,18 +135,18 @@
           "owner_id": "460262982534819840",
           "co_owners": [],
           "metadata": {
-            "record": "WWWWLL",
-            "streak": "2L"
+            "record": "WWWWLLL",
+            "streak": "3L"
           },
           "settings": {
             "division": 2,
             "wins": 4,
-            "losses": 2,
+            "losses": 3,
             "ties": 0,
-            "fpts": 733,
-            "fpts_decimal": 55,
-            "fpts_against": 674,
-            "fpts_against_decimal": 65
+            "fpts": 817,
+            "fpts_decimal": 99,
+            "fpts_against": 780,
+            "fpts_against_decimal": 70
           }
         },
         {
@@ -154,18 +154,18 @@
           "owner_id": "459814872146767872",
           "co_owners": [],
           "metadata": {
-            "record": "LLLWWW",
-            "streak": "3W"
+            "record": "LLLWWWL",
+            "streak": "1L"
           },
           "settings": {
             "division": 2,
             "wins": 3,
-            "losses": 3,
+            "losses": 4,
             "ties": 0,
-            "fpts": 615,
-            "fpts_decimal": 15,
-            "fpts_against": 619,
-            "fpts_against_decimal": 90
+            "fpts": 707,
+            "fpts_decimal": 50,
+            "fpts_against": 751,
+            "fpts_against_decimal": 60
           }
         },
         {
@@ -173,18 +173,18 @@
           "owner_id": "460430879521501184",
           "co_owners": [],
           "metadata": {
-            "record": "WLWWWW",
-            "streak": "4W"
+            "record": "WLWWWWW",
+            "streak": "5W"
           },
           "settings": {
             "division": 2,
-            "wins": 5,
+            "wins": 6,
             "losses": 1,
             "ties": 0,
-            "fpts": 718,
-            "fpts_decimal": 40,
-            "fpts_against": 588,
-            "fpts_against_decimal": 75
+            "fpts": 824,
+            "fpts_decimal": 20,
+            "fpts_against": 671,
+            "fpts_against_decimal": 25
           }
         },
         {
@@ -192,18 +192,18 @@
           "owner_id": "449023164270243840",
           "co_owners": [],
           "metadata": {
-            "record": "LWLWLL",
-            "streak": "2L"
+            "record": "LWLWLLW",
+            "streak": "1W"
           },
           "settings": {
             "division": 3,
-            "wins": 2,
+            "wins": 3,
             "losses": 4,
             "ties": 0,
-            "fpts": 575,
-            "fpts_decimal": 20,
-            "fpts_against": 637,
-            "fpts_against_decimal": 70
+            "fpts": 681,
+            "fpts_decimal": 25,
+            "fpts_against": 722,
+            "fpts_against_decimal": 15
           }
         },
         {
@@ -211,18 +211,18 @@
           "owner_id": "455157080240680960",
           "co_owners": [],
           "metadata": {
-            "record": "WLWLWW",
-            "streak": "2W"
+            "record": "WLWLWWL",
+            "streak": "1L"
           },
           "settings": {
             "division": 1,
             "wins": 4,
-            "losses": 2,
+            "losses": 3,
             "ties": 0,
-            "fpts": 696,
-            "fpts_decimal": 5,
-            "fpts_against": 624,
-            "fpts_against_decimal": 0
+            "fpts": 778,
+            "fpts_decimal": 55,
+            "fpts_against": 729,
+            "fpts_against_decimal": 80
           }
         },
         {
@@ -230,18 +230,18 @@
           "owner_id": "455196161398009856",
           "co_owners": [],
           "metadata": {
-            "record": "LLLLLL",
-            "streak": "6L"
+            "record": "LLLLLLW",
+            "streak": "1W"
           },
           "settings": {
             "division": 1,
-            "wins": 0,
+            "wins": 1,
             "losses": 6,
             "ties": 0,
-            "fpts": 555,
-            "fpts_decimal": 50,
-            "fpts_against": 737,
-            "fpts_against_decimal": 40
+            "fpts": 647,
+            "fpts_decimal": 85,
+            "fpts_against": 820,
+            "fpts_against_decimal": 90
           }
         },
         {
@@ -249,18 +249,18 @@
           "owner_id": "460216259665981440",
           "co_owners": [],
           "metadata": {
-            "record": "LLWWLW",
-            "streak": "1W"
+            "record": "LLWWLWW",
+            "streak": "2W"
           },
           "settings": {
             "division": 3,
-            "wins": 3,
+            "wins": 4,
             "losses": 3,
             "ties": 0,
-            "fpts": 670,
-            "fpts_decimal": 80,
-            "fpts_against": 629,
-            "fpts_against_decimal": 85
+            "fpts": 783,
+            "fpts_decimal": 50,
+            "fpts_against": 738,
+            "fpts_against_decimal": 10
           }
         }
       ],
@@ -489,16 +489,16 @@
           "r": 1,
           "l": null,
           "w": null,
-          "t1": 6,
-          "t2": 10
+          "t1": 5,
+          "t2": 6
         },
         {
           "m": 2,
           "r": 1,
           "l": null,
           "w": null,
-          "t1": 5,
-          "t2": 3
+          "t1": 12,
+          "t2": 1
         },
         {
           "m": 3,
@@ -516,15 +516,15 @@
           "r": 2,
           "l": null,
           "w": null,
-          "t1": 1,
+          "t1": 3,
           "t2": null,
           "t2_from": {
             "w": 2
           }
         },
         {
-          "m": 5,
           "p": 5,
+          "m": 5,
           "r": 2,
           "l": null,
           "w": null,
@@ -538,8 +538,8 @@
           }
         },
         {
-          "m": 6,
           "p": 1,
+          "m": 6,
           "r": 3,
           "l": null,
           "w": null,
@@ -553,8 +553,8 @@
           }
         },
         {
-          "m": 7,
           "p": 3,
+          "m": 7,
           "r": 3,
           "l": null,
           "w": null,
@@ -575,14 +575,14 @@
           "l": null,
           "w": null,
           "t1": 9,
-          "t2": 2
+          "t2": 11
         },
         {
           "m": 2,
           "r": 1,
           "l": null,
           "w": null,
-          "t1": 11,
+          "t1": 2,
           "t2": 4
         },
         {
@@ -590,7 +590,7 @@
           "r": 2,
           "l": null,
           "w": null,
-          "t1": 12,
+          "t1": 10,
           "t2": null,
           "t2_from": {
             "w": 1
@@ -608,8 +608,8 @@
           }
         },
         {
-          "m": 5,
           "p": 5,
+          "m": 5,
           "r": 2,
           "l": null,
           "w": null,
@@ -623,8 +623,8 @@
           }
         },
         {
-          "m": 6,
           "p": 1,
+          "m": 6,
           "r": 3,
           "l": null,
           "w": null,
@@ -638,8 +638,8 @@
           }
         },
         {
-          "m": 7,
           "p": 3,
+          "m": 7,
           "r": 3,
           "l": null,
           "w": null,
@@ -894,37 +894,37 @@
         },
         {
           "rank": 2,
-          "rosterId": 1,
+          "rosterId": 3,
           "points": 11,
           "source": "regular-season-fallback"
         },
         {
           "rank": 3,
-          "rosterId": 6,
+          "rosterId": 1,
           "points": 10,
           "source": "regular-season-fallback"
         },
         {
           "rank": 4,
-          "rosterId": 10,
+          "rosterId": 5,
           "points": 9,
           "source": "regular-season-fallback"
         },
         {
           "rank": 5,
-          "rosterId": 3,
+          "rosterId": 6,
           "points": 8,
           "source": "regular-season-fallback"
         },
         {
           "rank": 6,
-          "rosterId": 5,
+          "rosterId": 12,
           "points": 7,
           "source": "regular-season-fallback"
         },
         {
           "rank": 7,
-          "rosterId": 12,
+          "rosterId": 10,
           "points": 6,
           "source": "regular-season-fallback"
         },
@@ -948,13 +948,13 @@
         },
         {
           "rank": 11,
-          "rosterId": 2,
+          "rosterId": 11,
           "points": 2,
           "source": "regular-season-fallback"
         },
         {
           "rank": 12,
-          "rosterId": 11,
+          "rosterId": 2,
           "points": 1,
           "source": "regular-season-fallback"
         }
