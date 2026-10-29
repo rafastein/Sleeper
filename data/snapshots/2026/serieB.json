@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-28T15:59:19.234Z",
+  "generatedAt": "2026-10-29T16:06:03.715Z",
   "source": "Sleeper API",
   "year": 2026,
   "seriesKey": "serieB",
@@ -36,7 +36,7 @@
             "wins": 3,
             "losses": 4,
             "ties": 0,
-            "fpts": 729,
+            "fpts": 730,
             "fpts_decimal": 8,
             "fpts_against": 777,
             "fpts_against_decimal": 26
@@ -93,7 +93,7 @@
             "wins": 3,
             "losses": 4,
             "ties": 0,
-            "fpts": 652,
+            "fpts": 651,
             "fpts_decimal": 94,
             "fpts_against": 685,
             "fpts_against_decimal": 30
@@ -171,7 +171,7 @@
             "ties": 0,
             "fpts": 811,
             "fpts_decimal": 76,
-            "fpts_against": 603,
+            "fpts_against": 604,
             "fpts_against_decimal": 80
           }
         },
@@ -229,7 +229,7 @@
             "ties": 0,
             "fpts": 729,
             "fpts_decimal": 88,
-            "fpts_against": 813,
+            "fpts_against": 812,
             "fpts_against_decimal": 28
           }
         },
@@ -432,7 +432,7 @@
           "r": 1,
           "l": null,
           "w": null,
-          "t1": 11,
+          "t1": 1,
           "t2": 9
         },
         {
@@ -525,7 +525,7 @@
           "r": 2,
           "l": null,
           "w": null,
-          "t1": 1,
+          "t1": 11,
           "t2": null,
           "t2_from": {
             "w": 1
@@ -853,13 +853,13 @@
         },
         {
           "rank": 6,
-          "rosterId": 11,
+          "rosterId": 1,
           "points": 7,
           "source": "regular-season-fallback"
         },
         {
           "rank": 7,
-          "rosterId": 1,
+          "rosterId": 11,
           "points": 6,
           "source": "regular-season-fallback"
         },
@@ -1036,7 +1036,7 @@
             "ties": 0,
             "fpts": 694,
             "fpts_decimal": 92,
-            "fpts_against": 722,
+            "fpts_against": 721,
             "fpts_against_decimal": 16
           }
         },
@@ -1149,7 +1149,7 @@
             "wins": 4,
             "losses": 3,
             "ties": 0,
-            "fpts": 660,
+            "fpts": 659,
             "fpts_decimal": 96,
             "fpts_against": 629,
             "fpts_against_decimal": 92
@@ -1446,8 +1446,8 @@
           }
         },
         {
-          "p": 5,
           "m": 5,
+          "p": 5,
           "r": 2,
           "l": null,
           "w": null,
@@ -1461,8 +1461,8 @@
           }
         },
         {
-          "p": 1,
           "m": 6,
+          "p": 1,
           "r": 3,
           "l": null,
           "w": null,
@@ -1476,8 +1476,8 @@
           }
         },
         {
-          "p": 3,
           "m": 7,
+          "p": 3,
           "r": 3,
           "l": null,
           "w": null,

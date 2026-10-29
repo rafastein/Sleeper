@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-28T15:59:19.234Z",
+  "generatedAt": "2026-10-29T16:06:03.715Z",
   "source": "Sleeper API",
   "year": 2026,
   "seriesKey": "serieA",
@@ -91,7 +91,7 @@
             "ties": 0,
             "fpts": 693,
             "fpts_decimal": 66,
-            "fpts_against": 693,
+            "fpts_against": 692,
             "fpts_against_decimal": 20
           }
         },
@@ -196,7 +196,7 @@
             "wins": 3,
             "losses": 4,
             "ties": 0,
-            "fpts": 729,
+            "fpts": 728,
             "fpts_decimal": 18,
             "fpts_against": 704,
             "fpts_against_decimal": 46
@@ -1014,7 +1014,7 @@
             "wins": 6,
             "losses": 1,
             "ties": 0,
-            "fpts": 807,
+            "fpts": 808,
             "fpts_decimal": 82,
             "fpts_against": 628,
             "fpts_against_decimal": 90
@@ -1144,7 +1144,7 @@
             "ties": 0,
             "fpts": 770,
             "fpts_decimal": 98,
-            "fpts_against": 691,
+            "fpts_against": 692,
             "fpts_against_decimal": 99
           }
         },
@@ -1163,7 +1163,7 @@
             "wins": 4,
             "losses": 3,
             "ties": 0,
-            "fpts": 728,
+            "fpts": 727,
             "fpts_decimal": 78,
             "fpts_against": 716,
             "fpts_against_decimal": 24
@@ -1203,7 +1203,7 @@
             "ties": 0,
             "fpts": 669,
             "fpts_decimal": 74,
-            "fpts_against": 733,
+            "fpts_against": 732,
             "fpts_against_decimal": 80
           }
         }
