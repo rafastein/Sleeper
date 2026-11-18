@@ -40,3 +40,11 @@ test('redesign não introduz cores novas', () => {
     const novas = [...colors(redesign)].filter(color => !baseColors.has(color));
     assert.deepEqual(novas, []);
 });
+
+test('temporada no celular esconde indicadores, cabeçalho e filtros do ranking combinado', () => {
+    const block = css.slice(css.indexOf('/* 8.0.2'));
+    for (const selector of ['#season-stats', '#combined-panel > .panel__header', '#combined-panel > .history-toolbar']) {
+        assert.ok(block.includes(selector), selector);
+    }
+    assert.match(script, /compactSeason \? '' : \(route\.query \|\| ''\)/);
+});

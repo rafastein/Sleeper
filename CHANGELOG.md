@@ -1,5 +1,11 @@
 # Changelog
 
+## 8.0.2 — Temporada direto na classificação (celular)
+
+- No celular, a tela da temporada esconde os indicadores (Temporada, Managers/Participantes, Líder/Situação), o cabeçalho "Ranking combinado" com o selo de status, a busca, a ordenação e o contador de managers. A lista começa logo abaixo das abas Classificação/Playoffs.
+- No celular, links com `?q=` ou `?sort=` não filtram nem reordenam a classificação, já que esses controles não aparecem.
+- Desktop sem mudança.
+
 ## 8.0.1 — Classificação inteira numa tela
 
 - No celular, o ranking combinado e os grupos da Keeper usam linhas de uma só altura (~45 px): posição, avatar, manager, FPTS e pontos/campanha na mesma linha. Os 12 times cabem numa tela.

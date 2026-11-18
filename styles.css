@@ -2927,3 +2927,12 @@ th:last-child {
         margin-right: calc(12px + 5.4 * var(--fs-base) + 8px);
     }
 }
+
+/* 8.0.2 — temporada no celular: direto para a classificação */
+@media (max-width: 640px) {
+    #season-stats,
+    #combined-panel > .panel__header,
+    #combined-panel > .history-toolbar {
+        display: none;
+    }
+}

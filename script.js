@@ -2252,8 +2252,10 @@
             await loadHistoricalData();
             await showManagerProfile(route.manager, { updateUrl: false, scroll: false });
         } else if (route.view === 'season') {
-            state.seasonSort = route.sort || 'points';
-            state.seasonQuery = route.query || '';
+            // No celular a busca e a ordenação ficam ocultas: um link com ?q= ou ?sort= não pode filtrar a lista sem aviso.
+            const compactSeason = window.matchMedia?.('(max-width: 640px)').matches;
+            state.seasonSort = compactSeason ? 'points' : (route.sort || 'points');
+            state.seasonQuery = compactSeason ? '' : (route.query || '');
             elements.seasonSort.value = state.seasonSort;
             elements.seasonSearch.value = state.seasonQuery;
             const button = state.navButtons.get(`${route.year}:${route.series}`) || null;
