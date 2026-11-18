@@ -1,5 +1,20 @@
 # Changelog
 
+## 8.0.0 — Redesign mobile (cores preservadas)
+
+- Barra superior fixa no celular com a marca, o título da tela ao rolar e um menu "⋯" com Atualizar, Copiar link, Compartilhar e Exportar CSV.
+- Navegação inferior com Início, Temporada, Ranking e Campeões. A aba Temporada abre um seletor de ano e competição; o menu lateral fica só no desktop.
+- Escala tipográfica com 10 tokens (`--fs-*`) no lugar de 34 tamanhos soltos; nenhum texto abaixo de 12 px.
+- Indicadores em duas colunas; ranking histórico e trajetória do perfil em linhas compactas.
+- Início no celular: temporada atual e campeões recentes em carrossel, indicadores e recordes em 2 colunas; banner e atalhos saem (a navegação inferior cobre os dois).
+- Filtros compactos: busca em linha inteira, selects lado a lado e rótulos mais curtos.
+- Nenhuma cor alterada: o teste `redesign-mobile.test.js` falha se o CSS novo trouxer uma cor que não existia.
+- Não altera dados nem regras de classificação.
+
+## 7.1.7 — Correções
+
+- Link `?view=champions` abre o Hall; plural de "participações"; descrição do perfil sem minúsculas; trajetória sem avatar falso.
+
 ## 7.1.6 — Campanha somente com números
 
 - Remove as siglas V–D e V–D–E da Home e das classificações. Mantém os números, inclusive empates, e FPTS.

@@ -2,6 +2,10 @@
 
 Portal estático, compartilhável e responsivo para consultar a temporada mais recente, campeões, playoffs, rankings anuais e o desempenho histórico das ligas AMBO.
 
+## Versão 8.0.0 — redesign mobile
+
+No celular, o site ganhou barra superior com menu de ações, navegação inferior (Início, Temporada, Ranking, Campeões), seletor de temporada, indicadores em duas colunas, linhas compactas no ranking histórico e no perfil e um Início mais curto. As cores não mudaram. Veja **README-ATUALIZACAO-8.0.0.md**.
+
 ## Versão 7.1.5 — Home e classificações compactas
 
 A temporada atual aparece no topo da Home, logo após a apresentação. O card Keeper destaca os líderes dos grupos, sem pódio geral nem pontos de ranking. Nas Séries A/B, os pontos e o ranking combinado continuam iguais.

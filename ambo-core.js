@@ -910,6 +910,11 @@
         return { valid: errors.length === 0, errors };
     }
 
+    function plural(count, singular, pluralForm = `${singular}s`) {
+        const value = Number(count) || 0;
+        return `${count} ${Math.abs(value) === 1 ? singular : pluralForm}`;
+    }
+
     function parseRoute(search, options = {}) {
         const params = new URLSearchParams(String(search || '').replace(/^\?/, ''));
         const allowedViews = new Set(['home', 'champions', 'history', 'profile', 'season', 'playoffs']);
@@ -1015,6 +1020,7 @@
         csvEscape,
         rowsToCsv,
         parseRoute,
-        serializeRoute
+        serializeRoute,
+        plural
     });
 }));

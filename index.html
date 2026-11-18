@@ -21,11 +21,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=7.1.6">
-    <script src="ambo-core.js?v=7.1.6" defer></script>
+    <link rel="stylesheet" href="styles.css?v=8.0.0">
+    <script src="ambo-core.js?v=8.0.0" defer></script>
     <script src="config.js" defer></script>
     <script src="season-data.js" defer></script>
-    <script src="script.js?v=7.1.6" defer></script>
+    <script src="script.js?v=8.0.0" defer></script>
 </head>
 <body>
     <div class="page-glow page-glow--one" aria-hidden="true"></div>
@@ -35,6 +35,14 @@
         <span></span><span></span><span></span>
     </button>
     <button id="menu-backdrop" class="menu-backdrop" type="button" aria-label="Fechar menu" tabindex="-1"></button>
+
+    <header class="app-bar">
+        <span class="brand__mark app-bar__mark" aria-hidden="true">A</span>
+        <span id="app-bar-title" class="app-bar__title">AMBO</span>
+        <button id="actions-toggle" class="app-bar__button" type="button" aria-label="Mais ações" aria-haspopup="true" aria-controls="page-actions" aria-expanded="false">
+            <span aria-hidden="true">⋯</span>
+        </button>
+    </header>
 
     <div class="app-shell">
         <aside id="sidebar" class="sidebar" aria-label="Navegação principal">
@@ -63,7 +71,7 @@
                 </div>
                 <div class="topbar__meta">
                     <div id="last-update" class="last-update" aria-live="polite"></div>
-                    <div class="page-actions" aria-label="Ações da página">
+                    <div id="page-actions" class="page-actions" aria-label="Ações da página">
                         <button id="install-app" class="action-button" type="button" hidden>Instalar app</button>
                         <button id="refresh-season" class="action-button" type="button" hidden>Atualizar</button>
                         <button id="copy-link" class="action-button" type="button">Copiar link</button>
@@ -215,23 +223,23 @@
 
                     <div class="history-toolbar" aria-label="Filtros do ranking histórico">
                         <label class="field-label field-label--search" for="history-search">
-                            Buscar manager
-                            <input id="history-search" type="search" placeholder="Digite um nome" autocomplete="off">
+                            <span class="field-label__text">Buscar manager</span>
+                            <input id="history-search" type="search" aria-label="Buscar manager" placeholder="Digite um nome" autocomplete="off">
                         </label>
                         <label class="field-label" for="history-series-filter">
-                            Série
+                            <span class="field-label__text">Série</span>
                             <select id="history-series-filter">
-                                <option value="all">Keeper + Série A + Série B</option>
-                                <option value="keeper">Somente Keeper</option>
-                                <option value="serieA">Somente Série A</option>
-                                <option value="serieB">Somente Série B</option>
+                                <option value="all">Todas</option>
+                                <option value="keeper">Keeper</option>
+                                <option value="serieA">Série A</option>
+                                <option value="serieB">Série B</option>
                             </select>
                         </label>
                         <label class="field-label" for="history-sort">
-                            Ordenar por
+                            <span class="field-label__text">Ordenar por</span>
                             <select id="history-sort">
-                                <option value="titles" selected>Títulos (desempate: 2º e 3º)</option>
-                                <option value="points">Pontos históricos</option>
+                                <option value="titles" selected>Títulos</option>
+                                <option value="points">Pontos</option>
                                 <option value="podiums">Pódios</option>
                                 <option value="average">Melhor média</option>
                             </select>
@@ -322,14 +330,14 @@
                     </div>
                     <div class="history-toolbar" aria-label="Filtros do ranking da temporada">
                         <label class="field-label field-label--search" for="season-search">
-                            Buscar manager
-                            <input id="season-search" type="search" placeholder="Digite um nome" autocomplete="off">
+                            <span class="field-label__text">Buscar manager</span>
+                            <input id="season-search" type="search" aria-label="Buscar manager" placeholder="Digite um nome" autocomplete="off">
                         </label>
                         <label class="field-label" for="season-sort">
-                            Ordenar por
+                            <span class="field-label__text">Ordenar por</span>
                             <select id="season-sort">
-                                <option value="points">Pontos do ranking</option>
-                                <option value="fpts">FPTS acumulado</option>
+                                <option value="points">Pontos</option>
+                                <option value="fpts">FPTS</option>
                                 <option value="bestRank">Melhor posição</option>
                                 <option value="name">Nome</option>
                             </select>
@@ -404,6 +412,27 @@
                 </article>
             </section>
         </main>
+    </div>
+
+    <nav id="bottom-nav" class="bottom-nav" aria-label="Navegação principal">
+        <button type="button" class="bottom-nav__item" data-tab="home"><span aria-hidden="true">⌂</span>Início</button>
+        <button type="button" class="bottom-nav__item" data-tab="season" aria-haspopup="dialog" aria-controls="season-sheet"><span aria-hidden="true">▦</span>Temporada</button>
+        <button type="button" class="bottom-nav__item" data-tab="history"><span aria-hidden="true">∞</span>Ranking</button>
+        <button type="button" class="bottom-nav__item" data-tab="champions"><span aria-hidden="true">★</span>Campeões</button>
+    </nav>
+
+    <div id="season-sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="season-sheet-title" hidden>
+        <div class="sheet__panel">
+            <span class="sheet__handle" aria-hidden="true"></span>
+            <div class="sheet__header">
+                <h2 id="season-sheet-title">Escolher temporada</h2>
+                <button id="season-sheet-close" class="sheet__close" type="button" aria-label="Fechar">✕</button>
+            </div>
+            <p class="sheet__label">Ano</p>
+            <div id="season-sheet-years" class="chip-row" role="group" aria-label="Ano"></div>
+            <p class="sheet__label">Competição</p>
+            <div id="season-sheet-series" class="sheet-series" role="group" aria-label="Competição"></div>
+        </div>
     </div>
 
     <div id="loading" class="loading-overlay" role="status" aria-live="polite" hidden>

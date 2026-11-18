@@ -143,7 +143,15 @@
         leaguePanelTemplate: document.getElementById('league-panel-template'),
         sidebar: document.getElementById('sidebar'),
         mobileMenuButton: document.getElementById('mobile-menu-button'),
-        menuBackdrop: document.getElementById('menu-backdrop')
+        menuBackdrop: document.getElementById('menu-backdrop'),
+        appBarTitle: document.getElementById('app-bar-title'),
+        actionsToggle: document.getElementById('actions-toggle'),
+        pageActions: document.getElementById('page-actions'),
+        bottomNav: document.getElementById('bottom-nav'),
+        seasonSheet: document.getElementById('season-sheet'),
+        seasonSheetClose: document.getElementById('season-sheet-close'),
+        seasonSheetYears: document.getElementById('season-sheet-years'),
+        seasonSheetSeries: document.getElementById('season-sheet-series')
     };
 
     function createElement(tag, className, text) {
@@ -291,11 +299,12 @@
     function createMobileRankingCard({ rank, total, avatar, name, meta, score, team, metrics, onNameClick, compact = false }) {
         const card = createElement('article', 'mobile-ranking-card');
         if (compact) card.classList.add('mobile-ranking-card--compact');
+        if (avatar === false) card.classList.add('mobile-ranking-card--no-avatar');
         applyRankClass(card, rank, total);
 
         const header = createElement('div', 'mobile-ranking-card__header');
         header.appendChild(createElement('span', 'rank-number', rank));
-        header.appendChild(createAvatar(avatar, name));
+        if (avatar !== false) header.appendChild(createAvatar(avatar, name));
 
         const entity = createElement('div', 'mobile-ranking-card__entity');
         if (onNameClick) {
@@ -345,6 +354,63 @@
         elements.exportCsv.hidden = viewName === 'home';
         state.currentView = viewName;
         updateRefreshControl();
+        updateBottomNav();
+    }
+
+    const BOTTOM_TAB_BY_VIEW = { home: 'home', season: 'season', playoffs: 'season', history: 'history', profile: 'history', champions: 'champions' };
+
+    function updateBottomNav() {
+        const activeTab = BOTTOM_TAB_BY_VIEW[state.currentView] || 'home';
+        elements.bottomNav.querySelectorAll('[data-tab]').forEach(button => {
+            const active = button.dataset.tab === activeTab;
+            button.classList.toggle('is-active', active);
+            button.toggleAttribute('aria-current', active);
+            if (active) button.setAttribute('aria-current', 'page');
+        });
+    }
+
+    function renderSeasonSheet(selectedYear) {
+        const years = configuredYears.slice().sort((a, b) => b - a);
+        const currentKey = state.currentSeason ? `${state.currentSeason.year}:${state.currentSeason.seriesKey}` : null;
+        elements.seasonSheetYears.replaceChildren(...years.map(year => {
+            const chip = createElement('button', 'chip', year);
+            chip.type = 'button';
+            chip.classList.toggle('is-active', year === selectedYear);
+            chip.setAttribute('aria-pressed', String(year === selectedYear));
+            chip.addEventListener('click', () => renderSeasonSheet(year));
+            return chip;
+        }));
+        elements.seasonSheetSeries.replaceChildren(...Object.entries(config.series).map(([seriesKey, seriesLabel]) => {
+            const navButton = state.navButtons.get(`${selectedYear}:${seriesKey}`) || null;
+            const option = createElement('button', 'sheet-series__option');
+            option.type = 'button';
+            option.disabled = !navButton;
+            option.classList.toggle('is-active', currentKey === `${selectedYear}:${seriesKey}`);
+            option.append(
+                createElement('span', 'sheet-series__icon', getSeriesIcon(seriesKey, seriesLabel)),
+                createElement('span', '', `AMBO ${seriesLabel}`)
+            );
+            option.addEventListener('click', () => {
+                closeSeasonSheet();
+                loadSeason(selectedYear, seriesKey, navButton);
+            });
+            return option;
+        }));
+    }
+
+    function openSeasonSheet() {
+        closeMobileMenu();
+        const year = Number(state.currentSeason?.year) || state.homeLatestYear || Math.max(...configuredYears);
+        renderSeasonSheet(year);
+        elements.seasonSheet.hidden = false;
+        document.body.classList.add('sheet-open');
+        elements.seasonSheetYears.querySelector('.is-active')?.focus();
+    }
+
+    function closeSeasonSheet() {
+        if (elements.seasonSheet.hidden) return;
+        elements.seasonSheet.hidden = true;
+        document.body.classList.remove('sheet-open');
     }
 
     function setActiveButton(button) {
@@ -681,9 +747,9 @@
             )[0] || null;
 
         elements.homeRecords.replaceChildren(
-            createHomeRecordCard('🏆', 'Maior campeão', titlesLeader, titlesLeader ? `${titlesLeader.titles} títulos` : '—', titlesLeader ? `${titlesLeader.secondPlaces} vices · ${titlesLeader.thirdPlaces} terceiros` : ''),
+            createHomeRecordCard('🏆', 'Maior campeão', titlesLeader, titlesLeader ? core.plural(titlesLeader.titles, 'título') : '—', titlesLeader ? `${core.plural(titlesLeader.secondPlaces, 'vice')} · ${core.plural(titlesLeader.thirdPlaces, 'terceiro')}` : ''),
             createHomeRecordCard('⭐', 'Mais pódios', podiumLeader, podiumLeader ? `${podiumLeader.podiums} pódios` : '—', podiumLeader ? `${podiumLeader.titles} títulos no histórico` : ''),
-            createHomeRecordCard('♾', 'Mais participações', appearancesLeader, appearancesLeader ? `${appearancesLeader.participations} recortes` : '—', appearancesLeader ? `${appearancesLeader.leagueAppearances} ligas disputadas` : ''),
+            createHomeRecordCard('♾', 'Mais participações', appearancesLeader, appearancesLeader ? core.plural(appearancesLeader.participations, 'recorte') : '—', appearancesLeader ? core.plural(appearancesLeader.leagueAppearances, 'liga disputada', 'ligas disputadas') : ''),
             createHomeRecordCard('◎', 'Melhor média', averageLeader, averageLeader ? formatPlacement(averageLeader.averageFinish, 2) : '—', averageLeader ? `Mínimo de 3 participações` : '')
         );
     }
@@ -1057,7 +1123,7 @@
             { label: 'Managers ranqueados', value: fullRanking.length, detail: state.historyQuery ? `${ranking.length} visível(is) na busca` : getHistoryScopeLabel() },
             { label: 'Recortes oficiais', value: recuts.size, detail: `${expectedRecuts} possíveis na configuração` },
             { label: 'Maior campeão', value: leader?.managerName || '—', detail: leader ? `${leader.titles} título${leader.titles === 1 ? '' : 's'} · ${leader.secondPlaces} vice${leader.secondPlaces === 1 ? '' : 's'} · ${leader.thirdPlaces} terceiro${leader.thirdPlaces === 1 ? '' : 's'}` : 'Sem dados oficiais' },
-            { label: 'Período coberto', value: coveredYears.length ? `${Math.min(...coveredYears)}–${Math.max(...coveredYears)}` : '—', detail: provisionalRecuts.size ? `${provisionalRecuts.size} recorte(s) provisório(s) omitido(s)` : 'Títulos pelo Hall · demais métricas por snapshots' }
+            { label: 'Período coberto', value: coveredYears.length ? `${Math.min(...coveredYears)}–${Math.max(...coveredYears)}` : '—', detail: provisionalRecuts.size ? `${core.plural(provisionalRecuts.size, 'recorte provisório omitido', 'recortes provisórios omitidos')}` : 'Títulos pelo Hall · demais métricas por snapshots' }
         ]);
 
         const totalTitles = titleRanking.reduce((sum, manager) => sum + manager.titles, 0);
@@ -1105,14 +1171,11 @@
                 total: ranking.length,
                 avatar: manager.avatar,
                 name: manager.managerName,
-                meta: `${manager.firstYear}–${manager.lastYear} · ${manager.leagueAppearances} ligas`,
-                score: `${manager.titles} título${manager.titles === 1 ? '' : 's'}`,
+                meta: `${manager.firstYear}–${manager.lastYear} · média ${Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—'}`,
+                team: `${core.plural(manager.secondPlaces, 'vice')} · ${core.plural(manager.thirdPlaces, 'terceiro')}`,
+                score: core.plural(manager.titles, 'título'),
                 onNameClick: () => showManagerProfile(manager.canonicalId),
-                metrics: [
-                    { label: 'Vices', value: manager.secondPlaces },
-                    { label: '3º lugares', value: manager.thirdPlaces },
-                    { label: 'Média', value: Number.isFinite(manager.averageFinish) ? formatPlacement(manager.averageFinish, 2) : '—' }
-                ]
+                compact: true
             }));
         });
         elements.historyBody.replaceChildren(tableFragment);
@@ -1178,11 +1241,11 @@
 
         elements.pageEyebrow.textContent = 'Perfil histórico';
         elements.pageTitle.textContent = profile.managerName;
-        elements.pageDescription.textContent = `Desempenho acumulado no recorte ${getHistoryScopeLabel().toLowerCase()}.`;
+        elements.pageDescription.textContent = `Desempenho acumulado em ${getHistoryScopeLabel()}.`;
         elements.lastUpdate.textContent = `${profile.firstYear}–${profile.lastYear}`;
         elements.profileAvatar.replaceChildren(createAvatar(profile.avatar, profile.managerName));
         elements.profileName.textContent = profile.managerName;
-        elements.profileMeta.textContent = `${profile.participations} participação${profile.participations === 1 ? '' : 'ões'} em rankings combinados · ${profile.leagueAppearances} liga${profile.leagueAppearances === 1 ? '' : 's'} disputada${profile.leagueAppearances === 1 ? '' : 's'}`;
+        elements.profileMeta.textContent = `${core.plural(profile.participations, 'participação', 'participações')} em rankings combinados · ${core.plural(profile.leagueAppearances, 'liga disputada', 'ligas disputadas')}`;
         elements.profileScope.textContent = getHistoryScopeLabel();
         updateDocumentTitle();
 
@@ -1234,17 +1297,13 @@
             cardFragment.appendChild(createMobileRankingCard({
                 rank: entry.rank,
                 total: Math.max(profile.history.length, 8),
-                avatar: null,
+                avatar: false,
                 name: `${entry.year} · ${entry.seriesLabel}`,
-                meta: entry.officialTitleOnly ? 'Registro oficial de campeão' : `${entry.leagueAppearances} liga${entry.leagueAppearances === 1 ? '' : 's'} disputada${entry.leagueAppearances === 1 ? '' : 's'}`,
+                meta: entry.officialTitleOnly ? 'Registro oficial de campeão' : `Melhor liga ${formatPlacement(entry.bestLeagueRank)} · FPTS ${formatNumber(entry.fpts)}`,
+                team: entry.officialTitleOnly ? '' : core.plural(entry.leagueAppearances, 'liga disputada', 'ligas disputadas'),
                 score: entry.officialTitleOnly ? 'Campeão' : `${entry.points} pts`,
                 onNameClick: openSeason,
-                metrics: [
-                    { label: 'Colocação', value: formatPlacement(entry.rank) },
-                    { label: 'Melhor liga', value: entry.officialTitleOnly ? '—' : formatPlacement(entry.bestLeagueRank) },
-                    { label: 'FPTS', value: entry.officialTitleOnly ? '—' : formatNumber(entry.fpts) },
-                    { label: 'Série', value: entry.seriesLabel }
-                ]
+                compact: true
             }));
         });
         elements.profileHistoryBody.replaceChildren(tableFragment);
@@ -2180,6 +2239,8 @@
 
         if (route.view === 'home') {
             await showHome(state.homeButton, { updateUrl: false });
+        } else if (route.view === 'champions') {
+            showChampions(state.championsButton, { updateUrl: false });
         } else if (route.view === 'history') {
             await showHistoricalRanking(state.historyButton, { updateUrl: false });
         } else if (route.view === 'profile') {
@@ -2347,6 +2408,50 @@
     elements.mobileMenuButton.addEventListener('click', toggleMobileMenu);
     elements.menuBackdrop.addEventListener('click', closeMobileMenu);
 
+    elements.bottomNav.addEventListener('click', event => {
+        const button = event.target.closest('[data-tab]');
+        if (!button) return;
+        setActionsMenu(false);
+        const tab = button.dataset.tab;
+        if (tab === 'home') showHome(state.homeButton);
+        else if (tab === 'history') showHistoricalRanking(state.historyButton);
+        else if (tab === 'champions') showChampions(state.championsButton);
+        else if (tab === 'season') openSeasonSheet();
+    });
+    elements.seasonSheetClose.addEventListener('click', closeSeasonSheet);
+    elements.seasonSheet.addEventListener('click', event => {
+        if (event.target === elements.seasonSheet) closeSeasonSheet();
+    });
+
+    function setActionsMenu(open) {
+        elements.pageActions.classList.toggle('is-open', open);
+        elements.actionsToggle.setAttribute('aria-expanded', String(open));
+    }
+
+    let pageTitleVisible = true;
+    function syncAppBarTitle() {
+        elements.appBarTitle.textContent = pageTitleVisible ? 'AMBO' : (elements.pageTitle.textContent || 'AMBO');
+    }
+
+    elements.actionsToggle.addEventListener('click', event => {
+        event.stopPropagation();
+        closeMobileMenu();
+        setActionsMenu(!elements.pageActions.classList.contains('is-open'));
+    });
+    elements.pageActions.addEventListener('click', event => {
+        if (event.target.closest('button')) setActionsMenu(false);
+    });
+    document.addEventListener('click', event => {
+        if (!event.target.closest('#page-actions, #actions-toggle')) setActionsMenu(false);
+    });
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(entries => {
+            pageTitleVisible = entries[0].isIntersecting;
+            syncAppBarTitle();
+        }, { rootMargin: '-60px 0px 0px 0px' }).observe(elements.pageTitle);
+    }
+    new MutationObserver(syncAppBarTitle).observe(elements.pageTitle, { childList: true, characterData: true, subtree: true });
+
     function handleRouteError(error) {
         console.error(error);
         showLoading(false);
@@ -2358,10 +2463,18 @@
         applyRoute(route, { replace: false }).catch(handleRouteError);
     });
     window.addEventListener('keydown', event => {
-        if (event.key === 'Escape') closeMobileMenu();
+        if (event.key === 'Escape') {
+            closeMobileMenu();
+            setActionsMenu(false);
+            closeSeasonSheet();
+        }
     });
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 820) closeMobileMenu();
+        if (window.innerWidth > 820) {
+            closeMobileMenu();
+            setActionsMenu(false);
+            closeSeasonSheet();
+        }
     });
 
     initializeProductionFeatures();
