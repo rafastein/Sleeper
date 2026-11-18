@@ -41,10 +41,20 @@ test('redesign não introduz cores novas', () => {
     assert.deepEqual(novas, []);
 });
 
-test('temporada no celular esconde indicadores, cabeçalho e filtros do ranking combinado', () => {
+test('temporada esconde indicadores, cabeçalho e filtros do ranking combinado em qualquer largura', () => {
     const block = css.slice(css.indexOf('/* 8.0.2'));
+    const rule = block.slice(0, block.indexOf('}'));
+    assert.doesNotMatch(rule, /@media/);
     for (const selector of ['#season-stats', '#combined-panel > .panel__header', '#combined-panel > .history-toolbar']) {
-        assert.ok(block.includes(selector), selector);
+        assert.ok(rule.includes(selector), selector);
     }
-    assert.match(script, /compactSeason \? '' : \(route\.query \|\| ''\)/);
+    assert.match(script, /state\.seasonSort = 'points';\s*state\.seasonQuery = '';/);
+});
+
+test('ranking combinado no computador não tem mais a coluna Ligas', () => {
+    const table = html.slice(html.indexOf('<table id="combined-table">'), html.indexOf('</table>', html.indexOf('<table id="combined-table">')));
+    const headers = [...table.matchAll(/<th[^>]*>([^<]*)</g)].map(match => match[1].trim()).filter(Boolean);
+    assert.deepEqual(headers, ['Pos.', 'Manager', 'Pontos', 'Melhor posição', 'FPTS']);
+    const combined = script.slice(script.indexOf('function renderCombinedStandings('), script.indexOf('function getLeagueRows('));
+    assert.doesNotMatch(combined, /standing\.appearances\)/);
 });

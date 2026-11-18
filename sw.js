@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ambo-v8.0.2-temporada-direta';
+const CACHE_VERSION = 'ambo-v8.0.3-temporada-web';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 const APP_SHELL = [

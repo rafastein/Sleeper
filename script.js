@@ -1446,8 +1446,7 @@
                 createEntityCell(standing.managerName),
                 createElement('td', 'points-value', standing.points),
                 createElement('td', '', formatPlacement(standing.bestRank)),
-                createElement('td', '', formatNumber(standing.fpts)),
-                createElement('td', '', standing.appearances)
+                createElement('td', '', formatNumber(standing.fpts))
             );
             tableFragment.appendChild(row);
 
@@ -2252,10 +2251,9 @@
             await loadHistoricalData();
             await showManagerProfile(route.manager, { updateUrl: false, scroll: false });
         } else if (route.view === 'season') {
-            // No celular a busca e a ordenação ficam ocultas: um link com ?q= ou ?sort= não pode filtrar a lista sem aviso.
-            const compactSeason = window.matchMedia?.('(max-width: 640px)').matches;
-            state.seasonSort = compactSeason ? 'points' : (route.sort || 'points');
-            state.seasonQuery = compactSeason ? '' : (route.query || '');
+            // A busca e a ordenação da temporada não aparecem mais: um link antigo com ?q= ou ?sort= não pode filtrar a lista sem aviso.
+            state.seasonSort = 'points';
+            state.seasonQuery = '';
             elements.seasonSort.value = state.seasonSort;
             elements.seasonSearch.value = state.seasonQuery;
             const button = state.navButtons.get(`${route.year}:${route.series}`) || null;

@@ -2928,11 +2928,9 @@ th:last-child {
     }
 }
 
-/* 8.0.2 — temporada no celular: direto para a classificação */
-@media (max-width: 640px) {
-    #season-stats,
-    #combined-panel > .panel__header,
-    #combined-panel > .history-toolbar {
-        display: none;
-    }
+/* 8.0.2/8.0.3 — temporada direto na classificação, no celular e no computador */
+#season-stats,
+#combined-panel > .panel__header,
+#combined-panel > .history-toolbar {
+    display: none;
 }

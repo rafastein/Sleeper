@@ -44,7 +44,7 @@ test('cards de outras telas continuam preservando métricas', () => {
 test('ranking combinado ativa modo compacto sem alterar a tabela desktop', () => {
     const render = source.slice(source.indexOf('    function renderCombinedStandings('), source.indexOf('    function getLeagueRows('));
     assert.match(render, /compact: true/);
-    assert.match(render, /createElement\('td', '', standing.appearances\)/);
+    assert.match(render, /createElement\('td', '', formatNumber\(standing\.fpts\)\)\n\s*\);/, 'FPTS é a última coluna da tabela desktop');
     const mobile = render.slice(render.indexOf('cardFragment.appendChild'));
     assert.doesNotMatch(mobile, /Melhor posição|Posição oficial|combinada|metrics:/);
 });

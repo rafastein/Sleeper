@@ -1,5 +1,12 @@
 # Changelog
 
+## 8.0.3 — Temporada direto na classificação também no computador
+
+- Indicadores da temporada, cabeçalho "Ranking combinado", busca, ordenação e contador de managers saem também no desktop.
+- A tabela do ranking combinado perde a coluna Ligas. Continuam Pos., Manager, Pontos, Melhor posição e FPTS.
+- Links antigos com `?q=` ou `?sort=` não filtram nem reordenam a classificação.
+- Desempate inalterado: pontos, melhor posição numa liga, FPTS.
+
 ## 8.0.2 — Temporada direto na classificação (celular)
 
 - No celular, a tela da temporada esconde os indicadores (Temporada, Managers/Participantes, Líder/Situação), o cabeçalho "Ranking combinado" com o selo de status, a busca, a ordenação e o contador de managers. A lista começa logo abaixo das abas Classificação/Playoffs.
