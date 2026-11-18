@@ -2815,3 +2815,115 @@ th:last-child {
         white-space: normal;
     }
 }
+
+/* 8.0.1 — linhas densas: os 12 times da classificação cabem numa tela */
+@media (max-width: 640px) {
+    .mobile-ranking-card--compact {
+        padding: 8px 12px 8px 10px;
+    }
+
+    .mobile-ranking-card--compact .mobile-ranking-card__header {
+        grid-template-columns: 24px 28px minmax(0, 1fr) auto;
+        align-items: center;
+    }
+
+    .mobile-ranking-card--compact .rank-number {
+        width: 24px;
+        height: 24px;
+    }
+
+    .mobile-ranking-card--compact .mobile-ranking-card__header > img,
+    .mobile-ranking-card--compact .avatar-placeholder {
+        width: 28px;
+        height: 28px;
+    }
+
+    .mobile-ranking-card--compact .entity-name,
+    .mobile-ranking-card--compact .manager-link {
+        line-height: 1.3;
+    }
+
+    .mobile-ranking-card--compact .entity-meta {
+        margin-top: 1px;
+        line-height: 1.3;
+    }
+
+    .mobile-ranking-card--inline .mobile-ranking-card__entity {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: baseline;
+        column-gap: 10px;
+    }
+
+    .mobile-ranking-card--inline .entity-name,
+    .mobile-ranking-card--inline .manager-link {
+        min-width: 0;
+        overflow: hidden;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mobile-ranking-card--inline .entity-meta {
+        margin-top: 0;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .mobile-ranking-card--inline .mobile-ranking-card__team {
+        grid-column: 1 / -1;
+    }
+
+    .mobile-ranking-card--inline .mobile-ranking-card__score {
+        min-width: 3.6em;
+        text-align: right;
+    }
+}
+
+/* Cabeçalho das colunas FPTS e pontuação, desenhado só com CSS sobre a lista */
+@media (max-width: 640px) {
+    .mobile-cards[data-list-head]:not([data-list-head=""]) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mobile-cards[data-list-head]:not([data-list-head=""])::before,
+    .mobile-cards[data-list-head]:not([data-list-head=""])::after {
+        grid-row: 1;
+        grid-column: 1;
+        padding: 8px 0 6px;
+        color: var(--muted);
+        font-size: var(--fs-2xs);
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .mobile-cards[data-list-head]:not([data-list-head=""])::before {
+        content: "FPTS";
+        justify-self: end;
+        margin-right: calc(12px + 3.6 * var(--fs-base) + 8px);
+    }
+
+    .mobile-cards[data-list-head]:not([data-list-head=""])::after {
+        content: attr(data-list-head);
+        justify-self: end;
+        margin-right: 12px;
+        border-bottom: 0;
+    }
+
+    .mobile-cards[data-list-head]:not([data-list-head=""]) > :first-child {
+        border-top: 1px solid var(--border);
+    }
+}
+
+@media (max-width: 640px) {
+    .mobile-cards[data-list-head="Campanha"] .mobile-ranking-card--inline .mobile-ranking-card__score {
+        min-width: 5.4em;
+    }
+
+    .mobile-cards[data-list-head="Campanha"]:not([data-list-head=""])::before {
+        margin-right: calc(12px + 5.4 * var(--fs-base) + 8px);
+    }
+}

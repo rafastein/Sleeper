@@ -296,10 +296,11 @@
         return metric;
     }
 
-    function createMobileRankingCard({ rank, total, avatar, name, meta, score, team, metrics, onNameClick, compact = false }) {
+    function createMobileRankingCard({ rank, total, avatar, name, meta, score, team, metrics, onNameClick, compact = false, inline = false }) {
         const card = createElement('article', 'mobile-ranking-card');
         if (compact) card.classList.add('mobile-ranking-card--compact');
         if (avatar === false) card.classList.add('mobile-ranking-card--no-avatar');
+        if (compact && inline) card.classList.add('mobile-ranking-card--inline');
         applyRankClass(card, rank, total);
 
         const header = createElement('div', 'mobile-ranking-card__header');
@@ -1455,12 +1456,14 @@
                 total: totalManagers,
                 avatar: standing.avatar,
                 name: standing.managerName,
-                meta: `FPTS ${formatNumber(standing.fpts)}`,
+                meta: formatNumber(standing.fpts),
                 score: `${standing.points} pts`,
-                compact: true
+                compact: true,
+                inline: true
             }));
         });
 
+        elements.combinedCards.setAttribute('data-list-head', standings.length ? 'Pontos' : '');
         elements.combinedBody.replaceChildren(tableFragment);
         elements.combinedCards.replaceChildren(cardFragment);
     }
@@ -1534,9 +1537,10 @@
                 avatar: user?.avatar,
                 name: managerName,
                 team: teamName !== managerName ? teamName : '',
-                meta: showRankingPoints ? `${campaign} · FPTS ${formatNumber(fpts)}` : `FPTS ${formatNumber(fpts)}`,
+                meta: showRankingPoints ? `${campaign} · FPTS ${formatNumber(fpts)}` : formatNumber(fpts),
                 score: showRankingPoints ? `${standing.points} pts` : campaign,
-                compact: true
+                compact: true,
+                inline: !showRankingPoints
             }));
         });
 
@@ -1546,6 +1550,7 @@
             cardFragment.appendChild(empty);
         }
 
+        cards.setAttribute('data-list-head', !showRankingPoints && rows.length ? 'Campanha' : '');
         body.replaceChildren(tableFragment);
         cards.replaceChildren(cardFragment);
         return panel;

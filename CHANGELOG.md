@@ -1,5 +1,11 @@
 # Changelog
 
+## 8.0.1 — Classificação inteira numa tela
+
+- No celular, o ranking combinado e os grupos da Keeper usam linhas de uma só altura (~45 px): posição, avatar, manager, FPTS e pontos/campanha na mesma linha. Os 12 times cabem numa tela.
+- Cabeçalho de colunas (FPTS · Pontos/Campanha) desenhado só com CSS; o prefixo "FPTS" saiu de cada linha.
+- As demais linhas compactas ficaram mais baixas (avatar de 28 px). Sem mudança de cores, dados ou regras.
+
 ## 8.0.0 — Redesign mobile (cores preservadas)
 
 - Barra superior fixa no celular com a marca, o título da tela ao rolar e um menu "⋯" com Atualizar, Copiar link, Compartilhar e Exportar CSV.

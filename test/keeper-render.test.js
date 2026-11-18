@@ -84,11 +84,12 @@ test('grupos e classificação final Keeper usam linhas mobile compactas', () =>
     for (const panel of panels) {
         const cards = panel.querySelector('.league-mobile-cards');
         assert.match(cards.attributes['aria-label'], /Classificação/);
+        assert.equal(cards.attributes['data-list-head'], 'Campanha');
         for (const card of cards.children) {
             assert.match(card.className, /--compact/);
             assert.equal(card.children.length, 1);
             assert.equal(card.children[0].children.length, 4);
-            assert.match(card.children[0].children[2].children[1].textContent, /FPTS/);
+            assert.match(card.children[0].children[2].children[1].textContent, /^[\d.]+,\d{2}$/, 'FPTS na coluna, sem prefixo');
         }
     }
     const final = panels[3];

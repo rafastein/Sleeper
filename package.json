@@ -1,6 +1,6 @@
 {
   "name": "ambo-sleeper",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "private": true,
   "description": "Central histórica das ligas AMBO com Keeper, Série A, Série B, snapshots e dados do Sleeper.",
   "scripts": {
